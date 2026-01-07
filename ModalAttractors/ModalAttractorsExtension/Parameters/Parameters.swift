@@ -14,7 +14,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
     // MARK: - Global Parameters
     ParameterGroupSpec(identifier: "global", name: "Global") {
         ParameterSpec(
-            address: .kParam_MasterGain,
+            address: ModalAttractorsExtensionParameterAddress.kParam_MasterGain,
             identifier: "masterGain",
             name: "Master Gain",
             units: .linearGain,
@@ -23,7 +23,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
         )
 
         ParameterSpec(
-            address: .kParam_CouplingStrength,
+            address: ModalAttractorsExtensionParameterAddress.kParam_CouplingStrength,
             identifier: "couplingStrength",
             name: "Coupling Strength",
             units: .generic,
@@ -32,7 +32,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
         )
 
         ParameterSpec(
-            address: .kParam_Topology,
+            address: ModalAttractorsExtensionParameterAddress.kParam_Topology,
             identifier: "topology",
             name: "Topology",
             units: .indexed,
@@ -45,7 +45,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
     // MARK: - Mode 0 Parameters
     ParameterGroupSpec(identifier: "mode0", name: "Mode 0") {
         ParameterSpec(
-            address: .kParam_Mode0_Frequency,
+            address: ModalAttractorsExtensionParameterAddress.kParam_Mode0_Frequency,
             identifier: "mode0Frequency",
             name: "Frequency Multiplier",
             units: .generic,
@@ -54,7 +54,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
         )
 
         ParameterSpec(
-            address: .kParam_Mode0_Damping,
+            address: ModalAttractorsExtensionParameterAddress.kParam_Mode0_Damping,
             identifier: "mode0Damping",
             name: "Damping",
             units: .generic,
@@ -63,7 +63,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
         )
 
         ParameterSpec(
-            address: .kParam_Mode0_Weight,
+            address: ModalAttractorsExtensionParameterAddress.kParam_Mode0_Weight,
             identifier: "mode0Weight",
             name: "Weight",
             units: .generic,
@@ -75,7 +75,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
     // MARK: - Mode 1 Parameters
     ParameterGroupSpec(identifier: "mode1", name: "Mode 1") {
         ParameterSpec(
-            address: .kParam_Mode1_Frequency,
+            address: ModalAttractorsExtensionParameterAddress.kParam_Mode1_Frequency,
             identifier: "mode1Frequency",
             name: "Frequency Multiplier",
             units: .generic,
@@ -84,7 +84,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
         )
 
         ParameterSpec(
-            address: .kParam_Mode1_Damping,
+            address: ModalAttractorsExtensionParameterAddress.kParam_Mode1_Damping,
             identifier: "mode1Damping",
             name: "Damping",
             units: .generic,
@@ -93,7 +93,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
         )
 
         ParameterSpec(
-            address: .kParam_Mode1_Weight,
+            address: ModalAttractorsExtensionParameterAddress.kParam_Mode1_Weight,
             identifier: "mode1Weight",
             name: "Weight",
             units: .generic,
@@ -105,7 +105,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
     // MARK: - Mode 2 Parameters
     ParameterGroupSpec(identifier: "mode2", name: "Mode 2") {
         ParameterSpec(
-            address: .kParam_Mode2_Frequency,
+            address: ModalAttractorsExtensionParameterAddress.kParam_Mode2_Frequency,
             identifier: "mode2Frequency",
             name: "Frequency Multiplier",
             units: .generic,
@@ -114,7 +114,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
         )
 
         ParameterSpec(
-            address: .kParam_Mode2_Damping,
+            address: ModalAttractorsExtensionParameterAddress.kParam_Mode2_Damping,
             identifier: "mode2Damping",
             name: "Damping",
             units: .generic,
@@ -123,7 +123,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
         )
 
         ParameterSpec(
-            address: .kParam_Mode2_Weight,
+            address: ModalAttractorsExtensionParameterAddress.kParam_Mode2_Weight,
             identifier: "mode2Weight",
             name: "Weight",
             units: .generic,
@@ -135,7 +135,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
     // MARK: - Mode 3 Parameters
     ParameterGroupSpec(identifier: "mode3", name: "Mode 3") {
         ParameterSpec(
-            address: .kParam_Mode3_Frequency,
+            address: ModalAttractorsExtensionParameterAddress.kParam_Mode3_Frequency,
             identifier: "mode3Frequency",
             name: "Frequency Multiplier",
             units: .generic,
@@ -144,7 +144,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
         )
 
         ParameterSpec(
-            address: .kParam_Mode3_Damping,
+            address: ModalAttractorsExtensionParameterAddress.kParam_Mode3_Damping,
             identifier: "mode3Damping",
             name: "Damping",
             units: .generic,
@@ -153,7 +153,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
         )
 
         ParameterSpec(
-            address: .kParam_Mode3_Weight,
+            address: ModalAttractorsExtensionParameterAddress.kParam_Mode3_Weight,
             identifier: "mode3Weight",
             name: "Weight",
             units: .generic,
@@ -165,7 +165,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
     // MARK: - Excitation Parameters
     ParameterGroupSpec(identifier: "excitation", name: "Excitation") {
         ParameterSpec(
-            address: .kParam_PokeStrength,
+            address: ModalAttractorsExtensionParameterAddress.kParam_PokeStrength,
             identifier: "pokeStrength",
             name: "Poke Strength",
             units: .generic,
@@ -174,7 +174,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
         )
 
         ParameterSpec(
-            address: .kParam_PokeDuration,
+            address: ModalAttractorsExtensionParameterAddress.kParam_PokeDuration,
             identifier: "pokeDuration",
             name: "Poke Duration",
             units: .milliseconds,
@@ -186,7 +186,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
     // MARK: - Voice Parameters
     ParameterGroupSpec(identifier: "voice", name: "Voice") {
         ParameterSpec(
-            address: .kParam_Polyphony,
+            address: ModalAttractorsExtensionParameterAddress.kParam_Polyphony,
             identifier: "polyphony",
             name: "Polyphony",
             units: .indexed,
@@ -196,7 +196,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
         )
 
         ParameterSpec(
-            address: .kParam_Personality,
+            address: ModalAttractorsExtensionParameterAddress.kParam_Personality,
             identifier: "personality",
             name: "Personality",
             units: .indexed,
