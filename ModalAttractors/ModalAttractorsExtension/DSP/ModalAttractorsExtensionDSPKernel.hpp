@@ -15,8 +15,6 @@
 
 #import "ModalAttractorsExtensionParameterAddresses.h"
 
-constexpr uint16_t kMaxVelocity = std::numeric_limits<std::uint16_t>::max();
-
 /*
  ModalAttractorsExtensionDSPKernel
  As a non-ObjC class, this is safe to use from render thread.
@@ -43,25 +41,27 @@ public:
     // Add a case for each parameter in ModalAttractorsExtensionParameterAddresses.h
     void setParameter(AUParameterAddress address, AUValue value) {
         switch (address) {
-            case ModalAttractorsExtensionParameterAddress::midiNoteNumber:
-                mNextNoteToSend = (uint8_t)value;
+            case ModalAttractorsExtensionParameterAddress::kParam_MasterGain:
+                // TODO: Implement parameter handling
                 break;
-            case ModalAttractorsExtensionParameterAddress::sendNote:
-                mShouldSendNoteOn = (bool)value;
+            case ModalAttractorsExtensionParameterAddress::kParam_CouplingStrength:
+                // TODO: Implement parameter handling
+                break;
+            default:
                 break;
         }
     }
-    
+
     AUValue getParameter(AUParameterAddress address) {
         // Return the goal. It is not thread safe to return the ramping value.
-        
+
         switch (address) {
-            case ModalAttractorsExtensionParameterAddress::midiNoteNumber:
-                return (AUValue)mNextNoteToSend;
-                
-            case ModalAttractorsExtensionParameterAddress::sendNote:
-                return (AUValue)mShouldSendNoteOn;
-                
+            case ModalAttractorsExtensionParameterAddress::kParam_MasterGain:
+                return 0.7f; // TODO: Return actual value
+
+            case ModalAttractorsExtensionParameterAddress::kParam_CouplingStrength:
+                return 0.3f; // TODO: Return actual value
+
             default: return 0.f;
         }
     }
@@ -92,14 +92,14 @@ public:
     
     /**
      MARK: - Internal Process
-     
-     This function does the core siginal processing.
-     Do your custom MIDI processing here.
+
+     This function does the core signal processing.
+     TODO: Integrate actual Modal Attractors DSP engine.
      */
     void process(AUEventSampleTime bufferStartTime, AUAudioFrameCount frameCount) {
-        
+
         if (mBypassed) { return; }
-        
+
         // Use this to get Musical context info from the Plugin Host,
         // Replace nullptr with &memberVariable according to the AUHostMusicalContextBlock function signature
         if (mMusicalContextBlock) {
@@ -110,52 +110,9 @@ public:
                                  nullptr /* sampleOffsetToNextBeat */,
                                  nullptr /* currentMeasureDownbeatPosition */);
         }
-        
-        /*
-         // If you require sample-accurate sequencing, calculate your midi events based on the frame and buffer offsets
-         
-         for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-         const int frameOffset = int(frameIndex + frameOffset);
-         // Do sample-accurate sequencing here
-         }
-         */
-        
-        // Do your midi processing here
-        
-        if (mShouldSendNoteOn && !mNoteIsCurrentlyOn) {
-            // note was not on, but should be - send a new note-on
-            sendNoteOn(bufferStartTime, mNextNoteToSend, kMaxVelocity);
-            mLastSentNote = mNextNoteToSend;
-            mNoteIsCurrentlyOn = true;
-            
-        } else if (mShouldSendNoteOn && mNoteIsCurrentlyOn && mLastSentNote != mNextNoteToSend) {
-            // note was on, but the note number changed - send a note off for the old note, and send a note-on for the new one
-            sendNoteOff(bufferStartTime, mLastSentNote, 0);
-            sendNoteOn(bufferStartTime, mNextNoteToSend, kMaxVelocity);
-            mLastSentNote = mNextNoteToSend;
-            
-        } else if (!mShouldSendNoteOn && mNoteIsCurrentlyOn) {
-            // note was on but should turn off
-            sendNoteOff(bufferStartTime, mLastSentNote, 0);
-            mNoteIsCurrentlyOn = false;
-        }
-        
-    }
-    
-    void sendNoteOn(AUEventSampleTime sampleTime, uint8_t noteNum, uint16_t velocity) {
-        auto message = MIDI2NoteOn(0, 0, noteNum, 0, 0, velocity);
-        MIDIEventList eventList = {};
-        MIDIEventPacket *packet = MIDIEventListInit(&eventList, kMIDIProtocol_2_0);
-        packet = MIDIEventListAdd(&eventList, sizeof(MIDIEventList), packet, 0, 2, (UInt32 *)&message);
-        mMIDIOutBlock(sampleTime, 0, &eventList);
-    }
-    
-    void sendNoteOff(AUEventSampleTime sampleTime, uint8_t noteNum, uint16_t velocity) {
-        auto message = MIDI2NoteOff(0, 0, noteNum, 0, 0, velocity);
-        MIDIEventList eventList = {};
-        MIDIEventPacket *packet = MIDIEventListInit(&eventList, kMIDIProtocol_2_0);
-        packet = MIDIEventListAdd(&eventList, sizeof(MIDIEventList), packet, 0, 2, (UInt32 *)&message);
-        mMIDIOutBlock(sampleTime, 0, &eventList);
+
+        // TODO: Process modal synthesis audio here
+
     }
     
     void handleOneEvent(AUEventSampleTime now, AURenderEvent const *event) {
@@ -204,14 +161,12 @@ public:
     
     // MARK: Member Variables
     AUHostMusicalContextBlock mMusicalContextBlock;
-    
+
     double mSampleRate = 44100.0;
     bool mBypassed = false;
     AUAudioFrameCount mMaxFramesToRender = 1024;
-    
-    bool mShouldSendNoteOn = false;  //  Should we send a note-on next process?
-    bool mNoteIsCurrentlyOn = false;  //  Have we sent a note-on without a matching note off?
-    uint8_t mLastSentNote = 255;
-    uint8_t mNextNoteToSend = 255;
+
     AUMIDIEventListBlock mMIDIOutBlock;
+
+    // TODO: Add Modal Attractors DSP engine instance
 };
