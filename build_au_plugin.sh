@@ -2,17 +2,30 @@
 #
 # Build script for Modal Attractors Audio Unit plugin
 #
-# This script builds the AU plugin bundle that can be installed in:
-# ~/Library/Audio/Plug-Ins/Components/
+# NOTE: This is a legacy script created in a Linux environment.
+# For macOS with Xcode, use one of these instead:
 #
-# Requirements:
-# - macOS 12.0+
-# - Xcode Command Line Tools
-# - CMake (for building DSP core library)
+#   ./build_xcode.sh          - Generate Xcode project and build
+#   See BUILD_MACOS.md        - Complete macOS build guide
 #
-# Usage:
-#   ./build_au_plugin.sh [clean|install|test]
+# This script attempts to build using command-line tools but
+# a proper Xcode project is recommended for AU plugin development.
 #
+
+echo "=========================================="
+echo "⚠️  IMPORTANT: macOS Build Instructions"
+echo "=========================================="
+echo ""
+echo "For building on macOS with Xcode, please use:"
+echo ""
+echo "  ./build_xcode.sh xcode    # Generate Xcode project"
+echo "  ./build_xcode.sh build    # Build from command line"
+echo ""
+echo "Or see BUILD_MACOS.md for complete instructions"
+echo ""
+echo "Press Ctrl+C to cancel, or wait 5 seconds to continue with legacy build..."
+echo ""
+sleep 5
 
 set -e  # Exit on error
 
