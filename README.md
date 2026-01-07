@@ -8,13 +8,13 @@ Ported from ESP32 distributed resonator system to professional AU plugin for Log
 
 ## Project Status
 
-**Current Phase:** Phase 1 - Core DSP Port ✅
+**Current Phase:** Phase 2 - Audio Unit Plugin ✅ (Structure Complete, Testing Required)
 
-This repository contains the initial structure and core DSP implementation for the Modal Attractors AU plugin, based on the [AU Plugin Porting Proposal](../docs/AU_PLUGIN_PORTING_PROPOSAL.md).
+This repository contains the Modal Attractors AU plugin implementation, from DSP core to Audio Unit wrapper, based on the ESP32 distributed resonator system.
 
 ### Completed Components
 
-- ✅ Project directory structure
+#### Phase 1: Core DSP ✅
 - ✅ ESP32 DSP core ported to macOS (C)
   - `modal_node.c/.h` - Core modal oscillator
   - `audio_synth.c/.h` - Audio synthesis engine
@@ -22,14 +22,22 @@ This repository contains the initial structure and core DSP implementation for t
   - `ModalVoice` - Voice management
   - `VoiceAllocator` - Polyphonic allocation
   - `TopologyEngine` - Network coupling
-- ✅ AU wrapper skeleton (C++ interface)
 - ✅ CMake build system
-- ✅ Standalone test application
+- ✅ Standalone test application (validated Jan 7, 2026)
+
+#### Phase 2: Audio Unit Plugin ✅ (Structure)
+- ✅ AU plugin bundle structure
+- ✅ Info.plist configuration
+- ✅ Objective-C++ AU wrapper (`ModalAttractorsAU.mm`)
+- ✅ MIDI event handling (note on/off)
+- ✅ AU parameter system (3 core parameters)
+- ✅ Build script for macOS
+- ⏳ macOS testing and validation required
 
 ### In Progress
 
-- ⏳ Phase 2: Audio Unit plugin implementation (requires Xcode)
-- ⏳ Phase 3: Voice coupling and topologies
+- ⏳ Phase 2: macOS testing and Logic Pro X validation
+- ⏳ Phase 3: Voice coupling and topologies expansion
 - ⏳ Phase 4: Preset system and GUI
 - ⏳ Phase 5: Optimization and polish
 
@@ -69,13 +77,11 @@ au-plugin/
 - **CMake 3.20+**
 - **Xcode Command Line Tools** (for clang/clang++)
 - **C++17 compiler**
+- **Logic Pro X** (optional, for DAW testing)
 
-### Quick Start
+### Phase 1: Standalone DSP Test
 
 ```bash
-# Navigate to au-plugin directory
-cd au-plugin
-
 # Create build directory
 mkdir build && cd build
 
@@ -85,11 +91,29 @@ cmake ..
 # Build
 make
 
-# Run standalone test (Phase 1 deliverable)
+# Run standalone test
 ./test_modal_voice
 ```
 
 This will generate a `test_output.wav` file demonstrating the modal oscillator.
+
+### Phase 2: Audio Unit Plugin
+
+```bash
+# Build AU plugin bundle
+./build_au_plugin.sh
+
+# Install to system AU folder
+./build_au_plugin.sh install
+
+# Validate with auval
+./build_au_plugin.sh test
+
+# Clean build artifacts
+./build_au_plugin.sh clean
+```
+
+The plugin will be installed to `~/Library/Audio/Plug-Ins/Components/ModalAttractors.component` and will appear in Logic Pro X under AU Instruments → Carsten Bund → Modal Attractors.
 
 ### Build Options
 

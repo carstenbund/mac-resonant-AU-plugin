@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>ModalAttractors</string>
+	<key>CFBundleIconFile</key>
+	<string></string>
+	<key>CFBundleIdentifier</key>
+	<string>com.carstenbund.audiounit.ModalAttractors</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Modal Attractors</string>
+	<key>CFBundlePackageType</key>
+	<string>BNDL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.0</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>1.0.0</string>
+	<key>CSResourcesFileMapped</key>
+	<true/>
+
+	<!-- Audio Unit Configuration -->
+	<key>AudioComponents</key>
+	<array>
+		<dict>
+			<!-- Audio Unit Type: Music Instrument (aumi) -->
+			<key>type</key>
+			<string>aumi</string>
+
+			<!-- Audio Unit Subtype: Custom 4-character code -->
+			<!-- 'modl' = Modal Attractors -->
+			<key>subtype</key>
+			<string>modl</string>
+
+			<!-- Audio Unit Manufacturer: Custom 4-character code -->
+			<!-- 'CBND' = Carsten Bund -->
+			<key>manufacturer</key>
+			<string>CBND</string>
+
+			<!-- Plugin Name -->
+			<key>name</key>
+			<string>Carsten Bund: Modal Attractors</string>
+
+			<!-- Plugin Description -->
+			<key>description</key>
+			<string>Modal synthesis with network coupling topologies</string>
+
+			<!-- Version -->
+			<key>version</key>
+			<integer>65536</integer>
+
+			<!-- Factory Function -->
+			<key>factoryFunction</key>
+			<string>ModalAttractorsAUFactory</string>
+
+			<!-- Sandbox Safe -->
+			<key>sandboxSafe</key>
+			<true/>
+
+			<!-- Resource Usage -->
+			<key>resourceUsage</key>
+			<dict>
+				<key>network.client</key>
+				<false/>
+				<key>temporary-exception.files.all.read-write</key>
+				<false/>
+			</dict>
+
+			<!-- Tags for categorization in Logic/GarageBand -->
+			<key>tags</key>
+			<array>
+				<string>Synthesizer</string>
+				<string>Modal</string>
+				<string>Experimental</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>
