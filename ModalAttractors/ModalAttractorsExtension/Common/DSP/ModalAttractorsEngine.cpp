@@ -1,149 +1,170 @@
 /**
  * @file ModalAttractorsEngine.cpp
- * @brief C++ implementation of DSP engine interface
+ * @brief C API implementation for Modal Attractors DSP engine
  *
- * This provides a C-compatible interface to the C++ DSP engine
- * so it can be called from Objective-C++ AU wrapper.
+ * Provides a C-compatible interface between the AU wrapper and C++ SynthEngine.
+ * All Apple types stay in the AU wrapper; this file is Apple-type-free.
  */
 
 #include "ModalAttractorsAU.h"
-#include "ModalParameters.h"
-#include "../dsp_core/VoiceAllocator.h"
-#include "../dsp_core/TopologyEngine.h"
+#include "../../DSP/SynthEngine.h"
 #include <cstring>
 
+// ============================================================================
+// Initialization and cleanup
+// ============================================================================
+
 void modal_attractors_engine_init(ModalAttractorsEngine* engine,
-                                  float sample_rate,
+                                  double sample_rate,
+                                  uint32_t max_frames,
                                   uint32_t max_polyphony) {
     if (!engine) return;
 
     memset(engine, 0, sizeof(ModalAttractorsEngine));
 
-    engine->sample_rate = sample_rate;
-    engine->max_polyphony = max_polyphony;
+    // Create C++ engine and event queue (only allocation happens here, not in render!)
+    engine->synth_engine = new SynthEngine(max_polyphony);
+    engine->event_queue = new EventQueue();
 
-    // Create DSP components
-    engine->voice_allocator = new VoiceAllocator(max_polyphony);
-    engine->topology_engine = new TopologyEngine(max_polyphony);
-
-    // Initialize
-    engine->voice_allocator->initialize(sample_rate);
-
-    // Set default parameters
-    engine->master_gain = kMasterGain_Default;
-    engine->coupling_strength = kCouplingStrength_Default;
-    engine->topology_type = kTopology_Default;
-
-    // Set default topology
-    engine->topology_engine->generateTopology(
-        TopologyType::Ring,
-        engine->coupling_strength
-    );
+    // Prepare engine for processing
+    engine->synth_engine->prepare(sample_rate, max_frames, 2);
 
     engine->initialized = true;
+}
+
+void modal_attractors_engine_prepare(ModalAttractorsEngine* engine,
+                                     double sample_rate,
+                                     uint32_t max_frames) {
+    if (!engine || !engine->initialized) return;
+
+    engine->synth_engine->prepare(sample_rate, max_frames, 2);
+}
+
+void modal_attractors_engine_reset(ModalAttractorsEngine* engine) {
+    if (!engine || !engine->initialized) return;
+
+    engine->synth_engine->reset();
 }
 
 void modal_attractors_engine_cleanup(ModalAttractorsEngine* engine) {
     if (!engine) return;
 
-    if (engine->voice_allocator) {
-        delete engine->voice_allocator;
-        engine->voice_allocator = nullptr;
+    if (engine->synth_engine) {
+        delete engine->synth_engine;
+        engine->synth_engine = nullptr;
     }
 
-    if (engine->topology_engine) {
-        delete engine->topology_engine;
-        engine->topology_engine = nullptr;
+    if (engine->event_queue) {
+        delete engine->event_queue;
+        engine->event_queue = nullptr;
     }
 
     engine->initialized = false;
 }
 
-void modal_attractors_engine_note_on(ModalAttractorsEngine* engine,
-                                     uint8_t note,
-                                     uint8_t velocity) {
+// ============================================================================
+// Event handling (real-time safe)
+// ============================================================================
+
+void modal_attractors_engine_begin_events(ModalAttractorsEngine* engine) {
     if (!engine || !engine->initialized) return;
 
-    // Normalize MIDI velocity (0-127) to float (0.0-1.0)
-    float velocity_normalized = velocity / 127.0f;
-    engine->voice_allocator->noteOn(note, velocity_normalized);
+    // Clear event queue for this render frame
+    engine->event_queue->clear();
 }
 
-void modal_attractors_engine_note_off(ModalAttractorsEngine* engine,
-                                      uint8_t note) {
+void modal_attractors_engine_push_note_on(ModalAttractorsEngine* engine,
+                                          int32_t sample_offset,
+                                          uint8_t note,
+                                          float velocity) {
     if (!engine || !engine->initialized) return;
 
-    engine->voice_allocator->noteOff(note);
+    SynthEvent event;
+    event.type = EventType::NoteOn;
+    event.sampleOffset = sample_offset;
+    event.noteOn.note = note;
+    event.noteOn.velocity = velocity;
+
+    engine->event_queue->push(event);
 }
+
+void modal_attractors_engine_push_note_off(ModalAttractorsEngine* engine,
+                                           int32_t sample_offset,
+                                           uint8_t note) {
+    if (!engine || !engine->initialized) return;
+
+    SynthEvent event;
+    event.type = EventType::NoteOff;
+    event.sampleOffset = sample_offset;
+    event.noteOff.note = note;
+
+    engine->event_queue->push(event);
+}
+
+void modal_attractors_engine_push_pitch_bend(ModalAttractorsEngine* engine,
+                                             int32_t sample_offset,
+                                             float value) {
+    if (!engine || !engine->initialized) return;
+
+    SynthEvent event;
+    event.type = EventType::PitchBend;
+    event.sampleOffset = sample_offset;
+    event.pitchBend.value = value;
+
+    engine->event_queue->push(event);
+}
+
+void modal_attractors_engine_push_parameter(ModalAttractorsEngine* engine,
+                                            int32_t sample_offset,
+                                            uint32_t param_id,
+                                            float value) {
+    if (!engine || !engine->initialized) return;
+
+    SynthEvent event;
+    event.type = EventType::Parameter;
+    event.sampleOffset = sample_offset;
+    event.parameter.paramId = param_id;
+    event.parameter.value = value;
+
+    engine->event_queue->push(event);
+}
+
+// ============================================================================
+// Rendering (real-time safe)
+// ============================================================================
 
 void modal_attractors_engine_render(ModalAttractorsEngine* engine,
                                     float* outL,
                                     float* outR,
                                     uint32_t num_frames) {
     if (!engine || !engine->initialized) {
-        // Return silence
+        // Return silence if not initialized
         memset(outL, 0, num_frames * sizeof(float));
-        memset(outR, 0, num_frames * sizeof(float));
+        if (outR != outL) {
+            memset(outR, 0, num_frames * sizeof(float));
+        }
         return;
     }
 
-    // Update voices at control rate
-    // (simplified - in real implementation, only update at control rate intervals)
-    engine->voice_allocator->updateVoices();
-
-    // Update coupling between voices
-    ModalVoice** voices = new ModalVoice*[engine->max_polyphony];
-    for (uint32_t i = 0; i < engine->max_polyphony; i++) {
-        voices[i] = engine->voice_allocator->getVoice(i);
-    }
-    engine->topology_engine->updateCoupling(voices, engine->max_polyphony);
-    delete[] voices;
-
-    // Render audio
-    engine->voice_allocator->renderAudio(outL, outR, num_frames);
-
-    // Apply master gain
-    for (uint32_t i = 0; i < num_frames; i++) {
-        outL[i] *= engine->master_gain;
-        outR[i] *= engine->master_gain;
-    }
+    // Render with sample-accurate event processing
+    engine->synth_engine->render(*engine->event_queue, outL, outR, num_frames);
 }
+
+// ============================================================================
+// Parameter access
+// ============================================================================
 
 void modal_attractors_engine_set_parameter(ModalAttractorsEngine* engine,
                                            uint32_t param_id,
                                            float value) {
     if (!engine || !engine->initialized) return;
 
-    switch (param_id) {
-        case kParam_MasterGain:
-            engine->master_gain = value;
-            break;
+    engine->synth_engine->setParameter(param_id, value);
+}
 
-        case kParam_CouplingStrength:
-            engine->coupling_strength = value;
-            engine->topology_engine->setCouplingStrength(value);
-            break;
+float modal_attractors_engine_get_parameter(ModalAttractorsEngine* engine,
+                                            uint32_t param_id) {
+    if (!engine || !engine->initialized) return 0.0f;
 
-        case kParam_Topology: {
-            engine->topology_type = static_cast<int>(value);
-            // Map int to topology type
-            TopologyType topo = TopologyType::Ring;
-            switch (engine->topology_type) {
-                case 0: topo = TopologyType::Ring; break;
-                case 1: topo = TopologyType::SmallWorld; break;
-                case 2: topo = TopologyType::Clustered; break;
-                case 3: topo = TopologyType::HubSpoke; break;
-                case 4: topo = TopologyType::Random; break;
-                case 5: topo = TopologyType::Complete; break;
-                case 6: topo = TopologyType::None; break;
-            }
-            engine->topology_engine->generateTopology(topo, engine->coupling_strength);
-            break;
-        }
-
-        // TODO: Add other parameter cases
-
-        default:
-            break;
-    }
+    return engine->synth_engine->getParameter(param_id);
 }
