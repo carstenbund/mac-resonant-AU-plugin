@@ -15,22 +15,42 @@ This guide is for building the AU plugin on macOS with Xcode.
    brew install cmake
    ```
 
+## Testing First (Highly Recommended)
+
+Before building the AU plugin, **test the DSP core** to verify everything works:
+
+```bash
+# Generate Xcode project with test suite
+./generate_xcode_project.sh
+
+# Open in Xcode
+open build_xcode/ModalAttractors.xcodeproj
+
+# Select scheme: "test_suite" or "test_modal_voice"
+# Press Cmd+R to run tests
+```
+
+See **[XCODE_TESTING.md](XCODE_TESTING.md)** for detailed testing guide.
+
+**Test results**: All 7 tests should pass with clean audio. See [TEST_RESULTS.md](TEST_RESULTS.md) for expected metrics.
+
+---
+
 ## Quick Start
 
 ### Option 1: Using CMake + Xcode (Recommended for DSP Core)
 
 ```bash
 # Generate Xcode project
-./build_xcode.sh xcode
+./generate_xcode_project.sh
 
 # Open in Xcode
-open build-xcode/ModalAttractors.xcodeproj
+open build_xcode/ModalAttractors.xcodeproj
 
-# Or build from command line
-./build_xcode.sh build
+# Select scheme: "test_suite" and press Cmd+R
 ```
 
-This builds the **DSP core library** only. For the full AU plugin, continue to Option 2.
+This builds and tests the **DSP core library**. For the full AU plugin, continue to Option 2.
 
 ### Option 2: Manual Xcode Project (Required for AU Plugin)
 
