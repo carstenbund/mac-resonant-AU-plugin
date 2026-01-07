@@ -102,11 +102,15 @@ void ModalVoice::renderAudio(float* outL, float* outR, uint32_t num_frames) {
         return;
     }
 
+    // Update modal state at control rate (500 Hz)
+    samples_since_update_ += num_frames;
+    while (samples_since_update_ >= samples_per_update_) {
+        updateModal();
+        samples_since_update_ -= samples_per_update_;
+    }
+
     // Render audio from modal state
     audio_synth_render(&synth_, outL, outR, num_frames);
-
-    // Track samples for control rate updates
-    samples_since_update_ += num_frames;
 }
 
 void ModalVoice::applyCoupling(const float coupling_inputs[MAX_MODES]) {
