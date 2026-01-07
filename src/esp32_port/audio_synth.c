@@ -152,21 +152,20 @@ void audio_synth_render(audio_synth_t* synth,
             // Phase increment (adapted for variable sample rate)
             float phase_inc = 2.0f * M_PI * freq_hz / sample_rate;
 
-            // Get phase from accumulator
+            // Use phase accumulator for continuous carrier
             uint32_t phase_acc = synth->params.phase_accumulator[k];
             float phase = (phase_acc / 4294967296.0f) * 2.0f * M_PI;
 
-            // Get phase from complex amplitude (use arg(a_k) for phase coherence)
-            float mode_phase = cargf(node->modes[k].a);
-            phase += mode_phase;
+            // Note: Do NOT add modal phase cargf(a_k) here - it causes discontinuities
+            // The amplitude already captures the modal dynamics
 
-            // Generate sample with fast sine
-            float sample_f = amplitude * fast_sin(phase);
+            // Generate sample with continuous phase
+            float sample_f = amplitude * sinf(phase);
 
             // Add to mix
             sample_sum += sample_f;
 
-            // Advance phase accumulator
+            // Advance phase accumulator for next sample
             phase_acc += (uint32_t)(phase_inc * 4294967296.0f / (2.0f * M_PI));
             synth->params.phase_accumulator[k] = phase_acc;
         }
