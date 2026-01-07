@@ -14,6 +14,8 @@
 #ifndef MODAL_ATTRACTORS_AU_H
 #define MODAL_ATTRACTORS_AU_H
 
+#include <cstdint>
+
 // NOTE: This file is a C++ header skeleton. The actual AU implementation
 // would be in Objective-C++ (.mm file) and would include:
 // - <AudioUnit/AudioUnit.h>
