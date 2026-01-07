@@ -29,6 +29,7 @@ SynthEngine::SynthEngine(uint32_t maxPolyphony)
     , masterGain_(0.7f)
     , couplingStrength_(0.3f)
     , topologyType_(0)
+    , nodeCount_(16)  // Default to full 16 nodes
 {
     // Allocate DSP components (done once at construction)
     voiceAllocator_ = new VoiceAllocator(maxPolyphony);
@@ -205,6 +206,23 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
             break;
         }
 
+        case kParam_NodeCount: {
+            uint32_t newCount = static_cast<uint32_t>(value);
+            if (newCount < 1) newCount = 1;
+            if (newCount > 16) newCount = 16;
+
+            if (newCount != nodeCount_) {
+                nodeCount_ = newCount;
+
+                // TODO: Full node architecture implementation
+                // For now, just store the value. Future refactor will:
+                // 1. Release nodes above newCount
+                // 2. Update allocator active limit
+                // 3. Regenerate topology for new node count
+            }
+            break;
+        }
+
         // TODO: Add per-mode parameters, poke strength, etc.
 
         default:
@@ -222,6 +240,9 @@ float SynthEngine::getParameter(uint32_t paramId) const {
 
         case kParam_Topology:
             return static_cast<float>(topologyType_);
+
+        case kParam_NodeCount:
+            return static_cast<float>(nodeCount_);
 
         default:
             return 0.0f;
