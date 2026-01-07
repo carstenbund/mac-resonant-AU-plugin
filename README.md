@@ -97,23 +97,25 @@ make
 
 This will generate a `test_output.wav` file demonstrating the modal oscillator.
 
-### Phase 2: Audio Unit Plugin
+### Phase 2: Audio Unit Plugin (macOS with Xcode)
 
+**For macOS users:** See **[BUILD_MACOS.md](BUILD_MACOS.md)** for complete Xcode build instructions.
+
+**Quick start:**
 ```bash
-# Build AU plugin bundle
-./build_au_plugin.sh
+# Generate Xcode project
+./build_xcode.sh xcode
 
-# Install to system AU folder
-./build_au_plugin.sh install
+# Open in Xcode
+open build-xcode/ModalAttractors.xcodeproj
 
-# Validate with auval
-./build_au_plugin.sh test
-
-# Clean build artifacts
-./build_au_plugin.sh clean
+# Or build from command line
+./build_xcode.sh build
 ```
 
-The plugin will be installed to `~/Library/Audio/Plug-Ins/Components/ModalAttractors.component` and will appear in Logic Pro X under AU Instruments → Carsten Bund → Modal Attractors.
+**Important:** The AU plugin requires a proper Xcode project with AudioUnit frameworks. The `BUILD_MACOS.md` guide provides step-by-step instructions for creating the Xcode project, adding source files, linking frameworks, and testing in Logic Pro X.
+
+The installed plugin will appear in Logic Pro X under: **AU Instruments → Carsten Bund → Modal Attractors**
 
 ### Build Options
 
