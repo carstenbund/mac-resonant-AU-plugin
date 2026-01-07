@@ -1,0 +1,244 @@
+# Xcode Project Template Configuration
+# This file tracks the structure and files of the Modal Attractors Xcode project template
+
+[project]
+name = "ModalAttractors"
+version = "1.0.0"
+description = "Audio Unit v3 (AUv3) plugin template for Modal Attractors synthesizer"
+language = "Swift"
+platform = "macOS"
+min_deployment_target = "12.0"
+
+[project.identifiers]
+bundle_id_base = "com.carstenbund.audiounit"
+app_bundle_id = "com.carstenbund.audiounit.ModalAttractors"
+extension_bundle_id = "com.carstenbund.audiounit.ModalAttractorsExtension"
+
+[project.targets]
+host_app = "ModalAttractors"
+au_extension = "ModalAttractorsExtension"
+
+# Xcode project files
+[[files]]
+path = "xcode-project/ModalAttractors.xcodeproj/project.pbxproj"
+type = "xcode_project"
+description = "Main Xcode project configuration file"
+
+[[files]]
+path = "xcode-project/ModalAttractors.xcodeproj/project.xcworkspace/contents.xcworkspacedata"
+type = "xcode_workspace"
+description = "Xcode workspace metadata"
+
+# Host Application files
+[[files]]
+path = "xcode-project/ModalAttractors/ModalAttractorsApp.swift"
+type = "swift_source"
+target = "ModalAttractors"
+description = "Main SwiftUI app entry point for host application"
+
+[[files]]
+path = "xcode-project/ModalAttractors/ContentView.swift"
+type = "swift_source"
+target = "ModalAttractors"
+description = "Main SwiftUI view for host application"
+
+[[files]]
+path = "xcode-project/ModalAttractors/ModalAttractors.entitlements"
+type = "entitlements"
+target = "ModalAttractors"
+description = "App entitlements and sandboxing configuration"
+
+# Host Application - Model
+[[files]]
+path = "xcode-project/ModalAttractors/Model/AudioUnitHostModel.swift"
+type = "swift_source"
+target = "ModalAttractors"
+description = "Model for hosting and managing Audio Unit instances"
+
+[[files]]
+path = "xcode-project/ModalAttractors/Model/AudioUnitViewModel.swift"
+type = "swift_source"
+target = "ModalAttractors"
+description = "ViewModel for Audio Unit UI integration"
+
+# Host Application - Common/Audio
+[[files]]
+path = "xcode-project/ModalAttractors/Common/Audio/SimplePlayEngine.swift"
+type = "swift_source"
+target = "ModalAttractors"
+description = "Simple audio playback engine for testing AU"
+
+[[files]]
+path = "xcode-project/ModalAttractors/Common/Audio/Synth.aif"
+type = "audio"
+target = "ModalAttractors"
+description = "Sample audio file for testing"
+
+# Host Application - Common/MIDI
+[[files]]
+path = "xcode-project/ModalAttractors/Common/MIDI/MIDIManager.swift"
+type = "swift_source"
+target = "ModalAttractors"
+description = "MIDI input management for host application"
+
+# Host Application - Common/UI
+[[files]]
+path = "xcode-project/ModalAttractors/Common/UI/ViewControllerRepresentable.swift"
+type = "swift_source"
+target = "ModalAttractors"
+description = "UIKit/AppKit view controller wrapper for SwiftUI"
+
+# Host Application - Common Utilities
+[[files]]
+path = "xcode-project/ModalAttractors/Common/TypeAliases.swift"
+type = "swift_source"
+target = "ModalAttractors"
+description = "Cross-platform type aliases"
+
+[[files]]
+path = "xcode-project/ModalAttractors/Common/String/StringHelpers.swift"
+type = "swift_source"
+target = "ModalAttractors"
+description = "String utility functions"
+
+# Host Application - Assets
+[[files]]
+path = "xcode-project/ModalAttractors/Assets.xcassets/Contents.json"
+type = "asset_catalog"
+target = "ModalAttractors"
+description = "Asset catalog root"
+
+[[files]]
+path = "xcode-project/ModalAttractors/Assets.xcassets/AppIcon.appiconset/Contents.json"
+type = "asset_catalog"
+target = "ModalAttractors"
+description = "Application icon asset"
+
+[[files]]
+path = "xcode-project/ModalAttractors/Assets.xcassets/AccentColor.colorset/Contents.json"
+type = "asset_catalog"
+target = "ModalAttractors"
+description = "Accent color asset"
+
+[[files]]
+path = "xcode-project/ModalAttractors/Assets.xcassets/LargeIcon.imageset/Contents.json"
+type = "asset_catalog"
+target = "ModalAttractors"
+description = "Large icon asset"
+
+[[files]]
+path = "xcode-project/ModalAttractors/Preview Content/Preview Assets.xcassets/Contents.json"
+type = "asset_catalog"
+target = "ModalAttractors"
+description = "Preview assets for SwiftUI previews"
+
+# Audio Unit Extension - Main Files
+[[files]]
+path = "xcode-project/ModalAttractorsExtension/Info.plist"
+type = "plist"
+target = "ModalAttractorsExtension"
+description = "Audio Unit extension bundle configuration and metadata"
+
+[[files]]
+path = "xcode-project/ModalAttractorsExtension/README.md"
+type = "documentation"
+target = "ModalAttractorsExtension"
+description = "Audio Unit extension documentation"
+
+[[files]]
+path = "xcode-project/ModalAttractorsExtension/Common/ModalAttractorsExtension-Bridging-Header.h"
+type = "bridging_header"
+target = "ModalAttractorsExtension"
+description = "Objective-C/C++ bridging header for Swift interop"
+
+# Audio Unit Extension - Audio Unit Implementation
+[[files]]
+path = "xcode-project/ModalAttractorsExtension/Common/Audio Unit/ModalAttractorsExtensionAudioUnit.swift"
+type = "swift_source"
+target = "ModalAttractorsExtension"
+description = "Main Audio Unit implementation (AUv3)"
+
+[[files]]
+path = "xcode-project/ModalAttractorsExtension/Common/AudioUnitFactory/AudioUnitFactory.swift"
+type = "swift_source"
+target = "ModalAttractorsExtension"
+description = "Factory class for creating Audio Unit instances"
+
+# Audio Unit Extension - DSP
+[[files]]
+path = "xcode-project/ModalAttractorsExtension/Common/DSP/ModalAttractorsExtensionAUProcessHelper.hpp"
+type = "cpp_header"
+target = "ModalAttractorsExtension"
+description = "C++ helper for audio processing and buffer management"
+
+[[files]]
+path = "xcode-project/ModalAttractorsExtension/DSP/ModalAttractorsExtensionDSPKernel.hpp"
+type = "cpp_header"
+target = "ModalAttractorsExtension"
+description = "DSP kernel implementation for audio processing"
+
+# Audio Unit Extension - Parameters
+[[files]]
+path = "xcode-project/ModalAttractorsExtension/Parameters/ModalAttractorsExtensionParameterAddresses.h"
+type = "c_header"
+target = "ModalAttractorsExtension"
+description = "Parameter address definitions for Audio Unit parameters"
+
+[[files]]
+path = "xcode-project/ModalAttractorsExtension/Parameters/Parameters.swift"
+type = "swift_source"
+target = "ModalAttractorsExtension"
+description = "Parameter specifications and metadata"
+
+[[files]]
+path = "xcode-project/ModalAttractorsExtension/Common/Parameters/ParameterSpecBase.swift"
+type = "swift_source"
+target = "ModalAttractorsExtension"
+description = "Base class for parameter specifications"
+
+# Audio Unit Extension - Utilities
+[[files]]
+path = "xcode-project/ModalAttractorsExtension/Common/Utility/CrossPlatform.swift"
+type = "swift_source"
+target = "ModalAttractorsExtension"
+description = "Cross-platform compatibility utilities"
+
+[[files]]
+path = "xcode-project/ModalAttractorsExtension/Common/Utility/String+Utils.swift"
+type = "swift_source"
+target = "ModalAttractorsExtension"
+description = "String utility extensions"
+
+[build_settings]
+language_standard = "C++17"
+stdlib = "libc++"
+architectures = ["arm64", "x86_64"]
+deployment_target = "12.0"
+
+[build_settings.frameworks]
+required = [
+    "AudioToolbox",
+    "AVFoundation",
+    "CoreAudio",
+    "SwiftUI",
+    "Combine"
+]
+
+[build_settings.header_search_paths]
+paths = [
+    "$(PROJECT_DIR)/../src/dsp_core",
+    "$(PROJECT_DIR)/../src/esp32_port",
+    "$(PROJECT_DIR)/../src/au_wrapper"
+]
+
+[audio_unit]
+type = "aumi"
+subtype = "mdla"
+manufacturer = "Cbnd"
+name = "Modal Attractors"
+description = "Physical modeling synthesizer using coupled modal oscillators"
+version = "1.0.0"
+
+[notes]
+usage = "This template provides a complete AUv3 Audio Unit implementation. To use: 1) Copy to your project directory, 2) Add DSP source files from src/, 3) Configure code signing, 4) Build and test"
+integration = "Integrates with Modal Attractors DSP engine (src/dsp_core, src/esp32_port, src/au_wrapper)"
