@@ -122,7 +122,7 @@ void modal_attractors_engine_set_parameter(ModalAttractorsEngine* engine,
             engine->topology_engine->setCouplingStrength(value);
             break;
 
-        case kParam_Topology:
+        case kParam_Topology: {
             engine->topology_type = static_cast<int>(value);
             // Map int to topology type
             TopologyType topo = TopologyType::Ring;
@@ -137,6 +137,7 @@ void modal_attractors_engine_set_parameter(ModalAttractorsEngine* engine,
             }
             engine->topology_engine->generateTopology(topo, engine->coupling_strength);
             break;
+        }
 
         // TODO: Add other parameter cases
 

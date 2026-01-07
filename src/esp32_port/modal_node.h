@@ -14,12 +14,18 @@
 #ifndef MODAL_NODE_H
 #define MODAL_NODE_H
 
-#include <complex.h>
 #include <stdint.h>
 #include <stdbool.h>
 
 #ifdef __cplusplus
+#include <complex>
+// C++ complex type compatibility
+typedef std::complex<float> modal_complex_t;
 extern "C" {
+#else
+#include <complex.h>
+// C99 complex type
+typedef float complex modal_complex_t;
 #endif
 
 // ============================================================================
@@ -57,8 +63,8 @@ typedef struct {
  * @brief Modal state (complex amplitude and dynamics)
  */
 typedef struct {
-    float complex a;        ///< Complex amplitude a(t) = |a|e^(iφ)
-    float complex a_dot;    ///< Time derivative (for integration)
+    modal_complex_t a;        ///< Complex amplitude a(t) = |a|e^(iφ)
+    modal_complex_t a_dot;    ///< Time derivative (for integration)
     mode_params_t params;   ///< Mode parameters
 } mode_state_t;
 
@@ -185,7 +191,7 @@ float modal_node_get_phase_modulation(const modal_node_t* node);
  * @param node Pointer to node structure
  * @return Complex amplitude of mode 0
  */
-float complex modal_node_get_mode0(const modal_node_t* node);
+modal_complex_t modal_node_get_mode0(const modal_node_t* node);
 
 /**
  * @brief Start node operation

@@ -125,7 +125,7 @@ public:
      * @brief Get mode 0 complex amplitude (for coupling broadcast)
      * @return Complex amplitude
      */
-    float complex getMode0Amplitude() const {
+    modal_complex_t getMode0Amplitude() const {
         return modal_node_get_mode0(&node_);
     }
 
