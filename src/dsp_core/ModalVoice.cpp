@@ -56,6 +56,9 @@ void ModalVoice::noteOn(uint8_t midi_note, float velocity) {
     // Update frequencies based on new note
     updateFrequencies();
 
+    // Reset phase accumulators to prevent clicks/discontinuities
+    audio_synth_reset_phase(&synth_);
+
     // Apply poke excitation
     poke_event_t poke;
     poke.source_node_id = voice_id_;

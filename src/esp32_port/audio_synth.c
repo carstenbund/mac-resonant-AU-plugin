@@ -204,5 +204,7 @@ void audio_synth_set_mute(audio_synth_t* synth, bool mute) {
 void audio_synth_reset_phase(audio_synth_t* synth) {
     for (int k = 0; k < MAX_MODES; k++) {
         synth->params.phase_accumulator[k] = 0;
+        // Also reset amplitude smoothing to prevent clicks
+        synth->amplitude_smooth[k] = 0.0f;
     }
 }

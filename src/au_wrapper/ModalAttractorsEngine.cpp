@@ -64,7 +64,9 @@ void modal_attractors_engine_note_on(ModalAttractorsEngine* engine,
                                      uint8_t velocity) {
     if (!engine || !engine->initialized) return;
 
-    engine->voice_allocator->noteOn(note, velocity);
+    // Normalize MIDI velocity (0-127) to float (0.0-1.0)
+    float velocity_normalized = velocity / 127.0f;
+    engine->voice_allocator->noteOn(note, velocity_normalized);
 }
 
 void modal_attractors_engine_note_off(ModalAttractorsEngine* engine,
