@@ -7,5 +7,4 @@
 
 #import "ModalAttractorsExtensionParameterAddresses.h"
 #import "ModalAttractorsExtensionAUProcessHelper.hpp"
-#import "ModalParameters.h"
 #import "ModalAttractorsAU.h"
