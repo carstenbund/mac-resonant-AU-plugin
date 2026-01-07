@@ -44,7 +44,7 @@ void VoiceAllocator::initialize(float sample_rate) {
     initialized_ = true;
 }
 
-ModalVoice* VoiceAllocator::noteOn(uint8_t midi_note, uint8_t velocity) {
+ModalVoice* VoiceAllocator::noteOn(uint8_t midi_note, float velocity) {
     if (!initialized_ || midi_note > 127) return nullptr;
 
     // Check if this note is already playing
@@ -52,8 +52,7 @@ ModalVoice* VoiceAllocator::noteOn(uint8_t midi_note, uint8_t velocity) {
     if (existing_voice >= 0) {
         // Re-trigger existing voice
         ModalVoice* voice = voices_[existing_voice];
-        float vel_normalized = velocity / 127.0f;
-        voice->noteOn(midi_note, vel_normalized);
+        voice->noteOn(midi_note, velocity);
         voice->setPitchBend(pitch_bend_);
         return voice;
     }
@@ -67,8 +66,7 @@ ModalVoice* VoiceAllocator::noteOn(uint8_t midi_note, uint8_t velocity) {
 
     if (voice) {
         // Allocate voice
-        float vel_normalized = velocity / 127.0f;
-        voice->noteOn(midi_note, vel_normalized);
+        voice->noteOn(midi_note, velocity);
         voice->setPitchBend(pitch_bend_);
 
         // Update mapping

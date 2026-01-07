@@ -42,10 +42,10 @@ public:
     /**
      * @brief Handle MIDI note on
      * @param midi_note MIDI note number (0-127)
-     * @param velocity Velocity (0-127)
+     * @param velocity Velocity (0.0-1.0 normalized)
      * @return Pointer to allocated voice, or nullptr if allocation failed
      */
-    ModalVoice* noteOn(uint8_t midi_note, uint8_t velocity);
+    ModalVoice* noteOn(uint8_t midi_note, float velocity);
 
     /**
      * @brief Handle MIDI note off
