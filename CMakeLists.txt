@@ -106,16 +106,24 @@ endif()
 # ============================================================================
 
 if(BUILD_STANDALONE_TEST)
+    # Original single voice test
     add_executable(test_modal_voice
         Tests/test_modal_voice.cpp
     )
-
     target_link_libraries(test_modal_voice PRIVATE modal_dsp_core)
 
-    # Install test binary
-    install(TARGETS test_modal_voice
+    # Comprehensive test suite
+    add_executable(test_suite
+        Tests/test_suite.cpp
+    )
+    target_link_libraries(test_suite PRIVATE modal_dsp_core)
+
+    # Install test binaries
+    install(TARGETS test_modal_voice test_suite
         RUNTIME DESTINATION bin
     )
+
+    message(STATUS "Building tests: test_modal_voice, test_suite")
 endif()
 
 # ============================================================================
