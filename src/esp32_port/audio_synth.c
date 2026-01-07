@@ -109,6 +109,10 @@ void audio_synth_render(audio_synth_t* synth,
     const modal_node_t* node = synth->node;
     const float sample_rate = synth->params.sample_rate;
 
+    // Initialize output buffers to zero
+    memset(outL, 0, num_frames * sizeof(float));
+    memset(outR, 0, num_frames * sizeof(float));
+
     // Generate stereo audio
     // Mix all modes together for both channels
     for (uint32_t sample_idx = 0; sample_idx < num_frames; sample_idx++) {
@@ -166,6 +170,10 @@ void audio_synth_render(audio_synth_t* synth,
             phase_acc += (uint32_t)(phase_inc * 4294967296.0f / (2.0f * M_PI));
             synth->params.phase_accumulator[k] = phase_acc;
         }
+
+        // Clamp to prevent overflow
+        if (sample_sum > 1.0f) sample_sum = 1.0f;
+        if (sample_sum < -1.0f) sample_sum = -1.0f;
 
         // Write to stereo output (mono source, duplicated to L/R)
         outL[sample_idx] = sample_sum;

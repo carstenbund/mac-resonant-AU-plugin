@@ -105,8 +105,11 @@ int main(int argc, char* argv[]) {
     float* temp_left = new float[BUFFER_SIZE];
     float* temp_right = new float[BUFFER_SIZE];
 
+    // Initialize all buffers to zero
     memset(output_left, 0, NUM_SAMPLES * sizeof(float));
     memset(output_right, 0, NUM_SAMPLES * sizeof(float));
+    memset(temp_left, 0, BUFFER_SIZE * sizeof(float));
+    memset(temp_right, 0, BUFFER_SIZE * sizeof(float));
 
     // Trigger note at t=0
     std::cout << "Triggering note on (MIDI 57, velocity 100)..." << std::endl;
@@ -119,10 +122,7 @@ int main(int argc, char* argv[]) {
     while (samples_rendered < NUM_SAMPLES) {
         uint32_t samples_to_render = std::min(BUFFER_SIZE, NUM_SAMPLES - samples_rendered);
 
-        // Update modal state (control rate - every buffer for simplicity)
-        voice.updateModal();
-
-        // Render audio block
+        // Render audio block (updateModal called automatically at 500 Hz)
         voice.renderAudio(temp_left, temp_right, samples_to_render);
 
         // Copy to output buffer
