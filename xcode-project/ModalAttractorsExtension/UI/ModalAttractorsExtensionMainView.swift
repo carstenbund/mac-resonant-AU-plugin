@@ -42,8 +42,21 @@ public struct ModalAttractorsExtensionMainView: View {
 
                 Divider()
 
+                // Mode 0-3 sections
+                ModeControlsView(mode: parameterTree.mode0, modeLabel: "MODE 0")
+                ModeControlsView(mode: parameterTree.mode1, modeLabel: "MODE 1")
+                ModeControlsView(mode: parameterTree.mode2, modeLabel: "MODE 2")
+                ModeControlsView(mode: parameterTree.mode3, modeLabel: "MODE 3")
+
+                Divider()
+
                 // Triggers section
                 TriggersControlsView()
+
+                Divider()
+
+                // Voice section
+                VoiceControlsView()
 
                 Divider()
 

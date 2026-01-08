@@ -14,14 +14,24 @@ import SwiftUI
 /// This bridges the AU parameter tree to SwiftUI's observable system
 public class ParameterTree: ObservableObject {
     public let global: GlobalParameters
+    public let mode0: ModeParameters
+    public let mode1: ModeParameters
+    public let mode2: ModeParameters
+    public let mode3: ModeParameters
     public let excitation: ExcitationParameters
+    public let voice: VoiceParameters
 
     private let auParameterTree: AUParameterTree
 
     public init(auParameterTree: AUParameterTree) {
         self.auParameterTree = auParameterTree
         self.global = GlobalParameters(auParameterTree: auParameterTree)
+        self.mode0 = ModeParameters(auParameterTree: auParameterTree, groupID: "mode0")
+        self.mode1 = ModeParameters(auParameterTree: auParameterTree, groupID: "mode1")
+        self.mode2 = ModeParameters(auParameterTree: auParameterTree, groupID: "mode2")
+        self.mode3 = ModeParameters(auParameterTree: auParameterTree, groupID: "mode3")
         self.excitation = ExcitationParameters(auParameterTree: auParameterTree)
+        self.voice = VoiceParameters(auParameterTree: auParameterTree)
     }
 
     /// Create a mock parameter tree for SwiftUI previews
@@ -53,6 +63,27 @@ public class GlobalParameters: ObservableObject {
     }
 }
 
+/// Mode parameter group (generic for mode0-3)
+public class ModeParameters: ObservableObject {
+    @Published public var frequency: ParameterWrapper
+    @Published public var damping: ParameterWrapper
+    @Published public var weight: ParameterWrapper
+
+    public let modeNumber: String
+
+    init(auParameterTree: AUParameterTree, groupID: String) {
+        self.modeNumber = groupID.replacingOccurrences(of: "mode", with: "")
+
+        let freq = auParameterTree.parameter(withID: "\(groupID).\(groupID)Frequency")!
+        let damp = auParameterTree.parameter(withID: "\(groupID).\(groupID)Damping")!
+        let wt = auParameterTree.parameter(withID: "\(groupID).\(groupID)Weight")!
+
+        self.frequency = ParameterWrapper(parameter: freq)
+        self.damping = ParameterWrapper(parameter: damp)
+        self.weight = ParameterWrapper(parameter: wt)
+    }
+}
+
 /// Excitation parameter group
 public class ExcitationParameters: ObservableObject {
     @Published public var pokeStrength: ParameterWrapper
@@ -64,6 +95,20 @@ public class ExcitationParameters: ObservableObject {
 
         self.pokeStrength = ParameterWrapper(parameter: strength)
         self.pokeDuration = ParameterWrapper(parameter: duration)
+    }
+}
+
+/// Voice parameter group
+public class VoiceParameters: ObservableObject {
+    @Published public var polyphony: ParameterWrapper
+    @Published public var personality: ParameterWrapper
+
+    init(auParameterTree: AUParameterTree) {
+        let poly = auParameterTree.parameter(withID: "voice.polyphony")!
+        let pers = auParameterTree.parameter(withID: "voice.personality")!
+
+        self.polyphony = ParameterWrapper(parameter: poly)
+        self.personality = ParameterWrapper(parameter: pers)
     }
 }
 
