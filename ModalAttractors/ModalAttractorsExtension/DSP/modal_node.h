@@ -1,32 +1,39 @@
 /**
  * @file modal_node.h
- * @brief Core 4-mode modal resonator node implementation
+ * @brief Core 4-mode modal resonator node implementation (macOS port)
  *
  * This module implements the autonomous modal resonator with up to 4 complex modes.
  * Each mode evolves according to: ȧ_k = (-γ_k + iω_k)a_k + u_k(t)
  *
- * Design: Audio-first, asynchronous operation
- * - No hard network sync requirement
- * - Stable autonomous operation
- * - Event-based excitation (pokes)
+ * Ported from ESP32 firmware for macOS Audio Unit plugin:
+ * - Removed FreeRTOS dependencies
+ * - Adapted for variable sample rates
+ * - Ready for C++ wrapper integration
  */
 
 #ifndef MODAL_NODE_H
 #define MODAL_NODE_H
 
-#include <complex.h>
 #include <stdint.h>
 #include <stdbool.h>
 
 #ifdef __cplusplus
+#include <complex>
+// Internal C++ complex type
+typedef std::complex<float> modal_complex_t;
 extern "C" {
+#else
+#include <complex.h>
+// C99 complex type
+typedef float complex modal_complex_t;
 #endif
 
-// C-compatible complex float (for C ABI)
+// C-compatible complex float (for C ABI / Swift bridging)
 typedef struct {
     float re;
     float im;
 } modal_complexf_t;
+
 
 // ============================================================================
 // Constants
@@ -63,8 +70,8 @@ typedef struct {
  * @brief Modal state (complex amplitude and dynamics)
  */
 typedef struct {
-    float complex a;        ///< Complex amplitude a(t) = |a|e^(iφ)
-    float complex a_dot;    ///< Time derivative (for integration)
+    modal_complex_t a;        ///< Complex amplitude a(t) = |a|e^(iφ)
+    modal_complex_t a_dot;    ///< Time derivative (for integration)
     mode_params_t params;   ///< Mode parameters
 } mode_state_t;
 
@@ -242,6 +249,12 @@ float freq_to_omega(float freq_hz);
 float random_phase(void);
 
 #ifdef __cplusplus
+}
+
+// C++ convenience wrapper (not C linkage)
+inline modal_complex_t modal_node_get_mode0_cpp(const modal_node_t* node) {
+    modal_complexf_t z = modal_node_get_mode0(node);
+    return modal_complex_t(z.re, z.im);
 }
 #endif
 

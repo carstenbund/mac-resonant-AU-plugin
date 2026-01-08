@@ -1,18 +1,11 @@
 /**
  * @file audio_synth.h
- * @brief 48kHz 4-channel audio synthesis from modal state
+ * @brief Variable sample rate audio synthesis from modal state (macOS port)
  *
- * Audio-first design:
- * - Runs independently at 48kHz regardless of network
- * - Modal state directly drives audio output
- * - I2S DMA output for low-latency
- * - 4-channel output (one channel per mode)
- *
- * Channel mapping:
- * - Channel 0: Mode 0 direct output
- * - Channel 1: Mode 1 direct output
- * - Channel 2: Mode 2 direct output
- * - Channel 3: Mode 3 direct output
+ * Ported from ESP32 firmware - adapted for:
+ * - Variable sample rates (44.1/48/88.2/96 kHz)
+ * - Pull-based rendering (AU callback model)
+ * - No I2S/DMA dependencies
  *
  * Each mode synthesizes its own sinusoid at its frequency (omega[k]),
  * with amplitude envelope from the mode's complex amplitude |a_k|.
@@ -33,11 +26,10 @@ extern "C" {
 // Constants
 // ============================================================================
 
-#define SAMPLE_RATE 48000
-#define AUDIO_BUFFER_SAMPLES 480  // 10ms buffer @ 48kHz
-#define NUM_AUDIO_CHANNELS 4      // 4 channels (one per mode)
-#define AUDIO_BUFFER_SIZE (AUDIO_BUFFER_SAMPLES * NUM_AUDIO_CHANNELS)  // Total buffer size
-#define BITS_PER_SAMPLE 16
+#define DEFAULT_SAMPLE_RATE 48000.0f
+#define AUDIO_BUFFER_SAMPLES 512  // Typical AU buffer size
+#define NUM_AUDIO_CHANNELS 2      // Stereo output for AU
+#define BITS_PER_SAMPLE 32        // Float samples for AU
 
 // ============================================================================
 // Type Definitions
@@ -47,7 +39,7 @@ extern "C" {
  * @brief Audio synthesis parameters
  */
 typedef struct {
-    float sample_rate;                    ///< Sample rate (Hz)
+    float sample_rate;                    ///< Sample rate (Hz) - variable
     uint32_t phase_accumulator[MAX_MODES]; ///< Phase accumulators (one per mode)
     float mode_gains[MAX_MODES];          ///< Per-mode gains [0,1]
     float master_gain;                    ///< Master output gain [0,1]
@@ -59,7 +51,6 @@ typedef struct {
  */
 typedef struct {
     audio_synth_params_t params;
-    int16_t buffer[AUDIO_BUFFER_SIZE];  ///< DMA buffer (4-channel interleaved)
     const modal_node_t* node;           ///< Reference to modal node state
     float amplitude_smooth[MAX_MODES];  ///< Smoothed amplitudes per mode
     bool initialized;
@@ -74,22 +65,35 @@ typedef struct {
  *
  * @param synth Pointer to synthesis state
  * @param node Pointer to modal node (state source)
- *
- * Note: Frequencies are taken from mode parameters (omega[k])
+ * @param sample_rate Sample rate in Hz (44100, 48000, 96000, etc.)
  */
 void audio_synth_init(audio_synth_t* synth,
-                     const modal_node_t* node);
+                     const modal_node_t* node,
+                     float sample_rate);
 
 /**
- * @brief Generate one buffer of audio samples
+ * @brief Generate audio samples (stereo float)
  *
  * Reads current modal state and generates audio samples.
- * Called by I2S DMA interrupt or audio task.
+ * Called by AU render callback.
  *
  * @param synth Pointer to synthesis state
- * @return Pointer to audio buffer (ready for I2S write)
+ * @param outL Left channel output buffer
+ * @param outR Right channel output buffer
+ * @param num_frames Number of frames to generate
  */
-int16_t* audio_synth_generate_buffer(audio_synth_t* synth);
+void audio_synth_render(audio_synth_t* synth,
+                       float* outL,
+                       float* outR,
+                       uint32_t num_frames);
+
+/**
+ * @brief Set sample rate (for sample rate changes)
+ *
+ * @param synth Pointer to synthesis state
+ * @param sample_rate New sample rate in Hz
+ */
+void audio_synth_set_sample_rate(audio_synth_t* synth, float sample_rate);
 
 /**
  * @brief Set per-mode gain
@@ -124,47 +128,13 @@ void audio_synth_set_mute(audio_synth_t* synth, bool mute);
 void audio_synth_reset_phase(audio_synth_t* synth);
 
 // ============================================================================
-// I2S Driver Interface
-// ============================================================================
-
-/**
- * @brief Initialize I2S driver for PCM5102A DAC
- *
- * Configures ESP32 I2S peripheral:
- * - 48kHz sample rate
- * - 16-bit samples
- * - Mono or stereo output
- * - DMA buffers
- */
-void audio_i2s_init(void);
-
-/**
- * @brief Write audio buffer to I2S
- *
- * @param buffer Pointer to audio samples
- * @param size Buffer size in bytes
- * @return Number of bytes written
- */
-size_t audio_i2s_write(const int16_t* buffer, size_t size);
-
-/**
- * @brief Audio task (FreeRTOS)
- *
- * Continuously generates audio and writes to I2S.
- * Runs at high priority on dedicated core.
- *
- * @param pvParameters Task parameters (audio_synth_t*)
- */
-void audio_task(void* pvParameters);
-
-// ============================================================================
 // Synthesis Helpers
 // ============================================================================
 
 /**
  * @brief Fast sine approximation
  *
- * Uses lookup table or fast polynomial for low-latency synthesis.
+ * Uses Taylor series for low-latency synthesis.
  *
  * @param phase Phase in radians
  * @return Sine value [-1, 1]
