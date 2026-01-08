@@ -367,18 +367,11 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
         // Create parameter tree wrapper for SwiftUI
         let paramTreeWrapper = ParameterTree(auParameterTree: paramTree)
 
-        // Create SwiftUI view with parameter tree
-        let contentView = ModalAttractorsExtensionMainView()
-            .environmentObject(paramTreeWrapper)
+        // Create and configure our custom AUViewController subclass
+        // that hosts the SwiftUI view internally
+        let vc = ModalAttractorsAUViewController()
+        vc.configure(paramTreeWrapper: paramTreeWrapper)
 
-        // Wrap in AnyView to type-erase, then create NSHostingController
-        // This makes the generic type concrete: NSHostingController<AnyView>
-        let hostingController = NSHostingController(rootView: AnyView(contentView))
-        hostingController.preferredContentSize = NSSize(
-            width: UIConstants.Sizes.windowMinWidth,
-            height: UIConstants.Sizes.windowMinHeight
-        )
-
-        completionHandler(hostingController)
+        completionHandler(vc)
     }
 }
