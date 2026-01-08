@@ -16,27 +16,34 @@ public class AudioUnitFactory: NSObject, AUAudioUnitFactory {
     private var observation: NSKeyValueObservation?
 
     public func beginRequest(with context: NSExtensionContext) {
-
+        // Extension request handling (if needed)
     }
 
     @objc
     public func createAudioUnit(with componentDescription: AudioComponentDescription) throws -> AUAudioUnit {
-        auAudioUnit = try ModalAttractorsExtensionAudioUnit(componentDescription: componentDescription, options: [])
+        auAudioUnit = try ModalAttractorsExtensionAudioUnit(
+            componentDescription: componentDescription,
+            options: []
+        )
 
-        guard let audioUnit = auAudioUnit as? ModalAttractorsExtensionAudioUnit else {
-            fatalError("Failed to create ModalAttractorsExtension")
+        guard let audioUnit = auAudioUnit else {
+            throw NSError(
+                domain: NSOSStatusErrorDomain,
+                code: Int(kAudioUnitErr_FailedInitialization),
+                userInfo: [NSLocalizedDescriptionKey: "Failed to create ModalAttractorsExtension"]
+            )
         }
 
-        audioUnit.setupParameterTree(ModalAttractorsExtensionParameterSpecs.createAUParameterTree())
-
+        // Observe allParameterValues to ensure host can set initial values
         self.observation = audioUnit.observe(\.allParameterValues, options: [.new]) { object, change in
             guard let tree = audioUnit.parameterTree else { return }
-            
-            // This insures the Audio Unit gets initial values from the host.
-            for param in tree.allParameters { param.value = param.value }
+
+            // This ensures the Audio Unit gets initial values from the host
+            for param in tree.allParameters {
+                param.value = param.value
+            }
         }
 
         return audioUnit
     }
-    
 }

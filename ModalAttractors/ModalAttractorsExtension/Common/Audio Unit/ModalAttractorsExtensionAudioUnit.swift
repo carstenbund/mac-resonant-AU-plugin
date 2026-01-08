@@ -31,6 +31,10 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
 
     private var format: AVAudioFormat
 
+    // MARK: - Parameter Tree
+
+    private var _parameterTree: AUParameterTree?
+
     // MARK: - Constants
 
     private let maxPolyphony: UInt32 = 16
@@ -66,6 +70,17 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
 
         // Build RT-safe render block once (no ARC in render thread)
         _renderBlock = Self.makeRenderBlock(enginePtr: enginePtr)
+
+        // Create parameter tree internally
+        _parameterTree = ModalAttractorsExtensionParameterSpecs.createAUParameterTree()
+
+        // Set default values from parameter tree
+        if let paramTree = _parameterTree {
+            for param in paramTree.allParameters {
+                modal_attractors_engine_set_parameter(engine, UInt32(param.address), param.value)
+            }
+            setupParameterCallbacks(paramTree)
+        }
     }
 
     deinit {
@@ -80,6 +95,11 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
 
     public override var outputBusses: AUAudioUnitBusArray {
         return _outputBusses
+    }
+
+    public override var parameterTree: AUParameterTree? {
+        get { return _parameterTree }
+        set { _parameterTree = newValue }
     }
 
     public override var maximumFramesToRender: AUAudioFrameCount {
@@ -100,23 +120,9 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
         }
     }
 
-    // MARK: - Parameter Tree
+    // MARK: - Parameter Tree Callbacks
 
-    public func setupParameterTree(_ parameterTree: AUParameterTree) {
-        self.parameterTree = parameterTree
-
-        // Set default values from parameter tree
-        guard let engine = engine else { return }
-
-        for param in parameterTree.allParameters {
-            modal_attractors_engine_set_parameter(engine, UInt32(param.address), param.value)
-        }
-
-        setupParameterCallbacks()
-    }
-
-    private func setupParameterCallbacks() {
-        guard let paramTree = parameterTree else { return }
+    private func setupParameterCallbacks(_ paramTree: AUParameterTree) {
 
         // Called when a parameter changes (from UI or host automation)
         // NOTE: this is not sample-accurate; sample-accurate automation comes via render events.
