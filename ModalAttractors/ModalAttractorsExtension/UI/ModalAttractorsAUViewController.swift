@@ -10,7 +10,7 @@ import SwiftUI
 
 /// Custom AUViewController subclass that hosts the SwiftUI view
 final class ModalAttractorsAUViewController: AUViewController {
-    private var hostingController: NSHostingController<ModalAttractorsExtensionMainView>?
+    private var hostingController: NSViewController?
 
     /// Configure the view controller with the parameter tree wrapper
     /// Call this before presenting to inject environment objects
