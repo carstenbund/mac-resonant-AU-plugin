@@ -17,6 +17,7 @@ enum {
     kParam_MasterGain = 0,
     kParam_CouplingStrength,
     kParam_Topology,
+    kParam_NodeCount,
 
     // Per-mode parameters (Mode 0)
     kParam_Mode0_Frequency,
@@ -68,6 +69,11 @@ enum {
 #define kTopology_Max 6
 #define kTopology_Default 0  // Ring
 
+// Node count: 1-16 (discrete)
+#define kNodeCount_Min 1
+#define kNodeCount_Max 16
+#define kNodeCount_Default 16
+
 // Mode frequency multipliers: 0.5 to 8.0
 #define kModeFreq_Min 0.5f
 #define kModeFreq_Max 8.0f
@@ -107,6 +113,7 @@ enum {
 #define kParamName_MasterGain "Master Gain"
 #define kParamName_CouplingStrength "Coupling Strength"
 #define kParamName_Topology "Topology"
+#define kParamName_NodeCount "Node Count"
 #define kParamName_PokeStrength "Poke Strength"
 #define kParamName_PokeDuration "Poke Duration"
 #define kParamName_Polyphony "Polyphony"
