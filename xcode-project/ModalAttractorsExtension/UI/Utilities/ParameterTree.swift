@@ -51,10 +51,10 @@ public class GlobalParameters: ObservableObject {
 
     init(auParameterTree: AUParameterTree) {
         // Fetch parameters from tree by address
-        let gain = auParameterTree.parameter(withAddress: AUParameterAddress(kParam_MasterGain.rawValue))!
-        let coupling = auParameterTree.parameter(withAddress: AUParameterAddress(kParam_CouplingStrength.rawValue))!
-        let topo = auParameterTree.parameter(withAddress: AUParameterAddress(kParam_Topology.rawValue))!
-        let nodes = auParameterTree.parameter(withAddress: AUParameterAddress(kParam_NodeCount.rawValue))!
+        let gain = auParameterTree.parameter(withAddress: AUParameterAddress(param_MasterGain.rawValue))!
+        let coupling = auParameterTree.parameter(withAddress: AUParameterAddress(param_CouplingStrength.rawValue))!
+        let topo = auParameterTree.parameter(withAddress: AUParameterAddress(param_Topology.rawValue))!
+        let nodes = auParameterTree.parameter(withAddress: AUParameterAddress(param_NodeCount.rawValue))!
 
         self.masterGain = ParameterWrapper(parameter: gain)
         self.couplingStrength = ParameterWrapper(parameter: coupling)
@@ -95,8 +95,8 @@ public class ExcitationParameters: ObservableObject {
 
     init(auParameterTree: AUParameterTree) {
         // Excitation parameters at addresses 16-17
-        let strength = auParameterTree.parameter(withAddress: AUParameterAddress(kParam_PokeStrength.rawValue))!
-        let duration = auParameterTree.parameter(withAddress: AUParameterAddress(kParam_PokeDuration.rawValue))!
+        let strength = auParameterTree.parameter(withAddress: AUParameterAddress(param_PokeStrength.rawValue))!
+        let duration = auParameterTree.parameter(withAddress: AUParameterAddress(param_PokeDuration.rawValue))!
 
         self.pokeStrength = ParameterWrapper(parameter: strength)
         self.pokeDuration = ParameterWrapper(parameter: duration)
@@ -110,8 +110,8 @@ public class VoiceParameters: ObservableObject {
 
     init(auParameterTree: AUParameterTree) {
         // Voice parameters at addresses 18-19
-        let poly = auParameterTree.parameter(withAddress: AUParameterAddress(kParam_Polyphony.rawValue))!
-        let pers = auParameterTree.parameter(withAddress: AUParameterAddress(kParam_Personality.rawValue))!
+        let poly = auParameterTree.parameter(withAddress: AUParameterAddress(param_Polyphony.rawValue))!
+        let pers = auParameterTree.parameter(withAddress: AUParameterAddress(param_Personality.rawValue))!
 
         self.polyphony = ParameterWrapper(parameter: poly)
         self.personality = ParameterWrapper(parameter: pers)
