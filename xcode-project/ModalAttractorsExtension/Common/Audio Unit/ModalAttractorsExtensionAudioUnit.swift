@@ -120,9 +120,10 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
 
             // REQUIRED: Add component identification for AUv3 validation
             // These must match the Info.plist AudioComponents entry
-            state["type"] = "aumi"
-            state["subtype"] = "Test"
-            state["manufacturer"] = "Test"
+            // Note: type/subtype/manufacturer must be FourCharCode as Int, not String
+            state["type"] = Self.fourCharCode("aumi")        // 1635085673
+            state["subtype"] = Self.fourCharCode("Test")     // 1413829748
+            state["manufacturer"] = Self.fourCharCode("Test") // 1413829748
             state["version"] = 67072
 
             // Save all parameter values
@@ -147,5 +148,16 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
                 }
             }
         }
+    }
+
+    // Helper function to convert 4-character string to FourCharCode integer
+    private static func fourCharCode(_ string: String) -> Int {
+        let chars = string.utf8
+        guard chars.count == 4 else { return 0 }
+        var result: Int = 0
+        for char in chars {
+            result = (result << 8) | Int(char)
+        }
+        return result
     }
 }

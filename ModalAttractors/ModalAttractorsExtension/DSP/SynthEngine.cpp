@@ -9,12 +9,28 @@
 #include "ModalVoice.h"
 #include <algorithm>
 
-// Parameter IDs (should match ModalParameters.h)
+// Parameter IDs (should match ModalAttractorsExtensionParameterAddresses.h)
 enum ParamID {
     kParam_MasterGain = 0,
-    kParam_CouplingStrength,
-    kParam_Topology,
-    kParam_NodeCount
+    kParam_CouplingStrength = 1,
+    kParam_Topology = 2,
+    kParam_NodeCount = 3,
+    kParam_Mode0_Frequency = 4,
+    kParam_Mode0_Damping = 5,
+    kParam_Mode0_Weight = 6,
+    kParam_Mode1_Frequency = 7,
+    kParam_Mode1_Damping = 8,
+    kParam_Mode1_Weight = 9,
+    kParam_Mode2_Frequency = 10,
+    kParam_Mode2_Damping = 11,
+    kParam_Mode2_Weight = 12,
+    kParam_Mode3_Frequency = 13,
+    kParam_Mode3_Damping = 14,
+    kParam_Mode3_Weight = 15,
+    kParam_PokeStrength = 16,
+    kParam_PokeDuration = 17,
+    kParam_Polyphony = 18,
+    kParam_Personality = 19
 };
 
 SynthEngine::SynthEngine(uint32_t maxPolyphony)
@@ -27,10 +43,30 @@ SynthEngine::SynthEngine(uint32_t maxPolyphony)
     , channels_(2)
     , initialized_(false)
     , controlRateCounter_(0)
+    // Global parameters - match defaults from Parameters.swift
     , masterGain_(0.7f)
     , couplingStrength_(0.3f)
     , topologyType_(0)
-    , nodeCount_(16)  // Default to full 16 nodes
+    , nodeCount_(16)
+    // Mode parameters - match defaults from Parameters.swift
+    , mode0_frequency_(1.0f)
+    , mode0_damping_(1.0f)
+    , mode0_weight_(1.0f)
+    , mode1_frequency_(2.0f)
+    , mode1_damping_(1.2f)
+    , mode1_weight_(0.8f)
+    , mode2_frequency_(3.0f)
+    , mode2_damping_(1.5f)
+    , mode2_weight_(0.6f)
+    , mode3_frequency_(4.5f)
+    , mode3_damping_(2.0f)
+    , mode3_weight_(0.4f)
+    // Excitation parameters
+    , pokeStrength_(0.5f)
+    , pokeDuration_(10.0f)
+    // Voice parameters
+    , polyphony_(16.0f)
+    , personality_(0.0f)
 {
     // Allocate DSP components (done once at construction)
     voiceAllocator_ = new VoiceAllocator(maxPolyphony);
@@ -224,7 +260,65 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
             break;
         }
 
-        // TODO: Add per-mode parameters, poke strength, etc.
+        // Mode 0 parameters
+        case kParam_Mode0_Frequency:
+            mode0_frequency_ = value;
+            break;
+        case kParam_Mode0_Damping:
+            mode0_damping_ = value;
+            break;
+        case kParam_Mode0_Weight:
+            mode0_weight_ = value;
+            break;
+
+        // Mode 1 parameters
+        case kParam_Mode1_Frequency:
+            mode1_frequency_ = value;
+            break;
+        case kParam_Mode1_Damping:
+            mode1_damping_ = value;
+            break;
+        case kParam_Mode1_Weight:
+            mode1_weight_ = value;
+            break;
+
+        // Mode 2 parameters
+        case kParam_Mode2_Frequency:
+            mode2_frequency_ = value;
+            break;
+        case kParam_Mode2_Damping:
+            mode2_damping_ = value;
+            break;
+        case kParam_Mode2_Weight:
+            mode2_weight_ = value;
+            break;
+
+        // Mode 3 parameters
+        case kParam_Mode3_Frequency:
+            mode3_frequency_ = value;
+            break;
+        case kParam_Mode3_Damping:
+            mode3_damping_ = value;
+            break;
+        case kParam_Mode3_Weight:
+            mode3_weight_ = value;
+            break;
+
+        // Excitation parameters
+        case kParam_PokeStrength:
+            pokeStrength_ = value;
+            break;
+        case kParam_PokeDuration:
+            pokeDuration_ = value;
+            break;
+
+        // Voice parameters
+        case kParam_Polyphony:
+            polyphony_ = value;
+            break;
+        case kParam_Personality:
+            personality_ = value;
+            break;
 
         default:
             break;
@@ -233,17 +327,59 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
 
 float SynthEngine::getParameter(uint32_t paramId) const {
     switch (paramId) {
+        // Global parameters
         case kParam_MasterGain:
             return masterGain_;
-
         case kParam_CouplingStrength:
             return couplingStrength_;
-
         case kParam_Topology:
             return static_cast<float>(topologyType_);
-
         case kParam_NodeCount:
             return static_cast<float>(nodeCount_);
+
+        // Mode 0 parameters
+        case kParam_Mode0_Frequency:
+            return mode0_frequency_;
+        case kParam_Mode0_Damping:
+            return mode0_damping_;
+        case kParam_Mode0_Weight:
+            return mode0_weight_;
+
+        // Mode 1 parameters
+        case kParam_Mode1_Frequency:
+            return mode1_frequency_;
+        case kParam_Mode1_Damping:
+            return mode1_damping_;
+        case kParam_Mode1_Weight:
+            return mode1_weight_;
+
+        // Mode 2 parameters
+        case kParam_Mode2_Frequency:
+            return mode2_frequency_;
+        case kParam_Mode2_Damping:
+            return mode2_damping_;
+        case kParam_Mode2_Weight:
+            return mode2_weight_;
+
+        // Mode 3 parameters
+        case kParam_Mode3_Frequency:
+            return mode3_frequency_;
+        case kParam_Mode3_Damping:
+            return mode3_damping_;
+        case kParam_Mode3_Weight:
+            return mode3_weight_;
+
+        // Excitation parameters
+        case kParam_PokeStrength:
+            return pokeStrength_;
+        case kParam_PokeDuration:
+            return pokeDuration_;
+
+        // Voice parameters
+        case kParam_Polyphony:
+            return polyphony_;
+        case kParam_Personality:
+            return personality_;
 
         default:
             return 0.0f;
