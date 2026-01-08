@@ -372,7 +372,8 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
             .environmentObject(paramTreeWrapper)
 
         // Wrap in NSHostingController (NSViewController for macOS)
-        let hostingController = NSHostingController(rootView: contentView)
+        // Explicitly type as NSViewController to match AUViewController typealias
+        let hostingController: NSViewController = NSHostingController(rootView: contentView)
         hostingController.preferredContentSize = NSSize(
             width: UIConstants.Sizes.windowMinWidth,
             height: UIConstants.Sizes.windowMinHeight
