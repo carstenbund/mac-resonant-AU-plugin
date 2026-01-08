@@ -303,6 +303,13 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
 
             var state: [String: Any] = [:]
 
+            // REQUIRED: Add component identification for AUv3 validation
+            // These must match the Info.plist AudioComponents entry
+            state["type"] = "aumi"
+            state["subtype"] = "Test"
+            state["manufacturer"] = "Test"
+            state["version"] = 67072
+
             // Save all parameter values
             if let paramTree = parameterTree {
                 for param in paramTree.allParameters {
