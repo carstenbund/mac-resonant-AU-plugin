@@ -13,7 +13,8 @@
 enum ParamID {
     kParam_MasterGain = 0,
     kParam_CouplingStrength,
-    kParam_Topology
+    kParam_Topology,
+    kParam_NodeCount
 };
 
 SynthEngine::SynthEngine(uint32_t maxPolyphony)
