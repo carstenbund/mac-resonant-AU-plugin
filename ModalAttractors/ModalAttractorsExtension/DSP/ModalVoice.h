@@ -126,7 +126,7 @@ public:
      * @return Complex amplitude
      */
     modal_complex_t getMode0Amplitude() const {
-        return modal_node_get_mode0(&node_);
+        return modal_node_get_mode0_cpp(&node_);
     }
 
     /**

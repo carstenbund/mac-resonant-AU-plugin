@@ -22,6 +22,12 @@
 extern "C" {
 #endif
 
+// C-compatible complex float (for C ABI)
+typedef struct {
+    float re;
+    float im;
+} modal_complexf_t;
+
 // ============================================================================
 // Constants
 // ============================================================================
@@ -185,7 +191,7 @@ float modal_node_get_phase_modulation(const modal_node_t* node);
  * @param node Pointer to node structure
  * @return Complex amplitude of mode 0
  */
-float complex modal_node_get_mode0(const modal_node_t* node);
+modal_complexf_t modal_node_get_mode0(const modal_node_t* node);
 
 /**
  * @brief Start node operation

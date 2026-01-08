@@ -238,8 +238,10 @@ float modal_node_get_phase_modulation(const modal_node_t* node) {
     return phase * amp * 0.1f; // Scale to reasonable range
 }
 
-float complex modal_node_get_mode0(const modal_node_t* node) {
-    return node->modes[0].a;
+modal_complexf_t modal_node_get_mode0(const modal_node_t* node) {
+    float complex z = node->modes[0].a;
+    modal_complexf_t result = { .re = crealf(z), .im = cimagf(z) };
+    return result;
 }
 
 void modal_node_start(modal_node_t* node) {
