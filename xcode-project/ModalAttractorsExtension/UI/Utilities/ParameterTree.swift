@@ -51,10 +51,10 @@ public class GlobalParameters: ObservableObject {
 
     init(auParameterTree: AUParameterTree) {
         // Fetch parameters from tree by address
-        let gain = auParameterTree.parameter(withAddress: AUParameterAddress(param_MasterGain.rawValue))!
-        let coupling = auParameterTree.parameter(withAddress: AUParameterAddress(param_CouplingStrength.rawValue))!
-        let topo = auParameterTree.parameter(withAddress: AUParameterAddress(param_Topology.rawValue))!
-        let nodes = auParameterTree.parameter(withAddress: AUParameterAddress(param_NodeCount.rawValue))!
+        let gain = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_MasterGain.rawValue)!
+        let coupling = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_CouplingStrength.rawValue)!
+        let topo = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_Topology.rawValue)!
+        let nodes = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_NodeCount.rawValue)!
 
         self.masterGain = ParameterWrapper(parameter: gain)
         self.couplingStrength = ParameterWrapper(parameter: coupling)
@@ -74,13 +74,36 @@ public class ModeParameters: ObservableObject {
     init(auParameterTree: AUParameterTree, modeIndex: Int) {
         self.modeNumber = modeIndex
 
-        // Each mode has 3 consecutive parameters: frequency, damping, weight
-        // Mode 0 starts at address 4, each mode takes 3 addresses
-        let baseAddress = 4 + (modeIndex * 3)
+        // Get parameter addresses based on mode index
+        // Using enum values for type safety
+        let freqAddr: ModalAttractorsExtensionParameterAddress
+        let dampAddr: ModalAttractorsExtensionParameterAddress
+        let wtAddr: ModalAttractorsExtensionParameterAddress
 
-        let freq = auParameterTree.parameter(withAddress: AUParameterAddress(baseAddress))!
-        let damp = auParameterTree.parameter(withAddress: AUParameterAddress(baseAddress + 1))!
-        let wt = auParameterTree.parameter(withAddress: AUParameterAddress(baseAddress + 2))!
+        switch modeIndex {
+        case 0:
+            freqAddr = .param_Mode0_Frequency
+            dampAddr = .param_Mode0_Damping
+            wtAddr = .param_Mode0_Weight
+        case 1:
+            freqAddr = .param_Mode1_Frequency
+            dampAddr = .param_Mode1_Damping
+            wtAddr = .param_Mode1_Weight
+        case 2:
+            freqAddr = .param_Mode2_Frequency
+            dampAddr = .param_Mode2_Damping
+            wtAddr = .param_Mode2_Weight
+        case 3:
+            freqAddr = .param_Mode3_Frequency
+            dampAddr = .param_Mode3_Damping
+            wtAddr = .param_Mode3_Weight
+        default:
+            fatalError("Invalid mode index: \(modeIndex)")
+        }
+
+        let freq = auParameterTree.parameter(withAddress: freqAddr.rawValue)!
+        let damp = auParameterTree.parameter(withAddress: dampAddr.rawValue)!
+        let wt = auParameterTree.parameter(withAddress: wtAddr.rawValue)!
 
         self.frequency = ParameterWrapper(parameter: freq)
         self.damping = ParameterWrapper(parameter: damp)
@@ -94,9 +117,9 @@ public class ExcitationParameters: ObservableObject {
     @Published public var pokeDuration: ParameterWrapper
 
     init(auParameterTree: AUParameterTree) {
-        // Excitation parameters at addresses 16-17
-        let strength = auParameterTree.parameter(withAddress: AUParameterAddress(param_PokeStrength.rawValue))!
-        let duration = auParameterTree.parameter(withAddress: AUParameterAddress(param_PokeDuration.rawValue))!
+        // Excitation parameters
+        let strength = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_PokeStrength.rawValue)!
+        let duration = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_PokeDuration.rawValue)!
 
         self.pokeStrength = ParameterWrapper(parameter: strength)
         self.pokeDuration = ParameterWrapper(parameter: duration)
@@ -109,9 +132,9 @@ public class VoiceParameters: ObservableObject {
     @Published public var personality: ParameterWrapper
 
     init(auParameterTree: AUParameterTree) {
-        // Voice parameters at addresses 18-19
-        let poly = auParameterTree.parameter(withAddress: AUParameterAddress(param_Polyphony.rawValue))!
-        let pers = auParameterTree.parameter(withAddress: AUParameterAddress(param_Personality.rawValue))!
+        // Voice parameters
+        let poly = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_Polyphony.rawValue)!
+        let pers = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_Personality.rawValue)!
 
         self.polyphony = ParameterWrapper(parameter: poly)
         self.personality = ParameterWrapper(parameter: pers)
