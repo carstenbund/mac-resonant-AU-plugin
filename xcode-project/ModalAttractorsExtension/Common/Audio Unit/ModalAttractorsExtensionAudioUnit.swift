@@ -8,6 +8,7 @@
 import AVFoundation
 import CoreAudioKit
 import SwiftUI
+import AppKit
 
 /// AUv3 Instrument implementation for Modal Attractors synthesis engine
 ///
@@ -370,8 +371,12 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
         let contentView = ModalAttractorsExtensionMainView()
             .environmentObject(paramTreeWrapper)
 
-        // Wrap in hosting controller
-        let hostingController = AUHostingController(rootView: contentView)
+        // Wrap in NSHostingController (NSViewController for macOS)
+        let hostingController = NSHostingController(rootView: contentView)
+        hostingController.preferredContentSize = NSSize(
+            width: UIConstants.Sizes.windowMinWidth,
+            height: UIConstants.Sizes.windowMinHeight
+        )
 
         completionHandler(hostingController)
     }
