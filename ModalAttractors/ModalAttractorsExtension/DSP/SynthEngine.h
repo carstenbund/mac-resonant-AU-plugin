@@ -195,11 +195,33 @@ private:
     uint32_t controlRateCounter_;
     static constexpr uint32_t CONTROL_RATE_SAMPLES = 96; // ~500 Hz at 48kHz
 
-    // Parameter cache
+    // Parameter cache - Global
     float masterGain_;
     float couplingStrength_;
     int topologyType_;
     uint32_t nodeCount_;  // Active node count (1-16), currently stored but not enforced
+
+    // Parameter cache - Per-mode parameters
+    float mode0_frequency_;
+    float mode0_damping_;
+    float mode0_weight_;
+    float mode1_frequency_;
+    float mode1_damping_;
+    float mode1_weight_;
+    float mode2_frequency_;
+    float mode2_damping_;
+    float mode2_weight_;
+    float mode3_frequency_;
+    float mode3_damping_;
+    float mode3_weight_;
+
+    // Parameter cache - Excitation
+    float pokeStrength_;
+    float pokeDuration_;
+
+    // Parameter cache - Voice
+    float polyphony_;
+    float personality_;
 
     /**
      * @brief Process single event (real-time safe)
