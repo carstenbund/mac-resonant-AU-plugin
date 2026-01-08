@@ -7,6 +7,7 @@
 
 import AVFoundation
 import CoreAudioKit
+import SwiftUI
 
 /// AUv3 Instrument implementation for Modal Attractors synthesis engine
 ///
@@ -352,5 +353,26 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
             result = (result << 8) | Int(char)
         }
         return result
+    }
+
+    // MARK: - UI Integration
+
+    public override func requestViewController(completionHandler: @escaping (AUViewController?) -> Void) {
+        guard let paramTree = parameterTree else {
+            completionHandler(nil)
+            return
+        }
+
+        // Create parameter tree wrapper for SwiftUI
+        let paramTreeWrapper = ParameterTree(auParameterTree: paramTree)
+
+        // Create SwiftUI view with parameter tree
+        let contentView = ModalAttractorsExtensionMainView()
+            .environmentObject(paramTreeWrapper)
+
+        // Wrap in hosting controller
+        let hostingController = AUHostingController(rootView: contentView)
+
+        completionHandler(hostingController)
     }
 }
