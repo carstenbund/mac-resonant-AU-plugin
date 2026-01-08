@@ -189,7 +189,7 @@ public class ParameterWrapper: ObservableObject {
 
         // Observe parameter changes from DSP/host automation
         // This ensures the UI updates when the parameter changes externally
-        parameter.implementorValueObserver = { [weak self] newValue in
+        parameter.implementorValueObserver = { [weak self] (param: AUParameter, newValue: AUValue) in
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 // Only update if the value actually changed to avoid feedback loops
