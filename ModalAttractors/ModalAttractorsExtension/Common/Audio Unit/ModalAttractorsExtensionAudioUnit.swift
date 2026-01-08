@@ -190,24 +190,22 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
 
     /// Build a real-time safe render block.
     /// - Important: Does not capture `self` (avoids ARC traffic on audio thread).
-    private static func makeRenderBlock(enginePtr: UnsafeMutablePointer<ModalAttractorsEngine>) -> AUInternalRenderBlock {
+    ///
+    
+    private static func makeRenderBlock(
+        enginePtr: UnsafeMutablePointer<ModalAttractorsEngine>
+    ) -> AUInternalRenderBlock {
 
-        let block: AUInternalRenderBlock = { (
-            actionFlags: UnsafeMutablePointer<AudioUnitRenderActionFlags>,
-            timestamp: UnsafePointer<AudioTimeStamp>,
-            frameCount: AUAudioFrameCount,
-            outputBusNumber: Int,
-            outputData: UnsafeMutablePointer<AudioBufferList>?,
-            realtimeEventListHead: UnsafePointer<AURenderEvent>?,
-            pullInputBlock: AURenderPullInputBlock?
-        ) -> OSStatus in
+        let block: AUInternalRenderBlock = { actionFlags,
+                                             timestamp,
+                                             frameCount,
+                                             outputBusNumber,
+                                             outputData,
+                                             realtimeEventListHead,
+                                             pullInputBlock -> AUAudioUnitStatus in
 
-            guard let outputData else { return kAudioUnitErr_InvalidProperty }
-
-            // Begin event batch for this render call
             modal_attractors_engine_begin_events(enginePtr)
 
-            // Parse AU events and push to engine with sample offsets
             var evtPtr = realtimeEventListHead
             let hostSampleTime = AUEventSampleTime(timestamp.pointee.mSampleTime)
 
@@ -215,7 +213,6 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
                 let ev = e.pointee
 
                 switch ev.head.eventType {
-
                 case .MIDI:
                     let midi = ev.MIDI
                     let offset = Int32(midi.eventSampleTime - hostSampleTime)
@@ -226,7 +223,7 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
                     let data2  = d.2
 
                     switch status & 0xF0 {
-                    case 0x90: // Note On
+                    case 0x90:
                         if data2 > 0 {
                             modal_attractors_engine_push_note_on(
                                 enginePtr, offset, data1, Float(data2) * (1.0 / 127.0)
@@ -234,15 +231,12 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
                         } else {
                             modal_attractors_engine_push_note_off(enginePtr, offset, data1)
                         }
-
-                    case 0x80: // Note Off
+                    case 0x80:
                         modal_attractors_engine_push_note_off(enginePtr, offset, data1)
-
-                    case 0xE0: // Pitch Bend
-                        let bend14 = (Int(data2) << 7) | Int(data1)                 // 0..16383
-                        let bend   = (Float(bend14) - 8192.0) * (1.0 / 8192.0)      // -1..+1
+                    case 0xE0:
+                        let bend14 = (Int(data2) << 7) | Int(data1)
+                        let bend   = (Float(bend14) - 8192.0) * (1.0 / 8192.0)
                         modal_attractors_engine_push_pitch_bend(enginePtr, offset, bend)
-
                     default:
                         break
                     }
@@ -250,39 +244,31 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
                 case .parameter:
                     let p = ev.parameter
                     let offset = Int32(p.eventSampleTime - hostSampleTime)
-
                     modal_attractors_engine_push_parameter(
                         enginePtr, offset, UInt32(p.parameterAddress), p.value
                     )
 
                 case .parameterRamp:
-                    // IMPORTANT: parameterRamp event uses the parameterRamp union field
                     let r = ev.parameter
                     let offset = Int32(r.eventSampleTime - hostSampleTime)
-
-                    // Minimal: push start value. If you add ramp support to DSP,
-                    // push (start,end,duration) and interpolate in-engine.
                     modal_attractors_engine_push_parameter(
                         enginePtr, offset, UInt32(r.parameterAddress), r.value
                     )
 
-                case .MIDIEventList:
-                    // MIDI 2.0 list (optional)
+                case .midiEventList:
                     break
 
                 @unknown default:
                     break
                 }
 
-                // Correct pointer iteration
                 if let next = ev.head.next {
-                    evtPtr = UnsafePointer(next)
+                    evtPtr = UnsafePointer<AURenderEvent>(next)
                 } else {
                     evtPtr = nil
                 }
             }
 
-            // Output buffers
             let buffers = UnsafeMutableAudioBufferListPointer(outputData)
             guard buffers.count >= 1 else { return kAudioUnitErr_InvalidProperty }
 
@@ -306,6 +292,8 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
 
         return block
     }
+
+
 
     // MARK: - State Management
 

@@ -42,7 +42,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
         )
 
         ParameterSpec(
-            address: .kParam_NodeCount,
+            address: ModalAttractorsExtensionParameterAddress.param_NodeCount,
             identifier: "nodeCount",
             name: "Node Count",
             units: .indexed,
