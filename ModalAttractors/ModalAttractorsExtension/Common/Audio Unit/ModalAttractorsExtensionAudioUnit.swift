@@ -371,14 +371,13 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
         let contentView = ModalAttractorsExtensionMainView()
             .environmentObject(paramTreeWrapper)
 
-        // Wrap in NSHostingController (NSViewController for macOS)
-        // Explicitly type as NSViewController to match AUViewController typealias
-        let hostingController: NSViewController = NSHostingController(rootView: contentView)
+        // Wrap in NSHostingController and return as AUViewController
+        let hostingController = NSHostingController(rootView: contentView)
         hostingController.preferredContentSize = NSSize(
             width: UIConstants.Sizes.windowMinWidth,
             height: UIConstants.Sizes.windowMinHeight
         )
 
-        completionHandler(hostingController)
+        completionHandler(hostingController as AUViewController)
     }
 }
