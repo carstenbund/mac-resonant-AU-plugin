@@ -12,7 +12,6 @@ import SwiftUI
 
 /// Main parameter tree wrapper for SwiftUI integration
 /// This bridges the AU parameter tree to SwiftUI's observable system
-@MainActor
 public class ParameterTree: ObservableObject {
     public let global: GlobalParameters
     public let excitation: ExcitationParameters
@@ -26,6 +25,7 @@ public class ParameterTree: ObservableObject {
     }
 
     /// Create a mock parameter tree for SwiftUI previews
+    @MainActor
     public static var preview: ParameterTree {
         let tree = ModalAttractorsExtensionParameterSpecs.createAUParameterTree()
         return ParameterTree(auParameterTree: tree)
@@ -33,7 +33,6 @@ public class ParameterTree: ObservableObject {
 }
 
 /// Global parameter group
-@MainActor
 public class GlobalParameters: ObservableObject {
     @Published public var masterGain: ParameterWrapper
     @Published public var couplingStrength: ParameterWrapper
@@ -55,7 +54,6 @@ public class GlobalParameters: ObservableObject {
 }
 
 /// Excitation parameter group
-@MainActor
 public class ExcitationParameters: ObservableObject {
     @Published public var pokeStrength: ParameterWrapper
     @Published public var pokeDuration: ParameterWrapper
@@ -70,7 +68,6 @@ public class ExcitationParameters: ObservableObject {
 }
 
 /// Wrapper around an AUParameter that provides SwiftUI-compatible binding
-@MainActor
 public class ParameterWrapper: ObservableObject {
     private let parameter: AUParameter
 
