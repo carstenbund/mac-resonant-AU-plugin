@@ -26,10 +26,10 @@ public class ParameterTree: ObservableObject {
     public init(auParameterTree: AUParameterTree) {
         self.auParameterTree = auParameterTree
         self.global = GlobalParameters(auParameterTree: auParameterTree)
-        self.mode0 = ModeParameters(auParameterTree: auParameterTree, groupID: "mode0")
-        self.mode1 = ModeParameters(auParameterTree: auParameterTree, groupID: "mode1")
-        self.mode2 = ModeParameters(auParameterTree: auParameterTree, groupID: "mode2")
-        self.mode3 = ModeParameters(auParameterTree: auParameterTree, groupID: "mode3")
+        self.mode0 = ModeParameters(auParameterTree: auParameterTree, modeIndex: 0)
+        self.mode1 = ModeParameters(auParameterTree: auParameterTree, modeIndex: 1)
+        self.mode2 = ModeParameters(auParameterTree: auParameterTree, modeIndex: 2)
+        self.mode3 = ModeParameters(auParameterTree: auParameterTree, modeIndex: 3)
         self.excitation = ExcitationParameters(auParameterTree: auParameterTree)
         self.voice = VoiceParameters(auParameterTree: auParameterTree)
     }
@@ -50,11 +50,11 @@ public class GlobalParameters: ObservableObject {
     @Published public var nodeCount: ParameterWrapper
 
     init(auParameterTree: AUParameterTree) {
-        // Fetch parameters from tree by full identifier (group.parameter)
-        let gain = auParameterTree.parameter(withID: "global.masterGain")!
-        let coupling = auParameterTree.parameter(withID: "global.couplingStrength")!
-        let topo = auParameterTree.parameter(withID: "global.topology")!
-        let nodes = auParameterTree.parameter(withID: "global.nodeCount")!
+        // Fetch parameters from tree by address
+        let gain = auParameterTree.parameter(withAddress: AUParameterAddress(kParam_MasterGain.rawValue))!
+        let coupling = auParameterTree.parameter(withAddress: AUParameterAddress(kParam_CouplingStrength.rawValue))!
+        let topo = auParameterTree.parameter(withAddress: AUParameterAddress(kParam_Topology.rawValue))!
+        let nodes = auParameterTree.parameter(withAddress: AUParameterAddress(kParam_NodeCount.rawValue))!
 
         self.masterGain = ParameterWrapper(parameter: gain)
         self.couplingStrength = ParameterWrapper(parameter: coupling)
@@ -69,14 +69,18 @@ public class ModeParameters: ObservableObject {
     @Published public var damping: ParameterWrapper
     @Published public var weight: ParameterWrapper
 
-    public let modeNumber: String
+    public let modeNumber: Int
 
-    init(auParameterTree: AUParameterTree, groupID: String) {
-        self.modeNumber = groupID.replacingOccurrences(of: "mode", with: "")
+    init(auParameterTree: AUParameterTree, modeIndex: Int) {
+        self.modeNumber = modeIndex
 
-        let freq = auParameterTree.parameter(withID: "\(groupID).\(groupID)Frequency")!
-        let damp = auParameterTree.parameter(withID: "\(groupID).\(groupID)Damping")!
-        let wt = auParameterTree.parameter(withID: "\(groupID).\(groupID)Weight")!
+        // Each mode has 3 consecutive parameters: frequency, damping, weight
+        // Mode 0 starts at address 4, each mode takes 3 addresses
+        let baseAddress = 4 + (modeIndex * 3)
+
+        let freq = auParameterTree.parameter(withAddress: AUParameterAddress(baseAddress))!
+        let damp = auParameterTree.parameter(withAddress: AUParameterAddress(baseAddress + 1))!
+        let wt = auParameterTree.parameter(withAddress: AUParameterAddress(baseAddress + 2))!
 
         self.frequency = ParameterWrapper(parameter: freq)
         self.damping = ParameterWrapper(parameter: damp)
@@ -90,8 +94,9 @@ public class ExcitationParameters: ObservableObject {
     @Published public var pokeDuration: ParameterWrapper
 
     init(auParameterTree: AUParameterTree) {
-        let strength = auParameterTree.parameter(withID: "excitation.pokeStrength")!
-        let duration = auParameterTree.parameter(withID: "excitation.pokeDuration")!
+        // Excitation parameters at addresses 16-17
+        let strength = auParameterTree.parameter(withAddress: AUParameterAddress(kParam_PokeStrength.rawValue))!
+        let duration = auParameterTree.parameter(withAddress: AUParameterAddress(kParam_PokeDuration.rawValue))!
 
         self.pokeStrength = ParameterWrapper(parameter: strength)
         self.pokeDuration = ParameterWrapper(parameter: duration)
@@ -104,8 +109,9 @@ public class VoiceParameters: ObservableObject {
     @Published public var personality: ParameterWrapper
 
     init(auParameterTree: AUParameterTree) {
-        let poly = auParameterTree.parameter(withID: "voice.polyphony")!
-        let pers = auParameterTree.parameter(withID: "voice.personality")!
+        // Voice parameters at addresses 18-19
+        let poly = auParameterTree.parameter(withAddress: AUParameterAddress(kParam_Polyphony.rawValue))!
+        let pers = auParameterTree.parameter(withAddress: AUParameterAddress(kParam_Personality.rawValue))!
 
         self.polyphony = ParameterWrapper(parameter: poly)
         self.personality = ParameterWrapper(parameter: pers)
