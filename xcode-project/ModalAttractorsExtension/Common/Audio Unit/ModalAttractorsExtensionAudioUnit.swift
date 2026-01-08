@@ -111,4 +111,41 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
 			return NSString.localizedStringWithFormat("%.f", value) as String
 		}
 	}
+
+    // MARK: - State Management
+
+    public override var fullState: [String : Any]? {
+        get {
+            var state: [String: Any] = [:]
+
+            // REQUIRED: Add component identification for AUv3 validation
+            // These must match the Info.plist AudioComponents entry
+            state["type"] = "aumi"
+            state["subtype"] = "Test"
+            state["manufacturer"] = "Test"
+            state["version"] = 67072
+
+            // Save all parameter values
+            if let paramTree = parameterTree {
+                for param in paramTree.allParameters {
+                    state[param.identifier] = kernel.getParameter(param.address)
+                }
+            }
+
+            return state
+        }
+        set {
+            guard let newState = newValue else { return }
+
+            // Restore parameter values
+            if let paramTree = parameterTree {
+                for param in paramTree.allParameters {
+                    if let value = newState[param.identifier] as? Float {
+                        kernel.setParameter(param.address, value)
+                        param.value = value
+                    }
+                }
+            }
+        }
+    }
 }
