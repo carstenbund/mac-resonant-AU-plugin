@@ -250,6 +250,12 @@ float random_phase(void);
 
 #ifdef __cplusplus
 }
+
+// C++ convenience wrapper (not C linkage)
+inline modal_complex_t modal_node_get_mode0_cpp(const modal_node_t* node) {
+    modal_complexf_t z = modal_node_get_mode0(node);
+    return modal_complex_t(z.re, z.im);
+}
 #endif
 
 #endif // MODAL_NODE_H
