@@ -19,7 +19,7 @@
 
 #ifdef __cplusplus
 #include <complex>
-// C++ complex type compatibility
+// Internal C++ complex type
 typedef std::complex<float> modal_complex_t;
 extern "C" {
 #else
@@ -27,6 +27,13 @@ extern "C" {
 // C99 complex type
 typedef float complex modal_complex_t;
 #endif
+
+// C-compatible complex float (for C ABI / Swift bridging)
+typedef struct {
+    float re;
+    float im;
+} modal_complexf_t;
+
 
 // ============================================================================
 // Constants
@@ -191,7 +198,7 @@ float modal_node_get_phase_modulation(const modal_node_t* node);
  * @param node Pointer to node structure
  * @return Complex amplitude of mode 0
  */
-modal_complex_t modal_node_get_mode0(const modal_node_t* node);
+modal_complexf_t modal_node_get_mode0(const modal_node_t* node);
 
 /**
  * @brief Start node operation

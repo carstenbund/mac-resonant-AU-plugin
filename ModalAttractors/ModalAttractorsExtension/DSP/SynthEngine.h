@@ -14,6 +14,7 @@
 #include <cstring>
 
 // Forward declarations - no Apple types leak into DSP
+class ModalVoice;
 class VoiceAllocator;
 class TopologyEngine;
 

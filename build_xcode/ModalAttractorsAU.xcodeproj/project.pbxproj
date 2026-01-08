@@ -1,0 +1,1406 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		3BC6C4F4BA2EEF8429C7A4CC /* ALL_BUILD */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 1C9D863391DA4D4B9EFD29DC /* Build configuration list for PBXAggregateTarget "ALL_BUILD" */;
+			buildPhases = (
+				BA226A8A57D16ACE7EBEE9C1 /* Generate CMakeFiles/ALL_BUILD */,
+			);
+			dependencies = (
+				389899490FF247BD9240419E /* PBXTargetDependency */,
+				4BC87FE85CFB4D418D431B6A /* PBXTargetDependency */,
+				B805750050A54F8AA5FB9871 /* PBXTargetDependency */,
+				8BCB5C60804B4C7E8E38049F /* PBXTargetDependency */,
+			);
+			name = ALL_BUILD;
+			productName = ALL_BUILD;
+		};
+		3C7D1AF3A498C1FACBC4AD2C /* ZERO_CHECK */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 22E42A7112FA46C8A840ED4F /* Build configuration list for PBXAggregateTarget "ZERO_CHECK" */;
+			buildPhases = (
+				AF1EA4EF62EBFAE3EE27E9E6 /* Generate CMakeFiles/ZERO_CHECK */,
+			);
+			dependencies = (
+			);
+			name = ZERO_CHECK;
+			productName = ZERO_CHECK;
+		};
+		B7F1C59A1BBCEE88DD1FE46A /* install */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = FE27393F922D4158BC83901D /* Build configuration list for PBXAggregateTarget "install" */;
+			buildPhases = (
+				93426DA6A4AC2C2AC9CE883C /* CMake PostBuild Rules */,
+			);
+			dependencies = (
+				8454420542C54349B186B4C7 /* PBXTargetDependency */,
+			);
+			name = install;
+			productName = install;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXBuildFile section */
+		0C59B556FCE54EDFA2C77FB0 /* /Users/carsten/code/mac-resonant-AU-plugin/CMakeLists.txt */ = {isa = PBXBuildFile; fileRef = 7E73614449AE411EA381711C /* /Users/carsten/code/mac-resonant-AU-plugin/CMakeLists.txt */; };
+		0EC9343A745C4D85840AA5DA /* /Users/carsten/code/mac-resonant-AU-plugin/Tests/test_suite.cpp */ = {isa = PBXBuildFile; fileRef = 48FBF220320A4052B3E1C7B5 /* /Users/carsten/code/mac-resonant-AU-plugin/Tests/test_suite.cpp */; };
+		12827B01029A45D0A9CEA7E7 /* /Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper/ModalAttractorsEngine.cpp */ = {isa = PBXBuildFile; fileRef = AE398A32C2E0484285D9A8E1 /* /Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper/ModalAttractorsEngine.cpp */; };
+		2511C5FD024745E982B902BC /* /Users/carsten/code/mac-resonant-AU-plugin/CMakeLists.txt */ = {isa = PBXBuildFile; fileRef = 12C90BA20CBD4A7F98FF7290 /* /Users/carsten/code/mac-resonant-AU-plugin/CMakeLists.txt */; };
+		29039ED8018143B6BA77A6AD /* /Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port/modal_node.c */ = {isa = PBXBuildFile; fileRef = 6AD40331669547C8B0A1512B /* /Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port/modal_node.c */; };
+		537A96CF004B42B2BAAFF926 /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/TopologyEngine.cpp */ = {isa = PBXBuildFile; fileRef = AAD7F6A9F8ED4662BA8F772F /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/TopologyEngine.cpp */; };
+		5B35AB110CF04F1ABD137A04 /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/ModalVoice.h */ = {isa = PBXBuildFile; fileRef = 6A8D28C1B5C5442990719D9B /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/ModalVoice.h */; };
+		623301E2ED5D4A6BB3248E2D /* /Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper/ModalParameters.h */ = {isa = PBXBuildFile; fileRef = 05D108F16E024F858EF265A7 /* /Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper/ModalParameters.h */; };
+		632FFD7D660B4517AFC9B409 /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/VoiceAllocator.h */ = {isa = PBXBuildFile; fileRef = 32C8DECC00034A75AA2A7846 /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/VoiceAllocator.h */; };
+		69BC9E8491BA41C3816AA940 /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/ModalVoice.cpp */ = {isa = PBXBuildFile; fileRef = 4E85E62052D84DFDA0AC03FB /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/ModalVoice.cpp */; };
+		6C303F3E9883415D8077567A /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/VoiceAllocator.cpp */ = {isa = PBXBuildFile; fileRef = F9279522F3EC4B3C8851E30F /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/VoiceAllocator.cpp */; };
+		6CE79548B1744D0980D12B07 /* /Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port/modal_node.h */ = {isa = PBXBuildFile; fileRef = 9FBC789605114F15ABA81681 /* /Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port/modal_node.h */; };
+		8921233624D44DC2BA69B790 /* /Users/carsten/code/mac-resonant-AU-plugin/Tests/test_modal_voice.cpp */ = {isa = PBXBuildFile; fileRef = B5D62901BE9C4211BE001563 /* /Users/carsten/code/mac-resonant-AU-plugin/Tests/test_modal_voice.cpp */; };
+		A9EB672177E94463996D36CE /* /Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper/ModalAttractorsAU.h */ = {isa = PBXBuildFile; fileRef = 036ED25D66294130B10E1DC4 /* /Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper/ModalAttractorsAU.h */; };
+		AAB4C27E87014F5592C81F84 /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/TopologyEngine.h */ = {isa = PBXBuildFile; fileRef = 53AB6CB6F43741DBA24653C0 /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/TopologyEngine.h */; };
+		AE9CBBB279D44CD29ECD8106 /* /Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port/audio_synth.h */ = {isa = PBXBuildFile; fileRef = 7783C6ED4F8C4415B5DFAE1E /* /Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port/audio_synth.h */; };
+		CA07A56EB95C4EB090F332C7 /* /Users/carsten/code/mac-resonant-AU-plugin/CMakeLists.txt */ = {isa = PBXBuildFile; fileRef = 47F9914D30DE4A488AFC5A85 /* /Users/carsten/code/mac-resonant-AU-plugin/CMakeLists.txt */; };
+		D00EDAD2BCDC4B34985BC79B /* /Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port/audio_synth.c */ = {isa = PBXBuildFile; fileRef = A95C0EB478CA4A50BD9EB1DE /* /Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port/audio_synth.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXBuildStyle section */
+		0E012AA0B9D449D494A3DD83 /* Release */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Release;
+		};
+		1634C298424C428993F1C552 /* MinSizeRel */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = MinSizeRel;
+		};
+		BD607C47CAE84A88AA5295A6 /* Debug */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Debug;
+		};
+		C6283B41DD8C4A1BA01ADED3 /* RelWithDebInfo */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = RelWithDebInfo;
+		};
+/* End PBXBuildStyle section */
+
+/* Begin PBXContainerItemProxy section */
+		693AFDA77DB747319B860B78 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F1C0A454AA8F48DEA0535696 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3C7D1AF3A498C1FACBC4AD2C;
+			remoteInfo = ZERO_CHECK;
+		};
+		70D6871EABD143E7B7899760 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F1C0A454AA8F48DEA0535696 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3C7D1AF3A498C1FACBC4AD2C;
+			remoteInfo = ZERO_CHECK;
+		};
+		84F10EE9B69545CDA2D7C702 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F1C0A454AA8F48DEA0535696 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7EC2B863E65AEF9F5ECA6493;
+			remoteInfo = test_suite;
+		};
+		9E85CE7B680440309401591D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F1C0A454AA8F48DEA0535696 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 68329DA6C827778140FA0216;
+			remoteInfo = modal_dsp_core;
+		};
+		A1F6C8201C6D4390A585B5B5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F1C0A454AA8F48DEA0535696 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 68329DA6C827778140FA0216;
+			remoteInfo = modal_dsp_core;
+		};
+		D8A112461BED409DB643F2C5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F1C0A454AA8F48DEA0535696 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3BC6C4F4BA2EEF8429C7A4CC;
+			remoteInfo = ALL_BUILD;
+		};
+		E04000B5D874426B982A4C4D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F1C0A454AA8F48DEA0535696 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 68329DA6C827778140FA0216;
+			remoteInfo = modal_dsp_core;
+		};
+		E6A4E57B6A844B0CBEA5CCDE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F1C0A454AA8F48DEA0535696 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3C7D1AF3A498C1FACBC4AD2C;
+			remoteInfo = ZERO_CHECK;
+		};
+		EA8D5F8B960046A58C43B741 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F1C0A454AA8F48DEA0535696 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 33C9D69AD189CB2292565356;
+			remoteInfo = test_modal_voice;
+		};
+		F2D7196B5EB1443889073A6F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F1C0A454AA8F48DEA0535696 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3C7D1AF3A498C1FACBC4AD2C;
+			remoteInfo = ZERO_CHECK;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		036ED25D66294130B10E1DC4 /* /Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper/ModalAttractorsAU.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = ModalAttractorsAU.h; path = src/au_wrapper/ModalAttractorsAU.h; sourceTree = SOURCE_ROOT; };
+		05D108F16E024F858EF265A7 /* /Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper/ModalParameters.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = ModalParameters.h; path = src/au_wrapper/ModalParameters.h; sourceTree = SOURCE_ROOT; };
+		12C90BA20CBD4A7F98FF7290 /* /Users/carsten/code/mac-resonant-AU-plugin/CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; name = CMakeLists.txt; path = CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+		32C8DECC00034A75AA2A7846 /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/VoiceAllocator.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = VoiceAllocator.h; path = src/dsp_core/VoiceAllocator.h; sourceTree = SOURCE_ROOT; };
+		3628D1A0463B43DAB8FE0DF6 /* test_suite */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; path = test_suite; sourceTree = BUILT_PRODUCTS_DIR; };
+		44481C076C8F44798731735C /* test_modal_voice */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; path = test_modal_voice; sourceTree = BUILT_PRODUCTS_DIR; };
+		47F9914D30DE4A488AFC5A85 /* /Users/carsten/code/mac-resonant-AU-plugin/CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; name = CMakeLists.txt; path = CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+		48FBF220320A4052B3E1C7B5 /* /Users/carsten/code/mac-resonant-AU-plugin/Tests/test_suite.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = test_suite.cpp; path = Tests/test_suite.cpp; sourceTree = SOURCE_ROOT; };
+		4E85E62052D84DFDA0AC03FB /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/ModalVoice.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = ModalVoice.cpp; path = src/dsp_core/ModalVoice.cpp; sourceTree = SOURCE_ROOT; };
+		53AB6CB6F43741DBA24653C0 /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/TopologyEngine.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = TopologyEngine.h; path = src/dsp_core/TopologyEngine.h; sourceTree = SOURCE_ROOT; };
+		6A8D28C1B5C5442990719D9B /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/ModalVoice.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = ModalVoice.h; path = src/dsp_core/ModalVoice.h; sourceTree = SOURCE_ROOT; };
+		6AD40331669547C8B0A1512B /* /Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port/modal_node.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = modal_node.c; path = src/esp32_port/modal_node.c; sourceTree = SOURCE_ROOT; };
+		7783C6ED4F8C4415B5DFAE1E /* /Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port/audio_synth.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = audio_synth.h; path = src/esp32_port/audio_synth.h; sourceTree = SOURCE_ROOT; };
+		7E73614449AE411EA381711C /* /Users/carsten/code/mac-resonant-AU-plugin/CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; name = CMakeLists.txt; path = CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+		9FBC789605114F15ABA81681 /* /Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port/modal_node.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = modal_node.h; path = src/esp32_port/modal_node.h; sourceTree = SOURCE_ROOT; };
+		A95C0EB478CA4A50BD9EB1DE /* /Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port/audio_synth.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = audio_synth.c; path = src/esp32_port/audio_synth.c; sourceTree = SOURCE_ROOT; };
+		AAD7F6A9F8ED4662BA8F772F /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/TopologyEngine.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = TopologyEngine.cpp; path = src/dsp_core/TopologyEngine.cpp; sourceTree = SOURCE_ROOT; };
+		AE398A32C2E0484285D9A8E1 /* /Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper/ModalAttractorsEngine.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = ModalAttractorsEngine.cpp; path = src/au_wrapper/ModalAttractorsEngine.cpp; sourceTree = SOURCE_ROOT; };
+		B5D62901BE9C4211BE001563 /* /Users/carsten/code/mac-resonant-AU-plugin/Tests/test_modal_voice.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = test_modal_voice.cpp; path = Tests/test_modal_voice.cpp; sourceTree = SOURCE_ROOT; };
+		C72DF489D04346A8B579550B /* modal_dsp_core */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libmodal_dsp_core.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		F06EEFAD63E5457492D1D183 /* /Users/carsten/code/mac-resonant-AU-plugin/CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; name = CMakeLists.txt; path = CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+		F9279522F3EC4B3C8851E30F /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/VoiceAllocator.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = VoiceAllocator.cpp; path = src/dsp_core/VoiceAllocator.cpp; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		387B0F361A674E6EBFF6108E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6515B66B5D424CF18D8C3A4C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B1B8C647755846969668E993 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0BF98865A41043188DFE9C29 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		49719E1DBDA94F6AB80A45C7 /* ALL_BUILD */ = {
+			isa = PBXGroup;
+			children = (
+				CDA77703552240A283358BF1 /* CMake Rules */,
+				F06EEFAD63E5457492D1D183 /* /Users/carsten/code/mac-resonant-AU-plugin/CMakeLists.txt */,
+			);
+			name = ALL_BUILD;
+			sourceTree = "<group>";
+		};
+		61134C6DF04746CB8C54B925 /* modal_dsp_core */ = {
+			isa = PBXGroup;
+			children = (
+				A21C2A414ADB4FDE919935A2 /* Header Files */,
+				7AF9A4BF66484FB6A2229A26 /* Source Files */,
+				47F9914D30DE4A488AFC5A85 /* /Users/carsten/code/mac-resonant-AU-plugin/CMakeLists.txt */,
+			);
+			name = modal_dsp_core;
+			sourceTree = "<group>";
+		};
+		6827A00BD8504019802CEC85 = {
+			isa = PBXGroup;
+			children = (
+				49719E1DBDA94F6AB80A45C7 /* ALL_BUILD */,
+				61134C6DF04746CB8C54B925 /* modal_dsp_core */,
+				D9B6988A6329454F98E1556E /* test_modal_voice */,
+				7F8D86301A694575977A924A /* test_suite */,
+				6C286B93926847DD8C43FD54 /* Products */,
+				0BF98865A41043188DFE9C29 /* Frameworks */,
+				E7BC0C7D086648048D5FC4B9 /* Resources */,
+			);
+			sourceTree = "<group>";
+		};
+		6C286B93926847DD8C43FD54 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C72DF489D04346A8B579550B /* modal_dsp_core */,
+				44481C076C8F44798731735C /* test_modal_voice */,
+				3628D1A0463B43DAB8FE0DF6 /* test_suite */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7AF9A4BF66484FB6A2229A26 /* Source Files */ = {
+			isa = PBXGroup;
+			children = (
+				AE398A32C2E0484285D9A8E1 /* /Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper/ModalAttractorsEngine.cpp */,
+				4E85E62052D84DFDA0AC03FB /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/ModalVoice.cpp */,
+				AAD7F6A9F8ED4662BA8F772F /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/TopologyEngine.cpp */,
+				F9279522F3EC4B3C8851E30F /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/VoiceAllocator.cpp */,
+				A95C0EB478CA4A50BD9EB1DE /* /Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port/audio_synth.c */,
+				6AD40331669547C8B0A1512B /* /Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port/modal_node.c */,
+			);
+			name = "Source Files";
+			sourceTree = "<group>";
+		};
+		7F8D86301A694575977A924A /* test_suite */ = {
+			isa = PBXGroup;
+			children = (
+				A871943E79D843D29AC8AFA4 /* Source Files */,
+				7E73614449AE411EA381711C /* /Users/carsten/code/mac-resonant-AU-plugin/CMakeLists.txt */,
+			);
+			name = test_suite;
+			sourceTree = "<group>";
+		};
+		A21C2A414ADB4FDE919935A2 /* Header Files */ = {
+			isa = PBXGroup;
+			children = (
+				036ED25D66294130B10E1DC4 /* /Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper/ModalAttractorsAU.h */,
+				05D108F16E024F858EF265A7 /* /Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper/ModalParameters.h */,
+				6A8D28C1B5C5442990719D9B /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/ModalVoice.h */,
+				53AB6CB6F43741DBA24653C0 /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/TopologyEngine.h */,
+				32C8DECC00034A75AA2A7846 /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/VoiceAllocator.h */,
+				7783C6ED4F8C4415B5DFAE1E /* /Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port/audio_synth.h */,
+				9FBC789605114F15ABA81681 /* /Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port/modal_node.h */,
+			);
+			name = "Header Files";
+			sourceTree = "<group>";
+		};
+		A871943E79D843D29AC8AFA4 /* Source Files */ = {
+			isa = PBXGroup;
+			children = (
+				48FBF220320A4052B3E1C7B5 /* /Users/carsten/code/mac-resonant-AU-plugin/Tests/test_suite.cpp */,
+			);
+			name = "Source Files";
+			sourceTree = "<group>";
+		};
+		CDA77703552240A283358BF1 /* CMake Rules */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "CMake Rules";
+			sourceTree = "<group>";
+		};
+		D9B6988A6329454F98E1556E /* test_modal_voice */ = {
+			isa = PBXGroup;
+			children = (
+				EEAB4453864D4A479C5B1918 /* Source Files */,
+				12C90BA20CBD4A7F98FF7290 /* /Users/carsten/code/mac-resonant-AU-plugin/CMakeLists.txt */,
+			);
+			name = test_modal_voice;
+			sourceTree = "<group>";
+		};
+		E7BC0C7D086648048D5FC4B9 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		EEAB4453864D4A479C5B1918 /* Source Files */ = {
+			isa = PBXGroup;
+			children = (
+				B5D62901BE9C4211BE001563 /* /Users/carsten/code/mac-resonant-AU-plugin/Tests/test_modal_voice.cpp */,
+			);
+			name = "Source Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		33C9D69AD189CB2292565356 /* test_modal_voice */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E051F2BDEC344B69A732CEAF /* Build configuration list for PBXNativeTarget "test_modal_voice" */;
+			buildPhases = (
+				53238CB57DC94D17AC07566C /* Sources */,
+				387B0F361A674E6EBFF6108E /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				16EDCE203E6C4C548EA74B6C /* PBXTargetDependency */,
+				DF286D1F38B2400BA2C5C8C4 /* PBXTargetDependency */,
+			);
+			name = test_modal_voice;
+			productName = test_modal_voice;
+			productReference = 44481C076C8F44798731735C /* test_modal_voice */;
+			productType = "com.apple.product-type.tool";
+		};
+		68329DA6C827778140FA0216 /* modal_dsp_core */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9D632C32A9A04E81BB72BDCE /* Build configuration list for PBXNativeTarget "modal_dsp_core" */;
+			buildPhases = (
+				21DE3CF92CDD472CB03A085E /* Sources */,
+				6515B66B5D424CF18D8C3A4C /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				41407D207BB24B9F8FB4E33F /* PBXTargetDependency */,
+			);
+			name = modal_dsp_core;
+			productName = modal_dsp_core;
+			productReference = C72DF489D04346A8B579550B /* modal_dsp_core */;
+			productType = "com.apple.product-type.library.static";
+		};
+		7EC2B863E65AEF9F5ECA6493 /* test_suite */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F8A8FC723F544D6998D654C9 /* Build configuration list for PBXNativeTarget "test_suite" */;
+			buildPhases = (
+				8AE676405F83480FAB0B245C /* Sources */,
+				B1B8C647755846969668E993 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				31E22A397C2B407B9B8DCFE6 /* PBXTargetDependency */,
+				4D422C877D474DE89649FEF3 /* PBXTargetDependency */,
+			);
+			name = test_suite;
+			productName = test_suite;
+			productReference = 3628D1A0463B43DAB8FE0DF6 /* test_suite */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F1C0A454AA8F48DEA0535696 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1620;
+			};
+			buildConfigurationList = 6D6A5ECD83C843C8B397BC37 /* Build configuration list for PBXProject "ModalAttractorsAU" */;
+			buildSettings = {
+			};
+			buildStyles = (
+				BD607C47CAE84A88AA5295A6 /* Debug */,
+				0E012AA0B9D449D494A3DD83 /* Release */,
+				1634C298424C428993F1C552 /* MinSizeRel */,
+				C6283B41DD8C4A1BA01ADED3 /* RelWithDebInfo */,
+			);
+			compatibilityVersion = "Xcode 3.2";
+			hasScannedForEncodings = 0;
+			mainGroup = 6827A00BD8504019802CEC85;
+			projectDirPath = "/Users/carsten/code/mac-resonant-AU-plugin";
+			projectRoot = "";
+			targets = (
+				3BC6C4F4BA2EEF8429C7A4CC /* ALL_BUILD */,
+				B7F1C59A1BBCEE88DD1FE46A /* install */,
+				68329DA6C827778140FA0216 /* modal_dsp_core */,
+				33C9D69AD189CB2292565356 /* test_modal_voice */,
+				7EC2B863E65AEF9F5ECA6493 /* test_suite */,
+				3C7D1AF3A498C1FACBC4AD2C /* ZERO_CHECK */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		3C0110FC8322DE7E50886E21 = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# shell script goes here
+exit 0";
+			showEnvVarsInLog = 0;
+		};
+		87AF4882E018677E2624B544 = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# shell script goes here
+exit 0";
+			showEnvVarsInLog = 0;
+		};
+		93426DA6A4AC2C2AC9CE883C /* CMake PostBuild Rules */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "CMake PostBuild Rules";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e
+if test \"$CONFIGURATION\" = \"Debug\"; then :
+  cd /Users/carsten/code/mac-resonant-AU-plugin/build_xcode
+  /opt/homebrew/bin/cmake -DBUILD_TYPE=$CONFIGURATION$EFFECTIVE_PLATFORM_NAME -P cmake_install.cmake
+fi
+if test \"$CONFIGURATION\" = \"Release\"; then :
+  cd /Users/carsten/code/mac-resonant-AU-plugin/build_xcode
+  /opt/homebrew/bin/cmake -DBUILD_TYPE=$CONFIGURATION$EFFECTIVE_PLATFORM_NAME -P cmake_install.cmake
+fi
+if test \"$CONFIGURATION\" = \"MinSizeRel\"; then :
+  cd /Users/carsten/code/mac-resonant-AU-plugin/build_xcode
+  /opt/homebrew/bin/cmake -DBUILD_TYPE=$CONFIGURATION$EFFECTIVE_PLATFORM_NAME -P cmake_install.cmake
+fi
+if test \"$CONFIGURATION\" = \"RelWithDebInfo\"; then :
+  cd /Users/carsten/code/mac-resonant-AU-plugin/build_xcode
+  /opt/homebrew/bin/cmake -DBUILD_TYPE=$CONFIGURATION$EFFECTIVE_PLATFORM_NAME -P cmake_install.cmake
+fi
+";
+			showEnvVarsInLog = 0;
+		};
+		9B50530E35CC49C82C2FACCF = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# shell script goes here
+exit 0";
+			showEnvVarsInLog = 0;
+		};
+		AF1EA4EF62EBFAE3EE27E9E6 /* Generate CMakeFiles/ZERO_CHECK */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Generate CMakeFiles/ZERO_CHECK";
+			outputPaths = (
+"/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/CMakeFiles/ZERO_CHECK"			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e
+if test \"$CONFIGURATION\" = \"Debug\"; then :
+  cd /Users/carsten/code/mac-resonant-AU-plugin/build_xcode
+  make -f /Users/carsten/code/mac-resonant-AU-plugin/build_xcode/CMakeScripts/ReRunCMake.make
+fi
+if test \"$CONFIGURATION\" = \"Release\"; then :
+  cd /Users/carsten/code/mac-resonant-AU-plugin/build_xcode
+  make -f /Users/carsten/code/mac-resonant-AU-plugin/build_xcode/CMakeScripts/ReRunCMake.make
+fi
+if test \"$CONFIGURATION\" = \"MinSizeRel\"; then :
+  cd /Users/carsten/code/mac-resonant-AU-plugin/build_xcode
+  make -f /Users/carsten/code/mac-resonant-AU-plugin/build_xcode/CMakeScripts/ReRunCMake.make
+fi
+if test \"$CONFIGURATION\" = \"RelWithDebInfo\"; then :
+  cd /Users/carsten/code/mac-resonant-AU-plugin/build_xcode
+  make -f /Users/carsten/code/mac-resonant-AU-plugin/build_xcode/CMakeScripts/ReRunCMake.make
+fi
+";
+			showEnvVarsInLog = 0;
+		};
+		BA226A8A57D16ACE7EBEE9C1 /* Generate CMakeFiles/ALL_BUILD */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Generate CMakeFiles/ALL_BUILD";
+			outputPaths = (
+"/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/CMakeFiles/ALL_BUILD"			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e
+if test \"$CONFIGURATION\" = \"Debug\"; then :
+  cd /Users/carsten/code/mac-resonant-AU-plugin/build_xcode
+  echo Build\\ all\\ projects
+fi
+if test \"$CONFIGURATION\" = \"Release\"; then :
+  cd /Users/carsten/code/mac-resonant-AU-plugin/build_xcode
+  echo Build\\ all\\ projects
+fi
+if test \"$CONFIGURATION\" = \"MinSizeRel\"; then :
+  cd /Users/carsten/code/mac-resonant-AU-plugin/build_xcode
+  echo Build\\ all\\ projects
+fi
+if test \"$CONFIGURATION\" = \"RelWithDebInfo\"; then :
+  cd /Users/carsten/code/mac-resonant-AU-plugin/build_xcode
+  echo Build\\ all\\ projects
+fi
+";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		21DE3CF92CDD472CB03A085E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				12827B01029A45D0A9CEA7E7 /* /Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper/ModalAttractorsEngine.cpp */,
+				69BC9E8491BA41C3816AA940 /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/ModalVoice.cpp */,
+				537A96CF004B42B2BAAFF926 /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/TopologyEngine.cpp */,
+				6C303F3E9883415D8077567A /* /Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core/VoiceAllocator.cpp */,
+				D00EDAD2BCDC4B34985BC79B /* /Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port/audio_synth.c */,
+				29039ED8018143B6BA77A6AD /* /Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port/modal_node.c */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		53238CB57DC94D17AC07566C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8921233624D44DC2BA69B790 /* /Users/carsten/code/mac-resonant-AU-plugin/Tests/test_modal_voice.cpp */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8AE676405F83480FAB0B245C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0EC9343A745C4D85840AA5DA /* /Users/carsten/code/mac-resonant-AU-plugin/Tests/test_suite.cpp */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		16EDCE203E6C4C548EA74B6C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3C7D1AF3A498C1FACBC4AD2C /* ZERO_CHECK */;
+			targetProxy = F2D7196B5EB1443889073A6F /* PBXContainerItemProxy */;
+		};
+		31E22A397C2B407B9B8DCFE6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3C7D1AF3A498C1FACBC4AD2C /* ZERO_CHECK */;
+			targetProxy = E6A4E57B6A844B0CBEA5CCDE /* PBXContainerItemProxy */;
+		};
+		389899490FF247BD9240419E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3C7D1AF3A498C1FACBC4AD2C /* ZERO_CHECK */;
+			targetProxy = 70D6871EABD143E7B7899760 /* PBXContainerItemProxy */;
+		};
+		41407D207BB24B9F8FB4E33F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3C7D1AF3A498C1FACBC4AD2C /* ZERO_CHECK */;
+			targetProxy = 693AFDA77DB747319B860B78 /* PBXContainerItemProxy */;
+		};
+		4BC87FE85CFB4D418D431B6A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 68329DA6C827778140FA0216 /* modal_dsp_core */;
+			targetProxy = 9E85CE7B680440309401591D /* PBXContainerItemProxy */;
+		};
+		4D422C877D474DE89649FEF3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 68329DA6C827778140FA0216 /* modal_dsp_core */;
+			targetProxy = A1F6C8201C6D4390A585B5B5 /* PBXContainerItemProxy */;
+		};
+		8454420542C54349B186B4C7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3BC6C4F4BA2EEF8429C7A4CC /* ALL_BUILD */;
+			targetProxy = D8A112461BED409DB643F2C5 /* PBXContainerItemProxy */;
+		};
+		8BCB5C60804B4C7E8E38049F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7EC2B863E65AEF9F5ECA6493 /* test_suite */;
+			targetProxy = 84F10EE9B69545CDA2D7C702 /* PBXContainerItemProxy */;
+		};
+		B805750050A54F8AA5FB9871 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 33C9D69AD189CB2292565356 /* test_modal_voice */;
+			targetProxy = EA8D5F8B960046A58C43B741 /* PBXContainerItemProxy */;
+		};
+		DF286D1F38B2400BA2C5C8C4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 68329DA6C827778140FA0216 /* modal_dsp_core */;
+			targetProxy = E04000B5D874426B982A4C4D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0319ADACFED54A5487B66B9A /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (arm64,x86_64);
+				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/RelWithDebInfo";
+				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_SUFFIX = .a;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 2;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = ("/Users/carsten/code/mac-resonant-AU-plugin/src","/Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port","/Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core","/Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper","$(inherited)");
+				INSTALL_PATH = "";
+				LIBRARY_STYLE = STATIC;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = ("       -DNDEBUG '-std=gnu11' -Wall -Wextra -Wpedantic -ffast-math ","$(inherited)");
+				OTHER_CPLUSPLUSFLAGS = "       -DNDEBUG '-std=gnu++17' -Wall -Wextra -Wpedantic -ffast-math ";
+				OTHER_LIBTOOLFLAGS = ("");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = modal_dsp_core;
+				SECTORDER_FLAGS = "";
+				TARGET_TEMP_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/build/modal_dsp_core.build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = RelWithDebInfo;
+		};
+		07C32431B250474B90425BE7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Release;
+		};
+		08151DE6D79C43DF8D2F37DD /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (arm64,x86_64);
+				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/MinSizeRel";
+				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_SUFFIX = .a;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = ("/Users/carsten/code/mac-resonant-AU-plugin/src","/Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port","/Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core","/Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper","$(inherited)");
+				INSTALL_PATH = "";
+				LIBRARY_STYLE = STATIC;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = ("    -DNDEBUG '-std=gnu11' -Wall -Wextra -Wpedantic -ffast-math ","$(inherited)");
+				OTHER_CPLUSPLUSFLAGS = "    -DNDEBUG '-std=gnu++17' -Wall -Wextra -Wpedantic -ffast-math ";
+				OTHER_LIBTOOLFLAGS = ("");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = modal_dsp_core;
+				SECTORDER_FLAGS = "";
+				TARGET_TEMP_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/build/modal_dsp_core.build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = MinSizeRel;
+		};
+		0A905A26B82B4C25BCD8ACA1 /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (arm64,x86_64);
+				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/RelWithDebInfo";
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 2;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = ("/Users/carsten/code/mac-resonant-AU-plugin/src","/Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port","/Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core","/Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper","$(inherited)");
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CPLUSPLUSFLAGS = "       -DNDEBUG '-std=gnu++17' -Wall -Wextra -Wpedantic -ffast-math ";
+				OTHER_LDFLAGS = (" -Wl,-search_paths_first -Wl,-headerpad_max_install_names","/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/RelWithDebInfo/libmodal_dsp_core.a","-lm","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = test_modal_voice;
+				SECTORDER_FLAGS = "";
+				TARGET_TEMP_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/build/test_modal_voice.build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = RelWithDebInfo;
+		};
+		0D7845A82B4D45BEB97CD6BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (arm64,x86_64);
+				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/Debug";
+				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_SUFFIX = .a;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = ("/Users/carsten/code/mac-resonant-AU-plugin/src","/Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port","/Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core","/Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper","$(inherited)");
+				INSTALL_PATH = "";
+				LIBRARY_STYLE = STATIC;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = ("   '-std=gnu11' -Wall -Wextra -Wpedantic -ffast-math ","$(inherited)");
+				OTHER_CPLUSPLUSFLAGS = "   '-std=gnu++17' -Wall -Wextra -Wpedantic -ffast-math ";
+				OTHER_LIBTOOLFLAGS = ("");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = modal_dsp_core;
+				SECTORDER_FLAGS = "";
+				TARGET_TEMP_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/build/modal_dsp_core.build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Debug;
+		};
+		1B2CC434DD614ADAB0FF8D6F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = install;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Debug;
+		};
+		2CF33853795348C1AD002517 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (arm64,x86_64);
+				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/Release";
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = ("/Users/carsten/code/mac-resonant-AU-plugin/src","/Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port","/Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core","/Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper","$(inherited)");
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CPLUSPLUSFLAGS = "    -DNDEBUG '-std=gnu++17' -Wall -Wextra -Wpedantic -ffast-math ";
+				OTHER_LDFLAGS = (" -Wl,-search_paths_first -Wl,-headerpad_max_install_names","/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/Release/libmodal_dsp_core.a","-lm","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = test_modal_voice;
+				SECTORDER_FLAGS = "";
+				TARGET_TEMP_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/build/test_modal_voice.build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Release;
+		};
+		304FA823498F4D50820FBA2F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (arm64,x86_64);
+				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/Release";
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = ("/Users/carsten/code/mac-resonant-AU-plugin/src","/Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port","/Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core","/Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper","$(inherited)");
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CPLUSPLUSFLAGS = "    -DNDEBUG '-std=gnu++17' -Wall -Wextra -Wpedantic -ffast-math ";
+				OTHER_LDFLAGS = (" -Wl,-search_paths_first -Wl,-headerpad_max_install_names","/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/Release/libmodal_dsp_core.a","-lm","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = test_suite;
+				SECTORDER_FLAGS = "";
+				TARGET_TEMP_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/build/test_suite.build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Release;
+		};
+		331B716CA35B4DD5A04A8EC2 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (arm64,x86_64);
+				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/MinSizeRel";
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = ("/Users/carsten/code/mac-resonant-AU-plugin/src","/Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port","/Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core","/Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper","$(inherited)");
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CPLUSPLUSFLAGS = "    -DNDEBUG '-std=gnu++17' -Wall -Wextra -Wpedantic -ffast-math ";
+				OTHER_LDFLAGS = (" -Wl,-search_paths_first -Wl,-headerpad_max_install_names","/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/MinSizeRel/libmodal_dsp_core.a","-lm","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = test_suite;
+				SECTORDER_FLAGS = "";
+				TARGET_TEMP_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/build/test_suite.build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = MinSizeRel;
+		};
+		3CC3427B843941C08A412376 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = install;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Release;
+		};
+		41F8EB3FE8E446FD846F9CB0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Release;
+		};
+		4BF79A4F9C834FDEBED9BC0B /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (arm64,x86_64);
+				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/MinSizeRel";
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = ("/Users/carsten/code/mac-resonant-AU-plugin/src","/Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port","/Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core","/Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper","$(inherited)");
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CPLUSPLUSFLAGS = "    -DNDEBUG '-std=gnu++17' -Wall -Wextra -Wpedantic -ffast-math ";
+				OTHER_LDFLAGS = (" -Wl,-search_paths_first -Wl,-headerpad_max_install_names","/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/MinSizeRel/libmodal_dsp_core.a","-lm","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = test_modal_voice;
+				SECTORDER_FLAGS = "";
+				TARGET_TEMP_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/build/test_modal_voice.build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = MinSizeRel;
+		};
+		6A7916846E80477D87FED441 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "arm64 x86_64";
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				SDKROOT = "";
+				SYMROOT = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/build";
+			};
+			name = Debug;
+		};
+		81ECEA5F7B584F84B607991F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Debug;
+		};
+		8603E94C7CCF4F429F66668A /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = RelWithDebInfo;
+		};
+		873CE3D86817477E949E24AA /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = RelWithDebInfo;
+		};
+		938019B6D6A9449BAE6B81F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (arm64,x86_64);
+				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/Debug";
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = ("/Users/carsten/code/mac-resonant-AU-plugin/src","/Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port","/Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core","/Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper","$(inherited)");
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CPLUSPLUSFLAGS = "   '-std=gnu++17' -Wall -Wextra -Wpedantic -ffast-math ";
+				OTHER_LDFLAGS = (" -Wl,-search_paths_first -Wl,-headerpad_max_install_names","/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/Debug/libmodal_dsp_core.a","-lm","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = test_modal_voice;
+				SECTORDER_FLAGS = "";
+				TARGET_TEMP_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/build/test_modal_voice.build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Debug;
+		};
+		98A0BC46B8044ABDB6B69B6A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Debug;
+		};
+		A201447106DA46E8B959A408 /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "arm64 x86_64";
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				SDKROOT = "";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SYMROOT = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/build";
+			};
+			name = RelWithDebInfo;
+		};
+		A9021F1A42674B8997D429A2 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "arm64 x86_64";
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				SDKROOT = "";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SYMROOT = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/build";
+			};
+			name = MinSizeRel;
+		};
+		B18D8A688FD84837A891B59A /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = install;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = MinSizeRel;
+		};
+		B55C018A4114427987DD516D /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = MinSizeRel;
+		};
+		BABD1CEDFF9B468AAB082518 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = MinSizeRel;
+		};
+		CBFF9BD34903479BB9714548 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (arm64,x86_64);
+				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/Release";
+				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_SUFFIX = .a;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = ("/Users/carsten/code/mac-resonant-AU-plugin/src","/Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port","/Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core","/Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper","$(inherited)");
+				INSTALL_PATH = "";
+				LIBRARY_STYLE = STATIC;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = ("    -DNDEBUG '-std=gnu11' -Wall -Wextra -Wpedantic -ffast-math ","$(inherited)");
+				OTHER_CPLUSPLUSFLAGS = "    -DNDEBUG '-std=gnu++17' -Wall -Wextra -Wpedantic -ffast-math ";
+				OTHER_LIBTOOLFLAGS = ("");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = modal_dsp_core;
+				SECTORDER_FLAGS = "";
+				TARGET_TEMP_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/build/modal_dsp_core.build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Release;
+		};
+		D05F22474A8B404DBBA828CE /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (arm64,x86_64);
+				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/RelWithDebInfo";
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 2;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = ("/Users/carsten/code/mac-resonant-AU-plugin/src","/Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port","/Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core","/Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper","$(inherited)");
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CPLUSPLUSFLAGS = "       -DNDEBUG '-std=gnu++17' -Wall -Wextra -Wpedantic -ffast-math ";
+				OTHER_LDFLAGS = (" -Wl,-search_paths_first -Wl,-headerpad_max_install_names","/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/RelWithDebInfo/libmodal_dsp_core.a","-lm","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = test_suite;
+				SECTORDER_FLAGS = "";
+				TARGET_TEMP_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/build/test_suite.build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = RelWithDebInfo;
+		};
+		D25DE9D387F44CD58563017D /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = install;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = RelWithDebInfo;
+		};
+		D6B4473781B6420FAFCB3B43 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "arm64 x86_64";
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				SDKROOT = "";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SYMROOT = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/build";
+			};
+			name = Release;
+		};
+		EAF7C1BBB4874AFD87CECAA4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (arm64,x86_64);
+				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/Debug";
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = ("/Users/carsten/code/mac-resonant-AU-plugin/src","/Users/carsten/code/mac-resonant-AU-plugin/src/esp32_port","/Users/carsten/code/mac-resonant-AU-plugin/src/dsp_core","/Users/carsten/code/mac-resonant-AU-plugin/src/au_wrapper","$(inherited)");
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CPLUSPLUSFLAGS = "   '-std=gnu++17' -Wall -Wextra -Wpedantic -ffast-math ";
+				OTHER_LDFLAGS = (" -Wl,-search_paths_first -Wl,-headerpad_max_install_names","/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/Debug/libmodal_dsp_core.a","-lm","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = test_suite;
+				SECTORDER_FLAGS = "";
+				TARGET_TEMP_DIR = "/Users/carsten/code/mac-resonant-AU-plugin/build_xcode/build/test_suite.build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1C9D863391DA4D4B9EFD29DC /* Build configuration list for PBXAggregateTarget "ALL_BUILD" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				81ECEA5F7B584F84B607991F /* Debug */,
+				41F8EB3FE8E446FD846F9CB0 /* Release */,
+				B55C018A4114427987DD516D /* MinSizeRel */,
+				873CE3D86817477E949E24AA /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		22E42A7112FA46C8A840ED4F /* Build configuration list for PBXAggregateTarget "ZERO_CHECK" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				98A0BC46B8044ABDB6B69B6A /* Debug */,
+				07C32431B250474B90425BE7 /* Release */,
+				BABD1CEDFF9B468AAB082518 /* MinSizeRel */,
+				8603E94C7CCF4F429F66668A /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		6D6A5ECD83C843C8B397BC37 /* Build configuration list for PBXProject "ModalAttractorsAU" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A7916846E80477D87FED441 /* Debug */,
+				D6B4473781B6420FAFCB3B43 /* Release */,
+				A9021F1A42674B8997D429A2 /* MinSizeRel */,
+				A201447106DA46E8B959A408 /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9D632C32A9A04E81BB72BDCE /* Build configuration list for PBXNativeTarget "modal_dsp_core" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0D7845A82B4D45BEB97CD6BC /* Debug */,
+				CBFF9BD34903479BB9714548 /* Release */,
+				08151DE6D79C43DF8D2F37DD /* MinSizeRel */,
+				0319ADACFED54A5487B66B9A /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E051F2BDEC344B69A732CEAF /* Build configuration list for PBXNativeTarget "test_modal_voice" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				938019B6D6A9449BAE6B81F6 /* Debug */,
+				2CF33853795348C1AD002517 /* Release */,
+				4BF79A4F9C834FDEBED9BC0B /* MinSizeRel */,
+				0A905A26B82B4C25BCD8ACA1 /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F8A8FC723F544D6998D654C9 /* Build configuration list for PBXNativeTarget "test_suite" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EAF7C1BBB4874AFD87CECAA4 /* Debug */,
+				304FA823498F4D50820FBA2F /* Release */,
+				331B716CA35B4DD5A04A8EC2 /* MinSizeRel */,
+				D05F22474A8B404DBBA828CE /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FE27393F922D4158BC83901D /* Build configuration list for PBXAggregateTarget "install" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1B2CC434DD614ADAB0FF8D6F /* Debug */,
+				3CC3427B843941C08A412376 /* Release */,
+				B18D8A688FD84837A891B59A /* MinSizeRel */,
+				D25DE9D387F44CD58563017D /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F1C0A454AA8F48DEA0535696 /* Project object */;
+}

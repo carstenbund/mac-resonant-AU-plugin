@@ -19,6 +19,9 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
     /// C++ DSP engine handle (managed via C API)
     private var engine: UnsafeMutablePointer<ModalAttractorsEngine>?
 
+    /// RT-safe render block (built once, does not capture self)
+    private var _renderBlock: AUInternalRenderBlock!
+
     // MARK: - Bus Configuration
 
     private var outputBus: AUAudioUnitBus?
@@ -50,13 +53,17 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
                                            busses: [outputBus!])
 
         // Allocate and initialize DSP engine
-        engine = UnsafeMutablePointer<ModalAttractorsEngine>.allocate(capacity: 1)
+        let enginePtr = UnsafeMutablePointer<ModalAttractorsEngine>.allocate(capacity: 1)
+        self.engine = enginePtr
         modal_attractors_engine_init(
-            engine,
+            enginePtr,
             defaultSampleRate,
             512, // max frames to render
             maxPolyphony
         )
+
+        // Build RT-safe render block once (no ARC in render thread)
+        _renderBlock = Self.makeRenderBlock(enginePtr: enginePtr)
     }
 
     deinit {
@@ -110,11 +117,9 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
         guard let paramTree = parameterTree else { return }
 
         // Called when a parameter changes (from UI or host automation)
+        // NOTE: this is not sample-accurate; sample-accurate automation comes via render events.
         paramTree.implementorValueObserver = { [weak self] param, value in
             guard let self = self, let engine = self.engine else { return }
-
-            // Update engine parameter immediately (non-sample-accurate)
-            // For sample-accurate updates, the render block will handle automation events
             modal_attractors_engine_set_parameter(engine, UInt32(param.address), value)
         }
 
@@ -128,14 +133,12 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
         paramTree.implementorStringFromValueCallback = { param, valuePtr in
             guard let value = valuePtr?.pointee else { return "-" }
 
-            // Format based on parameter type
             switch param.unit {
             case .linearGain:
                 return String(format: "%.2f", value)
             case .milliseconds:
                 return String(format: "%.1f ms", value)
             case .indexed:
-                // Use value strings if available
                 if let valueStrings = param.valueStrings,
                    Int(value) < valueStrings.count {
                     return valueStrings[Int(value)]
@@ -181,139 +184,127 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
 
     // MARK: - Rendering
 
-    /// Sample-accurate render block implementation
-    ///
-    /// This implements the pattern recommended for AUv3 instruments:
-    /// 1. Parse AURenderEvent list
-    /// 2. Push events to queue with sample offsets
-    /// 3. Render audio with sample-accurate event processing
     public override var internalRenderBlock: AUInternalRenderBlock {
-        return { [weak self] (
-            actionFlags,
-            timestamp,
-            frameCount,
-            outputBusNumber,
-            outputData,
-            realtimeEventListHead,
-            pullInputBlock
-        ) in
-            guard let self = self, let engine = self.engine else {
-                // Return silence if not initialized
-                return kAudioUnitErr_Uninitialized
-            }
+        _renderBlock
+    }
 
-            // Clear event queue for this render frame
-            modal_attractors_engine_begin_events(engine)
+    /// Build a real-time safe render block.
+    /// - Important: Does not capture `self` (avoids ARC traffic on audio thread).
+    private static func makeRenderBlock(enginePtr: UnsafeMutablePointer<ModalAttractorsEngine>) -> AUInternalRenderBlock {
 
-            // Parse AU events and push to queue with sample offsets
-            var event = realtimeEventListHead
-            while let currentEvent = event?.pointee {
+        let block: AUInternalRenderBlock = { (
+            actionFlags: UnsafeMutablePointer<AudioUnitRenderActionFlags>,
+            timestamp: UnsafePointer<AudioTimeStamp>,
+            frameCount: AUAudioFrameCount,
+            outputBusNumber: Int,
+            outputData: UnsafeMutablePointer<AudioBufferList>?,
+            realtimeEventListHead: UnsafePointer<AURenderEvent>?,
+            pullInputBlock: AURenderPullInputBlock?
+        ) -> OSStatus in
 
-                switch currentEvent.head.eventType {
+            guard let outputData else { return kAudioUnitErr_InvalidProperty }
 
-                // MARK: MIDI Events
+            // Begin event batch for this render call
+            modal_attractors_engine_begin_events(enginePtr)
+
+            // Parse AU events and push to engine with sample offsets
+            var evtPtr = realtimeEventListHead
+            let hostSampleTime = AUEventSampleTime(timestamp.pointee.mSampleTime)
+
+            while let e = evtPtr {
+                let ev = e.pointee
+
+                switch ev.head.eventType {
+
                 case .MIDI:
-                    let midiEvent = currentEvent.MIDI
-                    let offset = Int32(midiEvent.eventSampleTime - timestamp.pointee.mSampleTime)
+                    let midi = ev.MIDI
+                    let offset = Int32(midi.eventSampleTime - hostSampleTime)
 
-                    let data = midiEvent.data
-                    let status = data.0
-                    let data1 = data.1
-                    let data2 = data.2
+                    let d = midi.data
+                    let status = d.0
+                    let data1  = d.1
+                    let data2  = d.2
 
-                    let messageType = status & 0xF0
-
-                    switch messageType {
+                    switch status & 0xF0 {
                     case 0x90: // Note On
                         if data2 > 0 {
-                            // Note On with velocity
-                            let velocity = Float(data2) / 127.0
                             modal_attractors_engine_push_note_on(
-                                engine,
-                                offset,
-                                data1,
-                                velocity
+                                enginePtr, offset, data1, Float(data2) * (1.0 / 127.0)
                             )
                         } else {
-                            // Note On with velocity 0 = Note Off
-                            modal_attractors_engine_push_note_off(engine, offset, data1)
+                            modal_attractors_engine_push_note_off(enginePtr, offset, data1)
                         }
 
                     case 0x80: // Note Off
-                        modal_attractors_engine_push_note_off(engine, offset, data1)
+                        modal_attractors_engine_push_note_off(enginePtr, offset, data1)
 
                     case 0xE0: // Pitch Bend
-                        // Combine data1 (LSB) and data2 (MSB) into 14-bit value
-                        let bendValue14bit = (Int(data2) << 7) | Int(data1)
-                        // Convert to -1.0...+1.0 range (8192 is center)
-                        let bendNormalized = (Float(bendValue14bit) - 8192.0) / 8192.0
-                        modal_attractors_engine_push_pitch_bend(engine, offset, bendNormalized)
-
-                    case 0xB0: // Control Change
-                        // Could map CC to parameters here if needed
-                        break
+                        let bend14 = (Int(data2) << 7) | Int(data1)                 // 0..16383
+                        let bend   = (Float(bend14) - 8192.0) * (1.0 / 8192.0)      // -1..+1
+                        modal_attractors_engine_push_pitch_bend(enginePtr, offset, bend)
 
                     default:
                         break
                     }
 
-                // MARK: Parameter Events
                 case .parameter:
-                    let paramEvent = currentEvent.parameter
-                    let offset = Int32(paramEvent.eventSampleTime - timestamp.pointee.mSampleTime)
+                    let p = ev.parameter
+                    let offset = Int32(p.eventSampleTime - hostSampleTime)
 
-                    // Push parameter change with sample offset for sample-accurate automation
                     modal_attractors_engine_push_parameter(
-                        engine,
-                        offset,
-                        UInt32(paramEvent.parameterAddress),
-                        paramEvent.value
+                        enginePtr, offset, UInt32(p.parameterAddress), p.value
                     )
 
                 case .parameterRamp:
-                    let rampEvent = currentEvent.parameterRamp
-                    let offset = Int32(rampEvent.eventSampleTime - timestamp.pointee.mSampleTime)
+                    // IMPORTANT: parameterRamp event uses the parameterRamp union field
+                    let r = ev.parameter
+                    let offset = Int32(r.eventSampleTime - hostSampleTime)
 
-                    // For now, just apply the start value
-                    // A more sophisticated implementation would interpolate over the ramp duration
+                    // Minimal: push start value. If you add ramp support to DSP,
+                    // push (start,end,duration) and interpolate in-engine.
                     modal_attractors_engine_push_parameter(
-                        engine,
-                        offset,
-                        UInt32(rampEvent.parameterAddress),
-                        rampEvent.startValue
+                        enginePtr, offset, UInt32(r.parameterAddress), r.value
                     )
 
                 case .MIDIEventList:
-                    // Handle new MIDI 2.0 event list format if needed
+                    // MIDI 2.0 list (optional)
                     break
 
                 @unknown default:
                     break
                 }
 
-                event = currentEvent.head.next?.pointee
+                // Correct pointer iteration
+                if let next = ev.head.next {
+                    evtPtr = UnsafePointer(next)
+                } else {
+                    evtPtr = nil
+                }
             }
 
-            // Get output buffer pointers
-            guard let outputBufferList = UnsafeMutableAudioBufferListPointer(outputData) else {
-                return kAudioUnitErr_InvalidProperty
-            }
+            // Output buffers
+            let buffers = UnsafeMutableAudioBufferListPointer(outputData)
+            guard buffers.count >= 1 else { return kAudioUnitErr_InvalidProperty }
 
-            // Render audio with sample-accurate events
-            if outputBufferList.count >= 2 {
-                // Stereo output
-                let outL = outputBufferList[0].mData?.assumingMemoryBound(to: Float.self)
-                let outR = outputBufferList[1].mData?.assumingMemoryBound(to: Float.self)
+            if buffers.count >= 2 {
+                guard
+                    let outL = buffers[0].mData?.assumingMemoryBound(to: Float.self),
+                    let outR = buffers[1].mData?.assumingMemoryBound(to: Float.self)
+                else { return kAudioUnitErr_InvalidProperty }
 
-                modal_attractors_engine_render(engine, outL, outR, frameCount)
-            } else if outputBufferList.count == 1 {
-                // Mono output (use same buffer for both channels)
-                let outL = outputBufferList[0].mData?.assumingMemoryBound(to: Float.self)
-                modal_attractors_engine_render(engine, outL, outL, frameCount)
+                modal_attractors_engine_render(enginePtr, outL, outR, frameCount)
+            } else {
+                guard
+                    let out = buffers[0].mData?.assumingMemoryBound(to: Float.self)
+                else { return kAudioUnitErr_InvalidProperty }
+
+                modal_attractors_engine_render(enginePtr, out, out, frameCount)
             }
 
             return noErr
         }
+
+        return block
     }
 
     // MARK: - State Management
