@@ -40,6 +40,15 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
             defaultValue: 0,
             valueStrings: ["Ring", "Small World", "Clustered", "Hub-Spoke", "Random", "Complete", "None"]
         )
+
+        ParameterSpec(
+            address: .kParam_NodeCount,
+            identifier: "nodeCount",
+            name: "Node Count",
+            units: .indexed,
+            valueRange: 1...16,
+            defaultValue: 16
+        )
     }
 
     // MARK: - Mode 0 Parameters

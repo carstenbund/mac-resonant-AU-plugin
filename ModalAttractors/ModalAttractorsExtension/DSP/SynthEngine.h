@@ -199,6 +199,7 @@ private:
     float masterGain_;
     float couplingStrength_;
     int topologyType_;
+    uint32_t nodeCount_;  // Active node count (1-16), currently stored but not enforced
 
     /**
      * @brief Process single event (real-time safe)
