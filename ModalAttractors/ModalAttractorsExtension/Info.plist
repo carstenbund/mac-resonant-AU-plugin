@@ -24,7 +24,7 @@
 						<string>MIDI Processor</string>
 					</array>
 					<key>type</key>
-					<string>aumi</string>
+					<string>aumu</string>
 					<key>version</key>
 					<integer>67072</integer>
 				</dict>

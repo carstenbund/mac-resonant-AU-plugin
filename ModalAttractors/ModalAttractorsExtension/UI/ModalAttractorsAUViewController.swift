@@ -45,6 +45,6 @@ final class ModalAttractorsAUViewController: AUViewController {
             hc.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
 
-        hc.didMove(toParent: self)
+        //didMove(toParent: self)
     }
 }
