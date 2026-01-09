@@ -371,14 +371,16 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
             return
         }
 
-        // Create parameter tree wrapper for SwiftUI
-        let paramTreeWrapper = ParameterTree(auParameterTree: paramTree)
+        // Ensure UI creation happens on main thread
+        DispatchQueue.main.async {
+            // Create parameter tree wrapper for SwiftUI
+            let paramTreeWrapper = ParameterTree(auParameterTree: paramTree)
 
-        // Create and configure our custom AUViewController subclass
-        // that hosts the SwiftUI view internally
-        let vc = ModalAttractorsAUViewController()
-        vc.configure(paramTreeWrapper: paramTreeWrapper)
+            // Create and configure our custom AUViewController subclass
+            let vc = ModalAttractorsAUViewController()
+            vc.configure(paramTreeWrapper: paramTreeWrapper)
 
-        completionHandler(vc)
+            completionHandler(vc)
+        }
     }
 }
