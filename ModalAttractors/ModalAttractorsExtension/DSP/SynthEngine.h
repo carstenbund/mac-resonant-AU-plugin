@@ -15,7 +15,7 @@
 
 // Forward declarations - no Apple types leak into DSP
 class ModalVoice;
-class VoiceAllocator;
+class NodeManager;
 class TopologyEngine;
 
 /**
@@ -121,9 +121,10 @@ class SynthEngine {
 public:
     /**
      * @brief Constructor
-     * @param maxPolyphony Maximum number of voices
+     *
+     * Always creates 5-node network (maxPolyphony parameter ignored)
      */
-    SynthEngine(uint32_t maxPolyphony = 16);
+    SynthEngine(uint32_t maxPolyphony = 5);
 
     /**
      * @brief Destructor
@@ -167,9 +168,9 @@ public:
     float getParameter(uint32_t paramId) const;
 
     /**
-     * @brief Get maximum polyphony
+     * @brief Get maximum polyphony (always 5 nodes)
      */
-    uint32_t getMaxPolyphony() const { return maxPolyphony_; }
+    uint32_t getMaxPolyphony() const { return 5; }
 
     /**
      * @brief Get current sample rate
@@ -178,14 +179,13 @@ public:
 
 private:
     // DSP components (owned by this class)
-    VoiceAllocator* voiceAllocator_;
+    NodeManager* nodeManager_;
     TopologyEngine* topologyEngine_;
 
-    // Pre-allocated voice pointer array (no allocation in render!)
-    ModalVoice** voicePointers_;
+    // Pre-allocated node pointer array (no allocation in render!)
+    ModalVoice** nodePointers_;
 
     // Engine state
-    uint32_t maxPolyphony_;
     double sampleRate_;
     uint32_t maxFrames_;
     uint32_t channels_;
@@ -199,9 +199,19 @@ private:
     float masterGain_;
     float couplingStrength_;
     int topologyType_;
-    uint32_t nodeCount_;  // Active node count (1-16), currently stored but not enforced
 
-    // Parameter cache - Per-mode parameters
+    // Parameter cache - Node Characters (5 nodes, IDs 0-4)
+    uint8_t node0_character_;
+    uint8_t node1_character_;
+    uint8_t node2_character_;
+    uint8_t node3_character_;
+    uint8_t node4_character_;
+
+    // Parameter cache - Routing
+    uint8_t noteRouting_;      // 0=RoundRobin, 1=PitchZones
+    uint8_t multiExcite_;      // 0=ReTrigger, 1=Accumulate
+
+    // Parameter cache - Per-mode parameters (for Character Editor)
     float mode0_frequency_;
     float mode0_damping_;
     float mode0_weight_;
@@ -215,12 +225,11 @@ private:
     float mode3_damping_;
     float mode3_weight_;
 
-    // Parameter cache - Excitation
+    // Parameter cache - Excitation (for Character Editor)
     float pokeStrength_;
     float pokeDuration_;
 
-    // Parameter cache - Voice
-    float polyphony_;
+    // Parameter cache - Deprecated
     float personality_;
 
     /**
