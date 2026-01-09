@@ -44,6 +44,7 @@ struct SynthEvent {
         struct {
             uint8_t note;
             float velocity;  // 0.0-1.0 normalized
+            uint8_t channel; // MIDI channel (0-15, where 0 = channel 1)
         } noteOn;
 
         struct {

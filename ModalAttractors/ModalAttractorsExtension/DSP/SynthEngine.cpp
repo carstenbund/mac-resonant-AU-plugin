@@ -187,7 +187,7 @@ void SynthEngine::render(const EventQueue& events, float* outL, float* outR, uin
 void SynthEngine::processEvent(const SynthEvent& event) {
     switch (event.type) {
         case EventType::NoteOn:
-            nodeManager_->noteOn(event.noteOn.note, event.noteOn.velocity);
+            nodeManager_->noteOn(event.noteOn.note, event.noteOn.velocity, event.noteOn.channel);
             break;
 
         case EventType::NoteOff:
@@ -271,7 +271,10 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
         }
 
         case kParam_NodeCount:
-            // Deprecated: always 5 nodes
+            // Set active node count (1-5)
+            if (nodeManager_) {
+                nodeManager_->setNodeCount(static_cast<uint8_t>(value));
+            }
             break;
 
         // Node Character parameters
@@ -399,7 +402,7 @@ float SynthEngine::getParameter(uint32_t paramId) const {
         case kParam_Topology:
             return static_cast<float>(topologyType_);
         case kParam_NodeCount:
-            return 5.0f;  // Always 5 nodes
+            return nodeManager_ ? static_cast<float>(nodeManager_->getNodeCount()) : 5.0f;
 
         // Node Character parameters
         case kParam_Node0_Character:

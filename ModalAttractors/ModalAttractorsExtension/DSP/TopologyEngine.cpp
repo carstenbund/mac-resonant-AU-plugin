@@ -101,7 +101,7 @@ void TopologyEngine::updateCoupling(ModalVoice** voices, uint32_t num_voices) {
     if (!voices || num_voices != num_voices_) return;
 
     // OPTIMIZATION: Skip coupling entirely if strength is near zero or topology is None
-    if (coupling_strength_ < 0.001f || current_topology_ == TopologyType::None) {
+    if (coupling_strength_ < 0.001f || topology_type_ == TopologyType::None) {
         return;
     }
 

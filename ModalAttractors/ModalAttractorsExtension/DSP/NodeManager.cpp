@@ -8,9 +8,9 @@
 #include <algorithm>
 
 NodeManager::NodeManager()
-    : routing_mode_(NoteRoutingMode::RoundRobin)
+    : routing_mode_(NoteRoutingMode::MidiChannel)
     , multi_excite_mode_(MultiExciteMode::Accumulate)
-    , round_robin_counter_(0)
+    , active_node_count_(5)        // Default: all 5 nodes active
     , pitch_bend_(0.0f)
     , sample_rate_(48000.0f)
     , initialized_(false)
@@ -26,6 +26,7 @@ NodeManager::NodeManager()
 
     // Initialize note mapping
     memset(note_to_node_, 0xFF, sizeof(note_to_node_));  // 0xFF = no node
+    memset(note_to_channel_, 0xFF, sizeof(note_to_channel_));
 }
 
 NodeManager::~NodeManager() {
@@ -122,30 +123,47 @@ void NodeManager::applyCharacterToNode(uint8_t node_idx, const NodeCharacter* ch
 }
 
 // ============================================================================
+// Node Count Control
+// ============================================================================
+
+void NodeManager::setNodeCount(uint8_t count) {
+    // Clamp to valid range
+    if (count < 1) count = 1;
+    if (count > NUM_NETWORK_NODES) count = NUM_NETWORK_NODES;
+
+    // Stop all nodes before changing count (safety)
+    allNotesOff();
+
+    active_node_count_ = count;
+}
+
+// ============================================================================
 // Note Routing
 // ============================================================================
 
-uint8_t NodeManager::routeNoteToNode(uint8_t midi_note) {
+uint8_t NodeManager::routeNoteToNodes(uint8_t midi_note, uint8_t midi_channel, uint8_t* target_nodes) {
     switch (routing_mode_) {
-        case NoteRoutingMode::RoundRobin:
-            // Simple round-robin: cycle through nodes
+        case NoteRoutingMode::MidiChannel:
+            // Route by MIDI channel: Channel 1→Node 0, Channel 2→Node 1, etc.
+            // midi_channel is 0-based (0 = channel 1)
             {
-                uint8_t node_idx = round_robin_counter_ % NUM_NETWORK_NODES;
-                round_robin_counter_++;
-                return node_idx;
+                uint8_t node_idx = midi_channel % active_node_count_;
+                target_nodes[0] = node_idx;
+                return 1;  // One node
             }
 
-        case NoteRoutingMode::PitchZones:
-            // Pitch-based zones: low notes → low nodes, high notes → high nodes
-            // MIDI range 0-127 divided into 5 zones
-            if (midi_note < 36) return 0;      // 0-35: Bass zone (C0-B2)
-            else if (midi_note < 60) return 1; // 36-59: Low zone (C3-B4)
-            else if (midi_note < 72) return 2; // 60-71: Mid zone (C5-B5)
-            else if (midi_note < 96) return 3; // 72-95: High zone (C6-B7)
-            else return 4;                      // 96-127: Top zone (C8+)
+        case NoteRoutingMode::AllNodes:
+            // All active nodes receive the note
+            {
+                for (uint8_t i = 0; i < active_node_count_; i++) {
+                    target_nodes[i] = i;
+                }
+                return active_node_count_;
+            }
 
         default:
-            return 0;
+            target_nodes[0] = 0;
+            return 1;
     }
 }
 
@@ -153,26 +171,35 @@ uint8_t NodeManager::routeNoteToNode(uint8_t midi_note) {
 // Note Handling
 // ============================================================================
 
-void NodeManager::noteOn(uint8_t midi_note, float velocity) {
+void NodeManager::noteOn(uint8_t midi_note, float velocity, uint8_t midi_channel) {
     if (!initialized_ || midi_note > 127) return;
 
-    // Route to target node
-    uint8_t node_idx = routeNoteToNode(midi_note);
+    // Route to target node(s)
+    uint8_t target_nodes[NUM_NETWORK_NODES];
+    uint8_t num_targets = routeNoteToNodes(midi_note, midi_channel, target_nodes);
 
-    // Check multi-excite mode
-    bool node_is_active = nodes_[node_idx]->isActive();
+    // Excite each target node
+    for (uint8_t i = 0; i < num_targets; i++) {
+        uint8_t node_idx = target_nodes[i];
 
-    if (multi_excite_mode_ == MultiExciteMode::ReTrigger && node_is_active) {
-        // Re-trigger: reset node first
-        nodes_[node_idx]->reset();
+        // Check multi-excite mode
+        bool node_is_active = nodes_[node_idx]->isActive();
+
+        if (multi_excite_mode_ == MultiExciteMode::ReTrigger && node_is_active) {
+            // Re-trigger: reset node first
+            nodes_[node_idx]->reset();
+        }
+        // If Accumulate mode: just excite on top of existing state
+
+        // Excite the node
+        exciteNode(node_idx, midi_note, velocity);
     }
-    // If Accumulate mode: just excite on top of existing state
 
-    // Excite the node
-    exciteNode(node_idx, midi_note, velocity);
-
-    // Track note → node mapping for note-off
-    note_to_node_[midi_note] = node_idx;
+    // Track note → node mapping for note-off (use first target for simplicity)
+    if (num_targets > 0) {
+        note_to_node_[midi_note] = target_nodes[0];
+        note_to_channel_[midi_note] = midi_channel;
+    }
 }
 
 void NodeManager::noteOff(uint8_t midi_note) {
@@ -259,8 +286,8 @@ void NodeManager::releaseNode(uint8_t node_idx) {
 void NodeManager::updateNodes() {
     if (!initialized_) return;
 
-    // Update all nodes at control rate
-    for (uint8_t i = 0; i < NUM_NETWORK_NODES; i++) {
+    // Update only active nodes at control rate
+    for (uint8_t i = 0; i < active_node_count_; i++) {
         if (nodes_[i]->isActive()) {
             nodes_[i]->updateModal();
         }
@@ -285,9 +312,9 @@ void NodeManager::renderAudio(float* outL, float* outR, uint32_t num_frames) {
         num_frames = max_buffer_size_;
     }
 
-    // OPTIMIZATION: Only render active nodes
-    // Inactive nodes produce silence, so skip them entirely
-    for (uint8_t i = 0; i < NUM_NETWORK_NODES; i++) {
+    // OPTIMIZATION: Only render active node count
+    // Skip nodes beyond active_node_count_ and inactive nodes
+    for (uint8_t i = 0; i < active_node_count_; i++) {
         // Skip inactive nodes (major performance win!)
         if (!nodes_[i]->isActive()) {
             continue;

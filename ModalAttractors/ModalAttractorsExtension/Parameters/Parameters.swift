@@ -46,9 +46,8 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
             identifier: "nodeCount",
             name: "Node Count",
             units: .indexed,
-            valueRange: 1...16,
-            defaultValue: 5,
-            flags: [.flag_IsReadable] // Read-only: always 5 nodes now
+            valueRange: 1...5,
+            defaultValue: 5
         )
     }
 
@@ -114,7 +113,7 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
             units: .indexed,
             valueRange: 0...1,
             defaultValue: 0,
-            valueStrings: ["Round-Robin", "Pitch Zones"]
+            valueStrings: ["MIDI Channel", "All Nodes"]
         )
 
         ParameterSpec(
