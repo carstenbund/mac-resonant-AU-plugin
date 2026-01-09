@@ -8,54 +8,65 @@
 import SwiftUI
 import AudioToolbox
 
-/// Main SwiftUI view for the Modal Attractors extension control panel
-///
-/// This view provides a comprehensive interface for controlling the Modal Attractors
-/// synthesis engine, organized into tabs:
-/// - Main: Network topology, node characters, routing
-/// - Editor: Advanced character parameter editing
+/// Root view for Modal Attractors AUv3 plugin
+/// Single view controller with internal tab/page switching
 public struct ModalAttractorsExtensionMainView: View {
     @EnvironmentObject var parameterTree: ParameterTree
-    @State private var selectedTab = 0
+    @State private var selectedTab: Tab = .main
 
     public init() {}
 
+    // MARK: - Tab Definition
+
+    enum Tab: Int, CaseIterable, Identifiable {
+        case main
+        case characterEditor
+
+        var id: Int { rawValue }
+
+        var title: String {
+            switch self {
+            case .main: return "Main"
+            case .characterEditor: return "Character Editor"
+            }
+        }
+    }
+
+    // MARK: - Body
+
     public var body: some View {
-        VStack(spacing: 0) {
-            // Tab picker (segmented control)
+        VStack(spacing: 12) {
+            // Segmented tab picker
             Picker("", selection: $selectedTab) {
-                Text("Main").tag(0)
-                Text("Character Editor").tag(1)
+                ForEach(Tab.allCases) { tab in
+                    Text(tab.title).tag(tab)
+                }
             }
             .pickerStyle(.segmented)
-            .padding([.horizontal, .top])
-
-            Divider()
-                .padding(.top, 8)
 
             // Tab content
             Group {
                 switch selectedTab {
-                case 0:
-                    mainTabContent
-                case 1:
+                case .main:
+                    MainTabView()
+                case .characterEditor:
                     CharacterEditorTabView()
-                        .environmentObject(parameterTree)
-                default:
-                    mainTabContent
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(
-            minWidth: UIConstants.Sizes.windowMinWidth,
-            minHeight: UIConstants.Sizes.windowMinHeight
-        )
+        .padding(12)
+        .frame(minWidth: 520, minHeight: 400)
     }
+}
 
-    // MARK: - Main Tab
+// MARK: - Main Tab
 
-    private var mainTabContent: some View {
+/// Main control page - simple interface for most users
+struct MainTabView: View {
+    @EnvironmentObject var parameterTree: ParameterTree
+
+    var body: some View {
         ScrollView {
             VStack(spacing: UIConstants.Spacing.large) {
                 // Header
@@ -68,7 +79,7 @@ public struct ModalAttractorsExtensionMainView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
-                .padding(.top, UIConstants.Spacing.medium)
+                .padding(.top, UIConstants.Spacing.small)
 
                 Divider()
 
@@ -95,8 +106,10 @@ public struct ModalAttractorsExtensionMainView: View {
     }
 }
 
+// MARK: - Preview
+
 #Preview {
     ModalAttractorsExtensionMainView()
         .environmentObject(ParameterTree.preview)
-        .frame(width: 500, height: 700)
+        .frame(width: 520, height: 400)
 }
