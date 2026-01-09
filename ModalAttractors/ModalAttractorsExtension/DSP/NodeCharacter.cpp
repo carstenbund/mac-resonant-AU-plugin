@@ -181,6 +181,126 @@ const NodeCharacter CHARACTER_DRONE_HUB = {
     .description = "Self-sustaining drone with beating chorus effect"
 };
 
+const NodeCharacter CHARACTER_METALLIC_STRIKE = {
+    .mode_freq_mult = { 1.0f, 3.14f, 5.87f, 8.23f },
+    .mode_damping = { 2.0f, 2.5f, 3.0f, 3.5f },
+    .mode_weight = { 0.6f, 0.8f, 1.0f, 0.7f },
+    .personality = PERSONALITY_RESONATOR,
+    .poke_strength = 0.9f,
+    .poke_duration_ms = 5.0f,
+    .coupling_response_gain = 1.0f,
+    .name = "Metallic Strike",
+    .description = "Bright inharmonic strike with fast decay"
+};
+
+const NodeCharacter CHARACTER_WARM_PAD = {
+    .mode_freq_mult = { 1.0f, 2.0f, 3.0f, 4.0f },
+    .mode_damping = { 0.2f, 0.25f, 0.3f, 0.4f },
+    .mode_weight = { 1.0f, 0.85f, 0.7f, 0.5f },
+    .personality = PERSONALITY_RESONATOR,
+    .poke_strength = 0.3f,
+    .poke_duration_ms = 30.0f,
+    .coupling_response_gain = 0.7f,
+    .name = "Warm Pad",
+    .description = "Smooth sustained pad with perfect harmonics"
+};
+
+const NodeCharacter CHARACTER_PERCUSSIVE_HIT = {
+    .mode_freq_mult = { 1.0f, 2.5f, 4.2f, 6.7f },
+    .mode_damping = { 3.0f, 3.5f, 4.0f, 4.5f },
+    .mode_weight = { 1.0f, 0.6f, 0.4f, 0.2f },
+    .personality = PERSONALITY_RESONATOR,
+    .poke_strength = 1.0f,
+    .poke_duration_ms = 3.0f,
+    .coupling_response_gain = 0.8f,
+    .name = "Percussive Hit",
+    .description = "Fast decay percussive strike"
+};
+
+const NodeCharacter CHARACTER_RESONANT_BELL = {
+    .mode_freq_mult = { 1.0f, 2.0f, 3.0f, 4.0f },
+    .mode_damping = { 0.6f, 0.7f, 0.8f, 1.0f },
+    .mode_weight = { 1.0f, 0.9f, 0.8f, 0.7f },
+    .personality = PERSONALITY_RESONATOR,
+    .poke_strength = 0.75f,
+    .poke_duration_ms = 12.0f,
+    .coupling_response_gain = 1.0f,
+    .name = "Resonant Bell",
+    .description = "Harmonic bell with balanced sustain"
+};
+
+const NodeCharacter CHARACTER_DEEP_RUMBLE = {
+    .mode_freq_mult = { 0.5f, 1.0f, 1.5f, 2.0f },
+    .mode_damping = { 0.5f, 0.6f, 0.8f, 1.0f },
+    .mode_weight = { 1.0f, 0.9f, 0.6f, 0.4f },
+    .personality = PERSONALITY_RESONATOR,
+    .poke_strength = 0.6f,
+    .poke_duration_ms = 20.0f,
+    .coupling_response_gain = 0.9f,
+    .name = "Deep Rumble",
+    .description = "Sub-bass focus with low partials"
+};
+
+const NodeCharacter CHARACTER_HARMONIC_STACK = {
+    .mode_freq_mult = { 1.0f, 2.0f, 3.0f, 4.0f },
+    .mode_damping = { 1.0f, 1.0f, 1.0f, 1.0f },
+    .mode_weight = { 1.0f, 0.8f, 0.6f, 0.4f },
+    .personality = PERSONALITY_RESONATOR,
+    .poke_strength = 0.65f,
+    .poke_duration_ms = 15.0f,
+    .coupling_response_gain = 1.0f,
+    .name = "Harmonic Stack",
+    .description = "Perfect harmonic series with uniform damping"
+};
+
+const NodeCharacter CHARACTER_DETUNED_CHORUS = {
+    .mode_freq_mult = { 1.0f, 1.99f, 2.98f, 4.03f },
+    .mode_damping = { 0.7f, 0.7f, 0.8f, 0.9f },
+    .mode_weight = { 1.0f, 0.85f, 0.7f, 0.5f },
+    .personality = PERSONALITY_RESONATOR,
+    .poke_strength = 0.5f,
+    .poke_duration_ms = 18.0f,
+    .coupling_response_gain = 0.85f,
+    .name = "Detuned Chorus",
+    .description = "Slightly detuned for thick chorused sound"
+};
+
+const NodeCharacter CHARACTER_MALLET_TONE = {
+    .mode_freq_mult = { 1.0f, 2.76f, 4.18f, 5.94f },
+    .mode_damping = { 1.5f, 1.8f, 2.2f, 2.5f },
+    .mode_weight = { 1.0f, 0.7f, 0.5f, 0.3f },
+    .personality = PERSONALITY_RESONATOR,
+    .poke_strength = 0.85f,
+    .poke_duration_ms = 8.0f,
+    .coupling_response_gain = 0.9f,
+    .name = "Mallet Tone",
+    .description = "Wood mallet-like inharmonic character"
+};
+
+const NodeCharacter CHARACTER_WIND_CHIME = {
+    .mode_freq_mult = { 3.0f, 4.5f, 6.2f, 8.7f },
+    .mode_damping = { 0.9f, 1.0f, 1.1f, 1.3f },
+    .mode_weight = { 0.7f, 0.8f, 1.0f, 0.8f },
+    .personality = PERSONALITY_RESONATOR,
+    .poke_strength = 0.4f,
+    .poke_duration_ms = 14.0f,
+    .coupling_response_gain = 0.7f,
+    .name = "Wind Chime",
+    .description = "High delicate partials, light and airy"
+};
+
+const NodeCharacter CHARACTER_GONG_WASH = {
+    .mode_freq_mult = { 1.0f, 2.37f, 3.86f, 5.19f },
+    .mode_damping = { 0.4f, 0.5f, 0.6f, 0.7f },
+    .mode_weight = { 0.8f, 1.0f, 0.9f, 0.7f },
+    .personality = PERSONALITY_RESONATOR,
+    .poke_strength = 0.7f,
+    .poke_duration_ms = 35.0f,
+    .coupling_response_gain = 1.1f,
+    .name = "Gong Wash",
+    .description = "Complex inharmonic wash with long sustain"
+};
+
 // ============================================================================
 // Character Library Array
 // ============================================================================
@@ -190,7 +310,17 @@ const NodeCharacter* CHARACTER_LIBRARY[NUM_BUILTIN_CHARACTERS] = {
     &CHARACTER_DARK_NODE,
     &CHARACTER_BRIGHT_BELL,
     &CHARACTER_GLASSY_SHIMMER,
-    &CHARACTER_DRONE_HUB
+    &CHARACTER_DRONE_HUB,
+    &CHARACTER_METALLIC_STRIKE,
+    &CHARACTER_WARM_PAD,
+    &CHARACTER_PERCUSSIVE_HIT,
+    &CHARACTER_RESONANT_BELL,
+    &CHARACTER_DEEP_RUMBLE,
+    &CHARACTER_HARMONIC_STACK,
+    &CHARACTER_DETUNED_CHORUS,
+    &CHARACTER_MALLET_TONE,
+    &CHARACTER_WIND_CHIME,
+    &CHARACTER_GONG_WASH
 };
 
 // ============================================================================

@@ -45,7 +45,7 @@ struct NodeCharacter {
 };
 
 // ============================================================================
-// Character Library - 5 Built-in Characters
+// Character Library - 15 Built-in Characters
 // ============================================================================
 
 /**
@@ -94,16 +94,106 @@ extern const NodeCharacter CHARACTER_GLASSY_SHIMMER;
 extern const NodeCharacter CHARACTER_DRONE_HUB;
 
 /**
+ * @brief Character 5: Metallic Strike
+ *
+ * Bright inharmonic ratios, fast decay.
+ * Sharp metallic attack character.
+ * High damping for percussive sound.
+ */
+extern const NodeCharacter CHARACTER_METALLIC_STRIKE;
+
+/**
+ * @brief Character 6: Warm Pad
+ *
+ * Perfect harmonics, ultra-low damping.
+ * Smooth sustained pad sound.
+ * Gentle long attack.
+ */
+extern const NodeCharacter CHARACTER_WARM_PAD;
+
+/**
+ * @brief Character 7: Percussive Hit
+ *
+ * Very high damping, fast decay.
+ * Punchy percussive attack.
+ * Minimal sustain.
+ */
+extern const NodeCharacter CHARACTER_PERCUSSIVE_HIT;
+
+/**
+ * @brief Character 8: Resonant Bell
+ *
+ * Harmonic stack, balanced sustain.
+ * Bell-like resonance.
+ * Medium attack and decay.
+ */
+extern const NodeCharacter CHARACTER_RESONANT_BELL;
+
+/**
+ * @brief Character 9: Deep Rumble
+ *
+ * Sub-bass focus, low partials.
+ * Deep fundamental emphasis.
+ * Sustained low end.
+ */
+extern const NodeCharacter CHARACTER_DEEP_RUMBLE;
+
+/**
+ * @brief Character 10: Harmonic Stack
+ *
+ * Perfect harmonic series (1,2,3,4).
+ * Uniform damping.
+ * Classic additive synthesis sound.
+ */
+extern const NodeCharacter CHARACTER_HARMONIC_STACK;
+
+/**
+ * @brief Character 11: Detuned Chorus
+ *
+ * Slightly detuned ratios.
+ * Thick chorused sound.
+ * Natural beating and movement.
+ */
+extern const NodeCharacter CHARACTER_DETUNED_CHORUS;
+
+/**
+ * @brief Character 12: Mallet Tone
+ *
+ * Wood mallet-like inharmonics.
+ * Percussive with wood character.
+ * Medium-fast decay.
+ */
+extern const NodeCharacter CHARACTER_MALLET_TONE;
+
+/**
+ * @brief Character 13: Wind Chime
+ *
+ * High delicate partials.
+ * Shimmering bell-like quality.
+ * Light and airy.
+ */
+extern const NodeCharacter CHARACTER_WIND_CHIME;
+
+/**
+ * @brief Character 14: Gong Wash
+ *
+ * Complex inharmonic ratios.
+ * Evolving gong-like timbre.
+ * Long sustained wash.
+ */
+extern const NodeCharacter CHARACTER_GONG_WASH;
+
+/**
  * @brief Character library array for indexed access
  *
- * Maps character ID (0-4) to character definition.
+ * Maps character ID (0-14) to character definition.
  */
-extern const NodeCharacter* CHARACTER_LIBRARY[5];
+extern const NodeCharacter* CHARACTER_LIBRARY[15];
 
 /**
  * @brief Number of built-in characters
  */
-#define NUM_BUILTIN_CHARACTERS 5
+#define NUM_BUILTIN_CHARACTERS 15
 
 // ============================================================================
 // Character Utilities

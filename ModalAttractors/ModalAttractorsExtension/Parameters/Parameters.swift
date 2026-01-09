@@ -58,9 +58,11 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
             identifier: "node0Character",
             name: "Node 0",
             units: .indexed,
-            valueRange: 0...4,
+            valueRange: 0...14,
             defaultValue: 0,
-            valueStrings: ["Vibrant Bass", "Dark Node", "Bright Bell", "Glassy Shimmer", "Drone Hub"]
+            valueStrings: ["Vibrant Bass", "Dark Node", "Bright Bell", "Glassy Shimmer", "Drone Hub",
+                          "Metallic Strike", "Warm Pad", "Percussive Hit", "Resonant Bell", "Deep Rumble",
+                          "Harmonic Stack", "Detuned Chorus", "Mallet Tone", "Wind Chime", "Gong Wash"]
         )
 
         ParameterSpec(
@@ -68,9 +70,11 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
             identifier: "node1Character",
             name: "Node 1",
             units: .indexed,
-            valueRange: 0...4,
+            valueRange: 0...14,
             defaultValue: 1,
-            valueStrings: ["Vibrant Bass", "Dark Node", "Bright Bell", "Glassy Shimmer", "Drone Hub"]
+            valueStrings: ["Vibrant Bass", "Dark Node", "Bright Bell", "Glassy Shimmer", "Drone Hub",
+                          "Metallic Strike", "Warm Pad", "Percussive Hit", "Resonant Bell", "Deep Rumble",
+                          "Harmonic Stack", "Detuned Chorus", "Mallet Tone", "Wind Chime", "Gong Wash"]
         )
 
         ParameterSpec(
@@ -78,9 +82,11 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
             identifier: "node2Character",
             name: "Node 2",
             units: .indexed,
-            valueRange: 0...4,
+            valueRange: 0...14,
             defaultValue: 2,
-            valueStrings: ["Vibrant Bass", "Dark Node", "Bright Bell", "Glassy Shimmer", "Drone Hub"]
+            valueStrings: ["Vibrant Bass", "Dark Node", "Bright Bell", "Glassy Shimmer", "Drone Hub",
+                          "Metallic Strike", "Warm Pad", "Percussive Hit", "Resonant Bell", "Deep Rumble",
+                          "Harmonic Stack", "Detuned Chorus", "Mallet Tone", "Wind Chime", "Gong Wash"]
         )
 
         ParameterSpec(
@@ -88,9 +94,11 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
             identifier: "node3Character",
             name: "Node 3",
             units: .indexed,
-            valueRange: 0...4,
+            valueRange: 0...14,
             defaultValue: 3,
-            valueStrings: ["Vibrant Bass", "Dark Node", "Bright Bell", "Glassy Shimmer", "Drone Hub"]
+            valueStrings: ["Vibrant Bass", "Dark Node", "Bright Bell", "Glassy Shimmer", "Drone Hub",
+                          "Metallic Strike", "Warm Pad", "Percussive Hit", "Resonant Bell", "Deep Rumble",
+                          "Harmonic Stack", "Detuned Chorus", "Mallet Tone", "Wind Chime", "Gong Wash"]
         )
 
         ParameterSpec(
@@ -98,9 +106,11 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
             identifier: "node4Character",
             name: "Node 4",
             units: .indexed,
-            valueRange: 0...4,
+            valueRange: 0...14,
             defaultValue: 4,
-            valueStrings: ["Vibrant Bass", "Dark Node", "Bright Bell", "Glassy Shimmer", "Drone Hub"]
+            valueStrings: ["Vibrant Bass", "Dark Node", "Bright Bell", "Glassy Shimmer", "Drone Hub",
+                          "Metallic Strike", "Warm Pad", "Percussive Hit", "Resonant Bell", "Deep Rumble",
+                          "Harmonic Stack", "Detuned Chorus", "Mallet Tone", "Wind Chime", "Gong Wash"]
         )
     }
 
