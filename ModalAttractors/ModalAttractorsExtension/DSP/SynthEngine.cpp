@@ -263,53 +263,95 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
         // Mode 0 parameters
         case kParam_Mode0_Frequency:
             mode0_frequency_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(0, value, mode0_damping_, mode0_weight_);
+            }
             break;
         case kParam_Mode0_Damping:
             mode0_damping_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(0, mode0_frequency_, value, mode0_weight_);
+            }
             break;
         case kParam_Mode0_Weight:
             mode0_weight_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(0, mode0_frequency_, mode0_damping_, value);
+            }
             break;
 
         // Mode 1 parameters
         case kParam_Mode1_Frequency:
             mode1_frequency_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(1, value, mode1_damping_, mode1_weight_);
+            }
             break;
         case kParam_Mode1_Damping:
             mode1_damping_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(1, mode1_frequency_, value, mode1_weight_);
+            }
             break;
         case kParam_Mode1_Weight:
             mode1_weight_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(1, mode1_frequency_, mode1_damping_, value);
+            }
             break;
 
         // Mode 2 parameters
         case kParam_Mode2_Frequency:
             mode2_frequency_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(2, value, mode2_damping_, mode2_weight_);
+            }
             break;
         case kParam_Mode2_Damping:
             mode2_damping_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(2, mode2_frequency_, value, mode2_weight_);
+            }
             break;
         case kParam_Mode2_Weight:
             mode2_weight_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(2, mode2_frequency_, mode2_damping_, value);
+            }
             break;
 
         // Mode 3 parameters
         case kParam_Mode3_Frequency:
             mode3_frequency_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(3, value, mode3_damping_, mode3_weight_);
+            }
             break;
         case kParam_Mode3_Damping:
             mode3_damping_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(3, mode3_frequency_, value, mode3_weight_);
+            }
             break;
         case kParam_Mode3_Weight:
             mode3_weight_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(3, mode3_frequency_, mode3_damping_, value);
+            }
             break;
 
         // Excitation parameters
         case kParam_PokeStrength:
             pokeStrength_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setPokeStrength(value);
+            }
             break;
         case kParam_PokeDuration:
             pokeDuration_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setPokeDuration(value);
+            }
             break;
 
         // Voice parameters
