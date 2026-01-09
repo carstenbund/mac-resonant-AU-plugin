@@ -17,6 +17,14 @@ ModalVoice::ModalVoice(uint8_t voice_id)
     , samples_since_update_(0)
     , samples_per_update_(0)
     , sample_rate_(48000.0f)
+    , envelope_state_(EnvelopeState::Idle)
+    , envelope_amplitude_(0.0f)
+    , envelope_phase_(0)
+    , attack_samples_(0.0f)
+    , decay_samples_(0.0f)
+    , sustain_level_(1.0f)
+    , release_samples_(0.0f)
+    , release_start_level_(0.0f)
 {
     // Initialize node with resonator personality by default
     modal_node_init(&node_, voice_id, PERSONALITY_RESONATOR);
@@ -53,6 +61,11 @@ void ModalVoice::noteOn(uint8_t midi_note, float velocity) {
     state_ = State::Attack;
     age_ = 0;
 
+    // Trigger ADSR envelope attack phase
+    envelope_state_ = EnvelopeState::Attack;
+    envelope_amplitude_ = 0.0f;
+    envelope_phase_ = 0;
+
     // Update frequencies based on new note
     updateFrequencies();
 
@@ -77,6 +90,11 @@ void ModalVoice::noteOff() {
     if (state_ == State::Inactive) return;
 
     state_ = State::Release;
+
+    // Trigger ADSR envelope release phase
+    envelope_state_ = EnvelopeState::Release;
+    release_start_level_ = envelope_amplitude_;  // Start release from current level
+    envelope_phase_ = 0;
 }
 
 void ModalVoice::setPitchBend(float bend_amount, float bend_range) {
@@ -114,6 +132,13 @@ void ModalVoice::renderAudio(float* outL, float* outR, uint32_t num_frames) {
 
     // Render audio from modal state
     audio_synth_render(&synth_, outL, outR, num_frames);
+
+    // Apply ADSR envelope per-sample
+    for (uint32_t i = 0; i < num_frames; i++) {
+        float env_amp = updateEnvelope();
+        outL[i] *= env_amp;
+        outR[i] *= env_amp;
+    }
 }
 
 void ModalVoice::applyCoupling(const float coupling_inputs[MAX_MODES]) {
@@ -155,6 +180,11 @@ void ModalVoice::reset() {
     state_ = State::Inactive;
     age_ = 0;
     samples_since_update_ = 0;
+
+    // Reset ADSR envelope
+    envelope_state_ = EnvelopeState::Idle;
+    envelope_amplitude_ = 0.0f;
+    envelope_phase_ = 0;
 }
 
 void ModalVoice::updateFrequencies() {
@@ -207,4 +237,93 @@ void ModalVoice::updateState() {
             }
             break;
     }
+}
+
+void ModalVoice::setADSR(float attack_ms, float decay_ms, float sustain_level, float release_ms) {
+    // Convert milliseconds to samples
+    attack_samples_ = (attack_ms / 1000.0f) * sample_rate_;
+    decay_samples_ = (decay_ms / 1000.0f) * sample_rate_;
+    sustain_level_ = sustain_level;
+    release_samples_ = (release_ms / 1000.0f) * sample_rate_;
+
+    // Clamp sustain level to valid range
+    if (sustain_level_ < 0.0f) sustain_level_ = 0.0f;
+    if (sustain_level_ > 1.0f) sustain_level_ = 1.0f;
+}
+
+float ModalVoice::updateEnvelope() {
+    switch (envelope_state_) {
+        case EnvelopeState::Idle:
+            envelope_amplitude_ = 0.0f;
+            break;
+
+        case EnvelopeState::Attack:
+            if (attack_samples_ > 0.0f) {
+                // Linear ramp from 0 to 1
+                envelope_amplitude_ = static_cast<float>(envelope_phase_) / attack_samples_;
+                envelope_phase_++;
+
+                if (envelope_phase_ >= static_cast<uint32_t>(attack_samples_)) {
+                    // Transition to decay
+                    envelope_state_ = EnvelopeState::Decay;
+                    envelope_amplitude_ = 1.0f;
+                    envelope_phase_ = 0;
+                }
+            } else {
+                // Instant attack
+                envelope_amplitude_ = 1.0f;
+                envelope_state_ = EnvelopeState::Decay;
+                envelope_phase_ = 0;
+            }
+            break;
+
+        case EnvelopeState::Decay:
+            if (decay_samples_ > 0.0f) {
+                // Linear ramp from 1 to sustain level
+                float t = static_cast<float>(envelope_phase_) / decay_samples_;
+                envelope_amplitude_ = 1.0f + t * (sustain_level_ - 1.0f);
+                envelope_phase_++;
+
+                if (envelope_phase_ >= static_cast<uint32_t>(decay_samples_)) {
+                    // Transition to sustain
+                    envelope_state_ = EnvelopeState::Sustain;
+                    envelope_amplitude_ = sustain_level_;
+                    envelope_phase_ = 0;
+                }
+            } else {
+                // Instant decay
+                envelope_amplitude_ = sustain_level_;
+                envelope_state_ = EnvelopeState::Sustain;
+                envelope_phase_ = 0;
+            }
+            break;
+
+        case EnvelopeState::Sustain:
+            // Hold at sustain level
+            envelope_amplitude_ = sustain_level_;
+            break;
+
+        case EnvelopeState::Release:
+            if (release_samples_ > 0.0f) {
+                // Linear ramp from release_start_level_ to 0
+                float t = static_cast<float>(envelope_phase_) / release_samples_;
+                envelope_amplitude_ = release_start_level_ * (1.0f - t);
+                envelope_phase_++;
+
+                if (envelope_phase_ >= static_cast<uint32_t>(release_samples_)) {
+                    // Transition to idle
+                    envelope_state_ = EnvelopeState::Idle;
+                    envelope_amplitude_ = 0.0f;
+                    envelope_phase_ = 0;
+                }
+            } else {
+                // Instant release
+                envelope_amplitude_ = 0.0f;
+                envelope_state_ = EnvelopeState::Idle;
+                envelope_phase_ = 0;
+            }
+            break;
+    }
+
+    return envelope_amplitude_;
 }

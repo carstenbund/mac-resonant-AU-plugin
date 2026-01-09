@@ -223,6 +223,12 @@ private:
     float polyphony_;
     float personality_;
 
+    // Parameter cache - ADSR Envelope
+    float attack_;
+    float decay_;
+    float sustain_;
+    float release_;
+
     /**
      * @brief Process single event (real-time safe)
      */

@@ -92,6 +92,15 @@ public:
     void setPokeDuration(float duration_ms);
 
     /**
+     * @brief Set ADSR envelope parameters for all voices
+     * @param attack_ms Attack time in milliseconds (0-5000)
+     * @param decay_ms Decay time in milliseconds (0-5000)
+     * @param sustain_level Sustain level (0.0-1.0)
+     * @param release_ms Release time in milliseconds (0-10000)
+     */
+    void setADSR(float attack_ms, float decay_ms, float sustain_level, float release_ms);
+
+    /**
      * @brief Set maximum number of active nodes/voices
      * @param node_count Number of active nodes (1-16)
      */

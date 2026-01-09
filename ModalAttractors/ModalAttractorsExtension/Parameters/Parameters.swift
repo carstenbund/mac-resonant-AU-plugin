@@ -214,6 +214,45 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
             valueStrings: ["Resonator", "Self-Oscillator"]
         )
     }
+
+    // MARK: - ADSR Envelope Parameters
+    ParameterGroupSpec(identifier: "envelope", name: "Envelope") {
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Attack,
+            identifier: "attack",
+            name: "Attack",
+            units: .milliseconds,
+            valueRange: 0.0...5000.0,
+            defaultValue: 10.0
+        )
+
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Decay,
+            identifier: "decay",
+            name: "Decay",
+            units: .milliseconds,
+            valueRange: 0.0...5000.0,
+            defaultValue: 100.0
+        )
+
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Sustain,
+            identifier: "sustain",
+            name: "Sustain",
+            units: .generic,
+            valueRange: 0.0...1.0,
+            defaultValue: 0.7
+        )
+
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Release,
+            identifier: "release",
+            name: "Release",
+            units: .milliseconds,
+            valueRange: 0.0...10000.0,
+            defaultValue: 500.0
+        )
+    }
 }
 
 // Extension to make parameter addresses work with ParameterSpec

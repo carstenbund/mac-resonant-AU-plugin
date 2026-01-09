@@ -29,6 +29,17 @@ public:
     };
 
     /**
+     * @brief ADSR envelope state enumeration
+     */
+    enum class EnvelopeState {
+        Idle,       ///< Envelope inactive
+        Attack,     ///< Attack phase (0 → 1)
+        Decay,      ///< Decay phase (1 → sustain level)
+        Sustain,    ///< Sustain phase (hold at sustain level)
+        Release     ///< Release phase (current → 0)
+    };
+
+    /**
      * @brief Constructor
      * @param voice_id Unique voice identifier (0-15 typically)
      */
@@ -151,6 +162,15 @@ public:
     void setPersonality(node_personality_t personality);
 
     /**
+     * @brief Set ADSR envelope parameters
+     * @param attack_ms Attack time in milliseconds (0-5000)
+     * @param decay_ms Decay time in milliseconds (0-5000)
+     * @param sustain_level Sustain level (0.0-1.0)
+     * @param release_ms Release time in milliseconds (0-10000)
+     */
+    void setADSR(float attack_ms, float decay_ms, float sustain_level, float release_ms);
+
+    /**
      * @brief Reset voice state
      */
     void reset();
@@ -171,6 +191,18 @@ private:
 
     float sample_rate_;             ///< Current sample rate
 
+    // ADSR envelope state
+    EnvelopeState envelope_state_;  ///< Current envelope state
+    float envelope_amplitude_;      ///< Current envelope level (0.0-1.0)
+    uint32_t envelope_phase_;       ///< Sample counter within current envelope phase
+
+    // ADSR parameters (stored in samples for efficiency)
+    float attack_samples_;          ///< Attack time in samples
+    float decay_samples_;           ///< Decay time in samples
+    float sustain_level_;           ///< Sustain level (0.0-1.0)
+    float release_samples_;         ///< Release time in samples
+    float release_start_level_;     ///< Level at release start (for smooth release from any level)
+
     /**
      * @brief Update mode frequencies based on MIDI note and pitch bend
      */
@@ -180,6 +212,12 @@ private:
      * @brief Update voice state machine
      */
     void updateState();
+
+    /**
+     * @brief Update ADSR envelope and return current amplitude
+     * @return Current envelope amplitude (0.0-1.0)
+     */
+    float updateEnvelope();
 };
 
 #endif // MODAL_VOICE_H

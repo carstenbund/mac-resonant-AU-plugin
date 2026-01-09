@@ -30,7 +30,11 @@ enum ParamID {
     kParam_PokeStrength = 16,
     kParam_PokeDuration = 17,
     kParam_Polyphony = 18,
-    kParam_Personality = 19
+    kParam_Personality = 19,
+    param_Attack = 20,
+    param_Decay = 21,
+    param_Sustain = 22,
+    param_Release = 23
 };
 
 SynthEngine::SynthEngine(uint32_t maxPolyphony)
@@ -67,6 +71,11 @@ SynthEngine::SynthEngine(uint32_t maxPolyphony)
     // Voice parameters
     , polyphony_(16.0f)
     , personality_(0.0f)
+    // ADSR Envelope parameters - match defaults from ModalParameters.h
+    , attack_(10.0f)
+    , decay_(100.0f)
+    , sustain_(0.7f)
+    , release_(500.0f)
 {
     // Allocate DSP components (done once at construction)
     voiceAllocator_ = new VoiceAllocator(maxPolyphony);
@@ -100,6 +109,9 @@ void SynthEngine::prepare(double sampleRate, uint32_t maxFrames, uint32_t channe
 
     // Initialize voice allocator
     voiceAllocator_->initialize(static_cast<float>(sampleRate));
+
+    // Set default ADSR envelope parameters
+    voiceAllocator_->setADSR(attack_, decay_, sustain_, release_);
 
     // Set default topology
     topologyEngine_->generateTopology(TopologyType::Ring, couplingStrength_);
@@ -372,6 +384,32 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
             }
             break;
 
+        // ADSR Envelope parameters
+        case param_Attack:
+            attack_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setADSR(attack_, decay_, sustain_, release_);
+            }
+            break;
+        case param_Decay:
+            decay_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setADSR(attack_, decay_, sustain_, release_);
+            }
+            break;
+        case param_Sustain:
+            sustain_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setADSR(attack_, decay_, sustain_, release_);
+            }
+            break;
+        case param_Release:
+            release_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setADSR(attack_, decay_, sustain_, release_);
+            }
+            break;
+
         default:
             break;
     }
@@ -432,6 +470,16 @@ float SynthEngine::getParameter(uint32_t paramId) const {
             return polyphony_;
         case kParam_Personality:
             return personality_;
+
+        // ADSR Envelope parameters
+        case param_Attack:
+            return attack_;
+        case param_Decay:
+            return decay_;
+        case param_Sustain:
+            return sustain_;
+        case param_Release:
+            return release_;
 
         default:
             return 0.0f;

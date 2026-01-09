@@ -47,6 +47,12 @@ enum {
     kParam_Polyphony,
     kParam_Personality,
 
+    // ADSR envelope parameters
+    kParam_Attack,
+    kParam_Decay,
+    kParam_Sustain,
+    kParam_Release,
+
     kNumParams
 };
 
@@ -106,6 +112,26 @@ enum {
 #define kPersonality_Max 1
 #define kPersonality_Default 0
 
+// Attack: 0.0 to 5000.0 ms
+#define kAttack_Min 0.0f
+#define kAttack_Max 5000.0f
+#define kAttack_Default 10.0f
+
+// Decay: 0.0 to 5000.0 ms
+#define kDecay_Min 0.0f
+#define kDecay_Max 5000.0f
+#define kDecay_Default 100.0f
+
+// Sustain: 0.0 to 1.0
+#define kSustain_Min 0.0f
+#define kSustain_Max 1.0f
+#define kSustain_Default 0.7f
+
+// Release: 0.0 to 10000.0 ms
+#define kRelease_Min 0.0f
+#define kRelease_Max 10000.0f
+#define kRelease_Default 500.0f
+
 // ============================================================================
 // Parameter Names
 // ============================================================================
@@ -118,5 +144,9 @@ enum {
 #define kParamName_PokeDuration "Poke Duration"
 #define kParamName_Polyphony "Polyphony"
 #define kParamName_Personality "Personality"
+#define kParamName_Attack "Attack"
+#define kParamName_Decay "Decay"
+#define kParamName_Sustain "Sustain"
+#define kParamName_Release "Release"
 
 #endif // MODAL_PARAMETERS_H

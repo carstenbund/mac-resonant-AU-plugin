@@ -203,6 +203,13 @@ void VoiceAllocator::setPokeDuration(float duration_ms) {
     // Poke duration is applied at note-on time
 }
 
+void VoiceAllocator::setADSR(float attack_ms, float decay_ms, float sustain_level, float release_ms) {
+    // Apply to all voices (both active and inactive)
+    for (uint32_t i = 0; i < max_polyphony_; i++) {
+        voices_[i]->setADSR(attack_ms, decay_ms, sustain_level, release_ms);
+    }
+}
+
 void VoiceAllocator::setNodeCount(uint32_t node_count) {
     // Clamp to valid range
     if (node_count < 1) node_count = 1;

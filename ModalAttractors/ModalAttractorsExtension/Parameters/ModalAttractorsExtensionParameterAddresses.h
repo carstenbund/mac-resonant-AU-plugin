@@ -44,5 +44,11 @@ typedef NS_ENUM(AUParameterAddress, ModalAttractorsExtensionParameterAddress) {
 
     // Voice/Node parameters (deprecated - kept for compatibility)
     kParam_Polyphony = 18,    // Read-only, always 16 (max nodes)
-    kParam_Personality = 19
+    kParam_Personality = 19,
+
+    // ADSR Envelope parameters
+    param_Attack = 20,
+    param_Decay = 21,
+    param_Sustain = 22,
+    param_Release = 23
 };
