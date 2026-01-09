@@ -21,7 +21,7 @@ struct NodeCharactersView: View {
 
             Text("Each node has distinct sonic character")
                 .font(.caption2)
-                .foregroundColor(UIConstants.Colors.textTertiary)
+                .foregroundColor(UIConstants.Colors.textSecondary)
 
             VStack(spacing: UIConstants.Spacing.small) {
                 // Node 0
