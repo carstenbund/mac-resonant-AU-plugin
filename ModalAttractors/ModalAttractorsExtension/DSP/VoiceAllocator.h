@@ -92,6 +92,12 @@ public:
     void setPokeDuration(float duration_ms);
 
     /**
+     * @brief Set maximum number of active nodes/voices
+     * @param node_count Number of active nodes (1-16)
+     */
+    void setNodeCount(uint32_t node_count);
+
+    /**
      * @brief Update all active voices (control rate)
      *
      * Should be called at control rate (500 Hz typically)
@@ -128,6 +134,7 @@ public:
 private:
     ModalVoice** voices_;              ///< Voice pool
     uint32_t max_polyphony_;           ///< Maximum polyphony
+    uint32_t active_node_count_;       ///< Current active node count (1-max_polyphony_)
 
     int8_t note_to_voice_[128];        ///< MIDI note → voice mapping (-1 = none)
     float pitch_bend_;                 ///< Current pitch bend amount
@@ -144,6 +151,11 @@ private:
     // Excitation parameters
     float poke_strength_;              ///< Poke strength (0.0-1.0)
     float poke_duration_ms_;           ///< Poke duration in milliseconds
+
+    // Pre-allocated temp buffers for render (real-time safe)
+    float* temp_buffer_L_;             ///< Temp buffer for voice rendering (L channel)
+    float* temp_buffer_R_;             ///< Temp buffer for voice rendering (R channel)
+    uint32_t max_buffer_size_;         ///< Maximum buffer size allocated
 
     float sample_rate_;                ///< Current sample rate
     bool initialized_;                 ///< Initialization flag

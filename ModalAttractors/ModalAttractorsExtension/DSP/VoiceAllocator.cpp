@@ -9,10 +9,14 @@
 
 VoiceAllocator::VoiceAllocator(uint32_t max_polyphony)
     : max_polyphony_(max_polyphony)
+    , active_node_count_(max_polyphony)  // Default to full polyphony
     , pitch_bend_(0.0f)
     , personality_(PERSONALITY_RESONATOR)
     , poke_strength_(0.5f)
     , poke_duration_ms_(10.0f)
+    , temp_buffer_L_(nullptr)
+    , temp_buffer_R_(nullptr)
+    , max_buffer_size_(0)
     , sample_rate_(48000.0f)
     , initialized_(false)
 {
@@ -40,6 +44,16 @@ VoiceAllocator::~VoiceAllocator() {
         }
         delete[] voices_;
     }
+
+    // Free temp buffers
+    if (temp_buffer_L_) {
+        delete[] temp_buffer_L_;
+        temp_buffer_L_ = nullptr;
+    }
+    if (temp_buffer_R_) {
+        delete[] temp_buffer_R_;
+        temp_buffer_R_ = nullptr;
+    }
 }
 
 void VoiceAllocator::initialize(float sample_rate) {
@@ -49,6 +63,12 @@ void VoiceAllocator::initialize(float sample_rate) {
     for (uint32_t i = 0; i < max_polyphony_; i++) {
         voices_[i]->initialize(sample_rate);
     }
+
+    // Allocate temp buffers for rendering (real-time safe)
+    // Use 2048 samples as maximum - covers most typical audio buffer sizes
+    max_buffer_size_ = 2048;
+    temp_buffer_L_ = new float[max_buffer_size_];
+    temp_buffer_R_ = new float[max_buffer_size_];
 
     initialized_ = true;
 }
@@ -183,6 +203,30 @@ void VoiceAllocator::setPokeDuration(float duration_ms) {
     // Poke duration is applied at note-on time
 }
 
+void VoiceAllocator::setNodeCount(uint32_t node_count) {
+    // Clamp to valid range
+    if (node_count < 1) node_count = 1;
+    if (node_count > max_polyphony_) node_count = max_polyphony_;
+
+    // If reducing node count, release voices above the new limit
+    if (node_count < active_node_count_) {
+        for (uint32_t i = node_count; i < max_polyphony_; i++) {
+            if (voices_[i]->isActive()) {
+                voices_[i]->reset();
+
+                // Clear note mapping for this voice
+                for (int note = 0; note < 128; note++) {
+                    if (note_to_voice_[note] == static_cast<int8_t>(i)) {
+                        note_to_voice_[note] = -1;
+                    }
+                }
+            }
+        }
+    }
+
+    active_node_count_ = node_count;
+}
+
 void VoiceAllocator::updateVoices() {
     if (!initialized_) return;
 
@@ -202,31 +246,29 @@ void VoiceAllocator::renderAudio(float* outL, float* outR, uint32_t num_frames) 
         return;
     }
 
+    // Safety check: ensure we don't exceed pre-allocated buffer size
+    if (num_frames > max_buffer_size_) {
+        // This should never happen in practice, but log and clamp if it does
+        num_frames = max_buffer_size_;
+    }
+
     // Clear output buffers
     memset(outL, 0, num_frames * sizeof(float));
     memset(outR, 0, num_frames * sizeof(float));
 
-    // Temporary buffers for each voice
-    float* tempL = new float[num_frames];
-    float* tempR = new float[num_frames];
-
-    // Mix all active voices
+    // Mix all active voices using pre-allocated temp buffers (real-time safe)
     for (uint32_t i = 0; i < max_polyphony_; i++) {
         if (voices_[i]->isActive()) {
-            // Render voice
-            voices_[i]->renderAudio(tempL, tempR, num_frames);
+            // Render voice into temp buffers
+            voices_[i]->renderAudio(temp_buffer_L_, temp_buffer_R_, num_frames);
 
             // Mix into output
             for (uint32_t j = 0; j < num_frames; j++) {
-                outL[j] += tempL[j];
-                outR[j] += tempR[j];
+                outL[j] += temp_buffer_L_[j];
+                outR[j] += temp_buffer_R_[j];
             }
         }
     }
-
-    // Clean up
-    delete[] tempL;
-    delete[] tempR;
 }
 
 ModalVoice* VoiceAllocator::getVoice(uint32_t voice_idx) {
@@ -245,8 +287,8 @@ uint32_t VoiceAllocator::getActiveVoiceCount() const {
 }
 
 ModalVoice* VoiceAllocator::findFreeVoice() {
-    // Find first inactive voice
-    for (uint32_t i = 0; i < max_polyphony_; i++) {
+    // Find first inactive voice within active node count limit
+    for (uint32_t i = 0; i < active_node_count_; i++) {
         if (!voices_[i]->isActive()) {
             return voices_[i];
         }
@@ -255,11 +297,11 @@ ModalVoice* VoiceAllocator::findFreeVoice() {
 }
 
 ModalVoice* VoiceAllocator::stealOldestVoice() {
-    // Find oldest active voice
+    // Find oldest active voice within active node count limit
     ModalVoice* oldest = nullptr;
     uint32_t max_age = 0;
 
-    for (uint32_t i = 0; i < max_polyphony_; i++) {
+    for (uint32_t i = 0; i < active_node_count_; i++) {
         if (voices_[i]->isActive()) {
             uint32_t age = voices_[i]->getAge();
             if (age > max_age) {
