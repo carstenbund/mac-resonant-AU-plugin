@@ -35,7 +35,29 @@ struct CharacterEditorView: View {
     ]
 
     var body: some View {
-        NavigationView {
+        VStack(spacing: 0) {
+            // Custom header bar (macOS doesn't have navigation bar)
+            HStack {
+                Button("Back") {
+                    dismiss()
+                }
+                .keyboardShortcut(.cancelAction)
+
+                Spacer()
+
+                Text("Character Editor")
+                    .font(.headline)
+
+                Spacer()
+
+                // Placeholder for symmetry
+                Button("") {}.hidden()
+            }
+            .padding()
+            .background(Color(nsColor: .controlBackgroundColor))
+
+            Divider()
+
             ScrollView {
                 VStack(spacing: UIConstants.Spacing.large) {
                     // Header
@@ -68,16 +90,8 @@ struct CharacterEditorView: View {
                 }
                 .padding()
             }
-            .navigationTitle("Character Editor")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Back") {
-                        dismiss()
-                    }
-                }
-            }
         }
+        .frame(minWidth: 600, minHeight: 700)
     }
 
     // MARK: - Header Section
@@ -412,42 +426,72 @@ struct PresetBrowserView: View {
     let onSelect: (CharacterPreset) -> Void
 
     var body: some View {
-        NavigationView {
-            List {
-                ForEach(presetManager.presets) { preset in
-                    Button {
-                        onSelect(preset)
-                    } label: {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(preset.name)
-                                .font(.headline)
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Button("Done") {
+                    dismiss()
+                }
+                .keyboardShortcut(.cancelAction)
 
-                            Text(preset.dateCreated, style: .date)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        .padding(.vertical, 4)
-                    }
-                }
-                .onDelete { indexSet in
-                    indexSet.forEach { index in
-                        presetManager.deletePreset(at: index)
-                    }
-                }
+                Spacer()
+
+                Text("Custom Presets")
+                    .font(.headline)
+
+                Spacer()
+
+                // Placeholder for symmetry
+                Button("") {}.hidden()
             }
-            .navigationTitle("Custom Presets")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
+            .padding()
+            .background(Color(nsColor: .controlBackgroundColor))
+
+            Divider()
+
+            // Preset list
+            if presetManager.presets.isEmpty {
+                VStack(spacing: UIConstants.Spacing.medium) {
+                    Spacer()
+                    Text("No Custom Presets")
+                        .font(.title3)
+                        .foregroundColor(.secondary)
+                    Text("Create presets in the Character Editor")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
                 }
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Done") {
-                        dismiss()
+            } else {
+                List {
+                    ForEach(presetManager.presets) { preset in
+                        Button {
+                            onSelect(preset)
+                        } label: {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(preset.name)
+                                        .font(.headline)
+
+                                    Text(preset.dateCreated, style: .date)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+
+                                Spacer()
+                            }
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .onDelete { indexSet in
+                        indexSet.forEach { index in
+                            presetManager.deletePreset(at: index)
+                        }
                     }
                 }
             }
         }
+        .frame(minWidth: 400, minHeight: 300)
     }
 }
 
