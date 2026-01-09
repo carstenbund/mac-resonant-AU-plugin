@@ -380,6 +380,85 @@ struct CharacterEditorTabView: View {
     }
 }
 
+// MARK: - Preset Browser View
+
+/// Simple preset browser/picker view
+struct PresetBrowserView: View {
+    @ObservedObject var presetManager: CharacterPresetManager
+    @Environment(\.dismiss) var dismiss
+
+    let onSelect: (CharacterPreset) -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Button("Done") {
+                    dismiss()
+                }
+                .keyboardShortcut(.cancelAction)
+
+                Spacer()
+
+                Text("Custom Presets")
+                    .font(.headline)
+
+                Spacer()
+
+                // Placeholder for symmetry
+                Button("") {}.hidden()
+            }
+            .padding()
+            .background(Color(nsColor: .controlBackgroundColor))
+
+            Divider()
+
+            // Preset list
+            if presetManager.presets.isEmpty {
+                VStack(spacing: UIConstants.Spacing.medium) {
+                    Spacer()
+                    Text("No Custom Presets")
+                        .font(.title3)
+                        .foregroundColor(.secondary)
+                    Text("Create presets in the Character Editor")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                }
+            } else {
+                List {
+                    ForEach(presetManager.presets) { preset in
+                        Button {
+                            onSelect(preset)
+                        } label: {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(preset.name)
+                                        .font(.headline)
+
+                                    Text(preset.dateCreated, style: .date)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+
+                                Spacer()
+                            }
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .onDelete { indexSet in
+                        indexSet.forEach { index in
+                            presetManager.deletePreset(at: index)
+                        }
+                    }
+                }
+            }
+        }
+        .frame(minWidth: 400, minHeight: 300)
+    }
+}
+
 #Preview {
     CharacterEditorTabView()
         .environmentObject(ParameterTree.preview)
