@@ -11,17 +11,51 @@ import AudioToolbox
 /// Main SwiftUI view for the Modal Attractors extension control panel
 ///
 /// This view provides a comprehensive interface for controlling the Modal Attractors
-/// synthesis engine, organized into three main sections:
-/// - Network: Topology and coupling controls
-/// - Triggers: Excitation parameters
-/// - Output: Master gain control
+/// synthesis engine, organized into tabs:
+/// - Main: Network topology, node characters, routing
+/// - Editor: Advanced character parameter editing
 public struct ModalAttractorsExtensionMainView: View {
     @EnvironmentObject var parameterTree: ParameterTree
-    @State private var showingCharacterEditor = false
+    @State private var selectedTab = 0
 
     public init() {}
 
     public var body: some View {
+        VStack(spacing: 0) {
+            // Tab picker (segmented control)
+            Picker("", selection: $selectedTab) {
+                Text("Main").tag(0)
+                Text("Character Editor").tag(1)
+            }
+            .pickerStyle(.segmented)
+            .padding([.horizontal, .top])
+
+            Divider()
+                .padding(.top, 8)
+
+            // Tab content
+            Group {
+                switch selectedTab {
+                case 0:
+                    mainTabContent
+                case 1:
+                    CharacterEditorTabView()
+                        .environmentObject(parameterTree)
+                default:
+                    mainTabContent
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .frame(
+            minWidth: UIConstants.Sizes.windowMinWidth,
+            minHeight: UIConstants.Sizes.windowMinHeight
+        )
+    }
+
+    // MARK: - Main Tab
+
+    private var mainTabContent: some View {
         ScrollView {
             VStack(spacing: UIConstants.Spacing.large) {
                 // Header
@@ -51,53 +85,12 @@ public struct ModalAttractorsExtensionMainView: View {
                 // Routing & Behavior
                 RoutingControlsView()
 
-                // Character Editor Button
-                Button {
-                    showingCharacterEditor = true
-                } label: {
-                    Label("Edit Characters...", systemImage: "slider.horizontal.3")
-                        .font(UIConstants.Fonts.buttonLabel)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, UIConstants.Spacing.small)
-                }
-                .buttonStyle(.bordered)
-                .help("Open advanced character editor")
-
                 Divider()
-
-                // Mode 0-3 sections (for Character Editor - hide in main view for now)
-                // TODO: Move these to a separate Character Editor page
-                /*
-                ModeControlsView(mode: parameterTree.mode0, modeLabel: "MODE 0")
-                ModeControlsView(mode: parameterTree.mode1, modeLabel: "MODE 1")
-                ModeControlsView(mode: parameterTree.mode2, modeLabel: "MODE 2")
-                ModeControlsView(mode: parameterTree.mode3, modeLabel: "MODE 3")
-
-                Divider()
-
-                // Triggers section
-                TriggersControlsView()
-
-                Divider()
-
-                // Voice section
-                VoiceControlsView()
-
-                Divider()
-                */
 
                 // Drive/Output section
                 DriveControlsView()
             }
             .padding()
-        }
-        .frame(
-            minWidth: UIConstants.Sizes.windowMinWidth,
-            minHeight: UIConstants.Sizes.windowMinHeight
-        )
-        .sheet(isPresented: $showingCharacterEditor) {
-            CharacterEditorView()
-                .environmentObject(parameterTree)
         }
     }
 }
