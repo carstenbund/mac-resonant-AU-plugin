@@ -158,6 +158,24 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
         }
     }
 
+    private func ensureParameterTree() -> AUParameterTree {
+        if let paramTree = _parameterTree {
+            return paramTree
+        }
+
+        let paramTree = ModalAttractorsExtensionParameterSpecs.createAUParameterTree()
+        _parameterTree = paramTree
+
+        if let engine = engine {
+            for param in paramTree.allParameters {
+                modal_attractors_engine_set_parameter(engine, UInt32(param.address), param.value)
+            }
+        }
+
+        setupParameterCallbacks(paramTree)
+        return paramTree
+    }
+
     // MARK: - Resource Management
 
     public override func allocateRenderResources() throws {
@@ -366,10 +384,7 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
     // MARK: - UI Integration
 
     public override func requestViewController(completionHandler: @escaping (AUViewController?) -> Void) {
-        guard let paramTree = parameterTree else {
-            completionHandler(nil)
-            return
-        }
+        let paramTree = ensureParameterTree()
 
         // Ensure UI creation happens on main thread
         DispatchQueue.main.async {

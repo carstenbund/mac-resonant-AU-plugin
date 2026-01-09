@@ -152,6 +152,16 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
         }
     }
 
+    private func ensureParameterTree() -> AUParameterTree {
+        if let paramTree = parameterTree {
+            return paramTree
+        }
+
+        let paramTree = ModalAttractorsExtensionParameterSpecs.createAUParameterTree()
+        setupParameterTree(paramTree)
+        return paramTree
+    }
+
     // MARK: - Resource Management
 
     public override func allocateRenderResources() throws {
@@ -359,10 +369,7 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
     // MARK: - UI Integration
 
     public override func requestViewController(completionHandler: @escaping (AUViewController?) -> Void) {
-        guard let paramTree = parameterTree else {
-            completionHandler(nil)
-            return
-        }
+        let paramTree = ensureParameterTree()
 
         // Create parameter tree wrapper for SwiftUI
         let paramTreeWrapper = ParameterTree(auParameterTree: paramTree)
