@@ -9,6 +9,14 @@
 import SwiftUI
 
 /// Character editor as a tab (no navigation wrapper)
+///
+/// NOTE: This editor uses a "global editor + assign" workflow:
+/// - Mode0-3, excitation, and personality parameters are GLOBAL (shared across all editing)
+/// - "selectedNodeIndex" determines which node receives the assignment when you click "Apply to Node"
+/// - The editor controls always show the current global parameter values
+/// - To edit a different character: load a template/preset, adjust parameters, then apply to a node
+///
+/// Future enhancement: Per-node parameter editing would require node-specific parameter storage
 struct CharacterEditorTabView: View {
     @EnvironmentObject var parameterTree: ParameterTree
     @StateObject private var presetManager = CharacterPresetManager.shared
@@ -446,6 +454,11 @@ struct PresetBrowserView: View {
                             .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
+                        .contextMenu {
+                            Button("Delete", role: .destructive) {
+                                presetManager.deletePreset(id: preset.id)
+                            }
+                        }
                     }
                     .onDelete { indexSet in
                         indexSet.forEach { index in
