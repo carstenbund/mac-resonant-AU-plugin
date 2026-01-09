@@ -11,26 +11,26 @@
 
 // Parameter IDs (should match ModalAttractorsExtensionParameterAddresses.h)
 enum ParamID {
-    kParam_MasterGain = 0,
-    kParam_CouplingStrength = 1,
-    kParam_Topology = 2,
-    kParam_NodeCount = 3,
-    kParam_Mode0_Frequency = 4,
-    kParam_Mode0_Damping = 5,
-    kParam_Mode0_Weight = 6,
-    kParam_Mode1_Frequency = 7,
-    kParam_Mode1_Damping = 8,
-    kParam_Mode1_Weight = 9,
-    kParam_Mode2_Frequency = 10,
-    kParam_Mode2_Damping = 11,
-    kParam_Mode2_Weight = 12,
-    kParam_Mode3_Frequency = 13,
-    kParam_Mode3_Damping = 14,
-    kParam_Mode3_Weight = 15,
-    kParam_PokeStrength = 16,
-    kParam_PokeDuration = 17,
-    kParam_Polyphony = 18,
-    kParam_Personality = 19,
+    param_MasterGain = 0,
+    param_CouplingStrength = 1,
+    param_Topology = 2,
+    param_NodeCount = 3,
+    param_Mode0_Frequency = 4,
+    param_Mode0_Damping = 5,
+    param_Mode0_Weight = 6,
+    param_Mode1_Frequency = 7,
+    param_Mode1_Damping = 8,
+    param_Mode1_Weight = 9,
+    param_Mode2_Frequency = 10,
+    param_Mode2_Damping = 11,
+    param_Mode2_Weight = 12,
+    param_Mode3_Frequency = 13,
+    param_Mode3_Damping = 14,
+    param_Mode3_Weight = 15,
+    param_PokeStrength = 16,
+    param_PokeDuration = 17,
+    param_Polyphony = 18,
+    param_Personality = 19,
     param_Attack = 20,
     param_Decay = 21,
     param_Sustain = 22,
@@ -227,16 +227,16 @@ void SynthEngine::updateControlRate() {
 
 void SynthEngine::setParameter(uint32_t paramId, float value) {
     switch (paramId) {
-        case kParam_MasterGain:
+        case param_MasterGain:
             masterGain_ = value;
             break;
 
-        case kParam_CouplingStrength:
+        case param_CouplingStrength:
             couplingStrength_ = value;
             topologyEngine_->setCouplingStrength(value);
             break;
 
-        case kParam_Topology: {
+        case param_Topology: {
             topologyType_ = static_cast<int>(value);
 
             // Map parameter value to topology type
@@ -255,7 +255,7 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
             break;
         }
 
-        case kParam_NodeCount: {
+        case param_NodeCount: {
             uint32_t newCount = static_cast<uint32_t>(value);
             if (newCount < 1) newCount = 1;
             if (newCount > 16) newCount = 16;
@@ -280,19 +280,19 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
         }
 
         // Mode 0 parameters
-        case kParam_Mode0_Frequency:
+        case param_Mode0_Frequency:
             mode0_frequency_ = value;
             if (voiceAllocator_) {
                 voiceAllocator_->setMode(0, value, mode0_damping_, mode0_weight_);
             }
             break;
-        case kParam_Mode0_Damping:
+        case param_Mode0_Damping:
             mode0_damping_ = value;
             if (voiceAllocator_) {
                 voiceAllocator_->setMode(0, mode0_frequency_, value, mode0_weight_);
             }
             break;
-        case kParam_Mode0_Weight:
+        case param_Mode0_Weight:
             mode0_weight_ = value;
             if (voiceAllocator_) {
                 voiceAllocator_->setMode(0, mode0_frequency_, mode0_damping_, value);
@@ -300,19 +300,19 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
             break;
 
         // Mode 1 parameters
-        case kParam_Mode1_Frequency:
+        case param_Mode1_Frequency:
             mode1_frequency_ = value;
             if (voiceAllocator_) {
                 voiceAllocator_->setMode(1, value, mode1_damping_, mode1_weight_);
             }
             break;
-        case kParam_Mode1_Damping:
+        case param_Mode1_Damping:
             mode1_damping_ = value;
             if (voiceAllocator_) {
                 voiceAllocator_->setMode(1, mode1_frequency_, value, mode1_weight_);
             }
             break;
-        case kParam_Mode1_Weight:
+        case param_Mode1_Weight:
             mode1_weight_ = value;
             if (voiceAllocator_) {
                 voiceAllocator_->setMode(1, mode1_frequency_, mode1_damping_, value);
@@ -320,19 +320,19 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
             break;
 
         // Mode 2 parameters
-        case kParam_Mode2_Frequency:
+        case param_Mode2_Frequency:
             mode2_frequency_ = value;
             if (voiceAllocator_) {
                 voiceAllocator_->setMode(2, value, mode2_damping_, mode2_weight_);
             }
             break;
-        case kParam_Mode2_Damping:
+        case param_Mode2_Damping:
             mode2_damping_ = value;
             if (voiceAllocator_) {
                 voiceAllocator_->setMode(2, mode2_frequency_, value, mode2_weight_);
             }
             break;
-        case kParam_Mode2_Weight:
+        case param_Mode2_Weight:
             mode2_weight_ = value;
             if (voiceAllocator_) {
                 voiceAllocator_->setMode(2, mode2_frequency_, mode2_damping_, value);
@@ -340,19 +340,19 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
             break;
 
         // Mode 3 parameters
-        case kParam_Mode3_Frequency:
+        case param_Mode3_Frequency:
             mode3_frequency_ = value;
             if (voiceAllocator_) {
                 voiceAllocator_->setMode(3, value, mode3_damping_, mode3_weight_);
             }
             break;
-        case kParam_Mode3_Damping:
+        case param_Mode3_Damping:
             mode3_damping_ = value;
             if (voiceAllocator_) {
                 voiceAllocator_->setMode(3, mode3_frequency_, value, mode3_weight_);
             }
             break;
-        case kParam_Mode3_Weight:
+        case param_Mode3_Weight:
             mode3_weight_ = value;
             if (voiceAllocator_) {
                 voiceAllocator_->setMode(3, mode3_frequency_, mode3_damping_, value);
@@ -360,13 +360,13 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
             break;
 
         // Excitation parameters
-        case kParam_PokeStrength:
+        case param_PokeStrength:
             pokeStrength_ = value;
             if (voiceAllocator_) {
                 voiceAllocator_->setPokeStrength(value);
             }
             break;
-        case kParam_PokeDuration:
+        case param_PokeDuration:
             pokeDuration_ = value;
             if (voiceAllocator_) {
                 voiceAllocator_->setPokeDuration(value);
@@ -374,10 +374,10 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
             break;
 
         // Voice parameters
-        case kParam_Polyphony:
+        case param_Polyphony:
             polyphony_ = value;
             break;
-        case kParam_Personality:
+        case param_Personality:
             personality_ = value;
             if (voiceAllocator_) {
                 voiceAllocator_->setPersonality(static_cast<node_personality_t>(static_cast<int>(value)));
@@ -418,57 +418,57 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
 float SynthEngine::getParameter(uint32_t paramId) const {
     switch (paramId) {
         // Global parameters
-        case kParam_MasterGain:
+        case param_MasterGain:
             return masterGain_;
-        case kParam_CouplingStrength:
+        case param_CouplingStrength:
             return couplingStrength_;
-        case kParam_Topology:
+        case param_Topology:
             return static_cast<float>(topologyType_);
-        case kParam_NodeCount:
+        case param_NodeCount:
             return static_cast<float>(nodeCount_);
 
         // Mode 0 parameters
-        case kParam_Mode0_Frequency:
+        case param_Mode0_Frequency:
             return mode0_frequency_;
-        case kParam_Mode0_Damping:
+        case param_Mode0_Damping:
             return mode0_damping_;
-        case kParam_Mode0_Weight:
+        case param_Mode0_Weight:
             return mode0_weight_;
 
         // Mode 1 parameters
-        case kParam_Mode1_Frequency:
+        case param_Mode1_Frequency:
             return mode1_frequency_;
-        case kParam_Mode1_Damping:
+        case param_Mode1_Damping:
             return mode1_damping_;
-        case kParam_Mode1_Weight:
+        case param_Mode1_Weight:
             return mode1_weight_;
 
         // Mode 2 parameters
-        case kParam_Mode2_Frequency:
+        case param_Mode2_Frequency:
             return mode2_frequency_;
-        case kParam_Mode2_Damping:
+        case param_Mode2_Damping:
             return mode2_damping_;
-        case kParam_Mode2_Weight:
+        case param_Mode2_Weight:
             return mode2_weight_;
 
         // Mode 3 parameters
-        case kParam_Mode3_Frequency:
+        case param_Mode3_Frequency:
             return mode3_frequency_;
-        case kParam_Mode3_Damping:
+        case param_Mode3_Damping:
             return mode3_damping_;
-        case kParam_Mode3_Weight:
+        case param_Mode3_Weight:
             return mode3_weight_;
 
         // Excitation parameters
-        case kParam_PokeStrength:
+        case param_PokeStrength:
             return pokeStrength_;
-        case kParam_PokeDuration:
+        case param_PokeDuration:
             return pokeDuration_;
 
         // Voice parameters
-        case kParam_Polyphony:
+        case param_Polyphony:
             return polyphony_;
-        case kParam_Personality:
+        case param_Personality:
             return personality_;
 
         // ADSR Envelope parameters

@@ -14,44 +14,44 @@
 
 enum {
     // Global parameters
-    kParam_MasterGain = 0,
-    kParam_CouplingStrength,
-    kParam_Topology,
-    kParam_NodeCount,
+    param_MasterGain = 0,
+    param_CouplingStrength,
+    param_Topology,
+    param_NodeCount,
 
     // Per-mode parameters (Mode 0)
-    kParam_Mode0_Frequency,
-    kParam_Mode0_Damping,
-    kParam_Mode0_Weight,
+    param_Mode0_Frequency,
+    param_Mode0_Damping,
+    param_Mode0_Weight,
 
     // Per-mode parameters (Mode 1)
-    kParam_Mode1_Frequency,
-    kParam_Mode1_Damping,
-    kParam_Mode1_Weight,
+    param_Mode1_Frequency,
+    param_Mode1_Damping,
+    param_Mode1_Weight,
 
     // Per-mode parameters (Mode 2)
-    kParam_Mode2_Frequency,
-    kParam_Mode2_Damping,
-    kParam_Mode2_Weight,
+    param_Mode2_Frequency,
+    param_Mode2_Damping,
+    param_Mode2_Weight,
 
     // Per-mode parameters (Mode 3)
-    kParam_Mode3_Frequency,
-    kParam_Mode3_Damping,
-    kParam_Mode3_Weight,
+    param_Mode3_Frequency,
+    param_Mode3_Damping,
+    param_Mode3_Weight,
 
     // Excitation parameters
-    kParam_PokeStrength,
-    kParam_PokeDuration,
+    param_PokeStrength,
+    param_PokeDuration,
 
     // Voice parameters
-    kParam_Polyphony,
-    kParam_Personality,
+    param_Polyphony,
+    param_Personality,
 
     // ADSR envelope parameters
-    kParam_Attack,
-    kParam_Decay,
-    kParam_Sustain,
-    kParam_Release,
+    param_Attack,
+    param_Decay,
+    param_Sustain,
+    param_Release,
 
     kNumParams
 };

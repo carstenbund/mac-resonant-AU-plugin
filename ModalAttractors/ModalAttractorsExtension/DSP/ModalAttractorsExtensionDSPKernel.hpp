@@ -41,10 +41,10 @@ public:
     // Add a case for each parameter in ModalAttractorsExtensionParameterAddresses.h
     void setParameter(AUParameterAddress address, AUValue value) {
         switch (address) {
-            case ModalAttractorsExtensionParameterAddress::kParam_MasterGain:
+            case ModalAttractorsExtensionParameterAddress::param_MasterGain:
                 // TODO: Implement parameter handling
                 break;
-            case ModalAttractorsExtensionParameterAddress::kParam_CouplingStrength:
+            case ModalAttractorsExtensionParameterAddress::param_CouplingStrength:
                 // TODO: Implement parameter handling
                 break;
             default:
@@ -56,10 +56,10 @@ public:
         // Return the goal. It is not thread safe to return the ramping value.
 
         switch (address) {
-            case ModalAttractorsExtensionParameterAddress::kParam_MasterGain:
+            case ModalAttractorsExtensionParameterAddress::param_MasterGain:
                 return 0.7f; // TODO: Return actual value
 
-            case ModalAttractorsExtensionParameterAddress::kParam_CouplingStrength:
+            case ModalAttractorsExtensionParameterAddress::param_CouplingStrength:
                 return 0.3f; // TODO: Return actual value
 
             default: return 0.f;
