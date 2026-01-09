@@ -28,13 +28,23 @@ struct CharacterEditorTabView: View {
     @State private var showingPresetList: Bool = false
     @State private var presetName: String = ""
 
-    // Character template names (matching NodeCharacter.cpp)
+    // Character template names (matching NodeCharacter.cpp + additional variations)
     private let characterTemplates = [
         "Vibrant Bass",
         "Dark Node",
         "Bright Bell",
         "Glassy Shimmer",
-        "Drone Hub"
+        "Drone Hub",
+        "Metallic Strike",
+        "Warm Pad",
+        "Percussive Hit",
+        "Resonant Bell",
+        "Deep Rumble",
+        "Harmonic Stack",
+        "Detuned Chorus",
+        "Mallet Tone",
+        "Wind Chime",
+        "Gong Wash"
     ]
 
     var body: some View {
@@ -296,18 +306,52 @@ struct CharacterEditorTabView: View {
 
     private func loadTemplate() {
         // Load template character values into editor parameters
-        // Template values are defined in NodeCharacter.cpp
+        // Format: [(freq_multiplier, damping, weight)] for each of 4 modes
         let templates: [[(Float, Float, Float)]] = [
-            // Vibrant Bass (low, rich fundamentals)
+            // 0: Vibrant Bass (low, rich fundamentals)
             [(1.0, 0.8, 1.0), (2.01, 1.0, 0.7), (3.02, 1.2, 0.5), (4.05, 1.5, 0.3)],
-            // Dark Node (low damping, complex)
+
+            // 1: Dark Node (low damping, complex)
             [(1.0, 0.5, 1.0), (1.9, 0.6, 0.8), (2.8, 0.7, 0.6), (3.5, 0.9, 0.4)],
-            // Bright Bell (harmonic, ringing)
+
+            // 2: Bright Bell (harmonic, ringing)
             [(1.0, 1.2, 0.8), (2.0, 1.4, 1.0), (3.0, 1.6, 0.7), (4.0, 2.0, 0.5)],
-            // Glassy Shimmer (high partials)
+
+            // 3: Glassy Shimmer (high partials)
             [(2.0, 0.8, 0.6), (3.5, 1.0, 0.8), (5.2, 1.2, 1.0), (7.1, 1.5, 0.7)],
-            // Drone Hub (sustained, coupled)
-            [(1.0, 0.3, 1.0), (1.5, 0.4, 0.9), (2.2, 0.5, 0.8), (3.1, 0.6, 0.7)]
+
+            // 4: Drone Hub (sustained, coupled)
+            [(1.0, 0.3, 1.0), (1.5, 0.4, 0.9), (2.2, 0.5, 0.8), (3.1, 0.6, 0.7)],
+
+            // 5: Metallic Strike (bright, sharp attack, fast decay)
+            [(1.0, 2.0, 0.6), (3.14, 2.5, 0.8), (5.87, 3.0, 1.0), (8.23, 3.5, 0.7)],
+
+            // 6: Warm Pad (smooth, sustained, low harmonics)
+            [(1.0, 0.2, 1.0), (2.0, 0.25, 0.85), (3.0, 0.3, 0.7), (4.0, 0.4, 0.5)],
+
+            // 7: Percussive Hit (fast decay, punchy)
+            [(1.0, 3.0, 1.0), (2.5, 3.5, 0.6), (4.2, 4.0, 0.4), (6.7, 4.5, 0.2)],
+
+            // 8: Resonant Bell (harmonic stack, long sustain)
+            [(1.0, 0.6, 1.0), (2.0, 0.7, 0.9), (3.0, 0.8, 0.8), (4.0, 1.0, 0.7)],
+
+            // 9: Deep Rumble (sub-bass focus, low partials)
+            [(0.5, 0.5, 1.0), (1.0, 0.6, 0.9), (1.5, 0.8, 0.6), (2.0, 1.0, 0.4)],
+
+            // 10: Harmonic Stack (perfect harmonic series)
+            [(1.0, 1.0, 1.0), (2.0, 1.0, 0.8), (3.0, 1.0, 0.6), (4.0, 1.0, 0.4)],
+
+            // 11: Detuned Chorus (slightly detuned, thick)
+            [(1.0, 0.7, 1.0), (1.99, 0.7, 0.85), (2.98, 0.8, 0.7), (4.03, 0.9, 0.5)],
+
+            // 12: Mallet Tone (wood/mallet character)
+            [(1.0, 1.5, 1.0), (2.76, 1.8, 0.7), (4.18, 2.2, 0.5), (5.94, 2.5, 0.3)],
+
+            // 13: Wind Chime (delicate, high partials)
+            [(3.0, 0.9, 0.7), (4.5, 1.0, 0.8), (6.2, 1.1, 1.0), (8.7, 1.3, 0.8)],
+
+            // 14: Gong Wash (complex inharmonic, evolving)
+            [(1.0, 0.4, 0.8), (2.37, 0.5, 1.0), (3.86, 0.6, 0.9), (5.19, 0.7, 0.7)]
         ]
 
         guard selectedTemplateIndex < templates.count else { return }
@@ -347,6 +391,36 @@ struct CharacterEditorTabView: View {
         case 4: // Drone Hub
             parameterTree.excitation.pokeStrength.value = 0.4
             parameterTree.excitation.pokeDuration.value = 25.0
+        case 5: // Metallic Strike
+            parameterTree.excitation.pokeStrength.value = 0.9
+            parameterTree.excitation.pokeDuration.value = 5.0
+        case 6: // Warm Pad
+            parameterTree.excitation.pokeStrength.value = 0.3
+            parameterTree.excitation.pokeDuration.value = 30.0
+        case 7: // Percussive Hit
+            parameterTree.excitation.pokeStrength.value = 1.0
+            parameterTree.excitation.pokeDuration.value = 3.0
+        case 8: // Resonant Bell
+            parameterTree.excitation.pokeStrength.value = 0.75
+            parameterTree.excitation.pokeDuration.value = 12.0
+        case 9: // Deep Rumble
+            parameterTree.excitation.pokeStrength.value = 0.6
+            parameterTree.excitation.pokeDuration.value = 20.0
+        case 10: // Harmonic Stack
+            parameterTree.excitation.pokeStrength.value = 0.65
+            parameterTree.excitation.pokeDuration.value = 15.0
+        case 11: // Detuned Chorus
+            parameterTree.excitation.pokeStrength.value = 0.5
+            parameterTree.excitation.pokeDuration.value = 18.0
+        case 12: // Mallet Tone
+            parameterTree.excitation.pokeStrength.value = 0.85
+            parameterTree.excitation.pokeDuration.value = 8.0
+        case 13: // Wind Chime
+            parameterTree.excitation.pokeStrength.value = 0.4
+            parameterTree.excitation.pokeDuration.value = 14.0
+        case 14: // Gong Wash
+            parameterTree.excitation.pokeStrength.value = 0.7
+            parameterTree.excitation.pokeDuration.value = 35.0
         default:
             break
         }
