@@ -17,6 +17,7 @@ import AudioToolbox
 /// - Output: Master gain control
 public struct ModalAttractorsExtensionMainView: View {
     @EnvironmentObject var parameterTree: ParameterTree
+    @State private var showingCharacterEditor = false
 
     public init() {}
 
@@ -50,6 +51,18 @@ public struct ModalAttractorsExtensionMainView: View {
                 // Routing & Behavior
                 RoutingControlsView()
 
+                // Character Editor Button
+                Button {
+                    showingCharacterEditor = true
+                } label: {
+                    Label("Edit Characters...", systemImage: "slider.horizontal.3")
+                        .font(UIConstants.Fonts.buttonLabel)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, UIConstants.Spacing.small)
+                }
+                .buttonStyle(.bordered)
+                .help("Open advanced character editor")
+
                 Divider()
 
                 // Mode 0-3 sections (for Character Editor - hide in main view for now)
@@ -82,6 +95,10 @@ public struct ModalAttractorsExtensionMainView: View {
             minWidth: UIConstants.Sizes.windowMinWidth,
             minHeight: UIConstants.Sizes.windowMinHeight
         )
+        .sheet(isPresented: $showingCharacterEditor) {
+            CharacterEditorView()
+                .environmentObject(parameterTree)
+        }
     }
 }
 
