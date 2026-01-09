@@ -191,9 +191,9 @@ private:
     uint32_t channels_;
     bool initialized_;
 
-    // Control rate state (update at ~500 Hz)
+    // Control rate state (update at ~200 Hz for better performance)
     uint32_t controlRateCounter_;
-    static constexpr uint32_t CONTROL_RATE_SAMPLES = 96; // ~500 Hz at 48kHz
+    static constexpr uint32_t CONTROL_RATE_SAMPLES = 240; // ~200 Hz at 48kHz
 
     // Parameter cache - Global
     float masterGain_;

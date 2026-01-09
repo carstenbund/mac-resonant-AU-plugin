@@ -285,9 +285,15 @@ void NodeManager::renderAudio(float* outL, float* outR, uint32_t num_frames) {
         num_frames = max_buffer_size_;
     }
 
-    // Mix all nodes (both active and inactive nodes are rendered, but inactive = silence)
+    // OPTIMIZATION: Only render active nodes
+    // Inactive nodes produce silence, so skip them entirely
     for (uint8_t i = 0; i < NUM_NETWORK_NODES; i++) {
-        // Render node to temp buffer
+        // Skip inactive nodes (major performance win!)
+        if (!nodes_[i]->isActive()) {
+            continue;
+        }
+
+        // Render active node to temp buffer
         nodes_[i]->renderAudio(temp_buffer_L_, temp_buffer_R_, num_frames);
 
         // Mix into output
