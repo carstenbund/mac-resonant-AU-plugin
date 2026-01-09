@@ -10,6 +10,7 @@
 VoiceAllocator::VoiceAllocator(uint32_t max_polyphony)
     : max_polyphony_(max_polyphony)
     , pitch_bend_(0.0f)
+    , personality_(PERSONALITY_RESONATOR)
     , sample_rate_(48000.0f)
     , initialized_(false)
 {
@@ -54,6 +55,7 @@ ModalVoice* VoiceAllocator::noteOn(uint8_t midi_note, float velocity) {
         ModalVoice* voice = voices_[existing_voice];
         voice->noteOn(midi_note, velocity);
         voice->setPitchBend(pitch_bend_);
+        voice->setPersonality(personality_);
         return voice;
     }
 
@@ -68,6 +70,7 @@ ModalVoice* VoiceAllocator::noteOn(uint8_t midi_note, float velocity) {
         // Allocate voice
         voice->noteOn(midi_note, velocity);
         voice->setPitchBend(pitch_bend_);
+        voice->setPersonality(personality_);
 
         // Update mapping
         for (uint32_t i = 0; i < max_polyphony_; i++) {
@@ -111,6 +114,15 @@ void VoiceAllocator::setPitchBend(float bend_amount) {
         if (voices_[i]->isActive()) {
             voices_[i]->setPitchBend(bend_amount);
         }
+    }
+}
+
+void VoiceAllocator::setPersonality(node_personality_t personality) {
+    personality_ = personality;
+
+    // Apply to all voices (both active and inactive)
+    for (uint32_t i = 0; i < max_polyphony_; i++) {
+        voices_[i]->setPersonality(personality);
     }
 }
 

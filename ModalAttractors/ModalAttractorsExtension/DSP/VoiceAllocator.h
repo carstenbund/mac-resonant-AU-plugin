@@ -65,6 +65,12 @@ public:
     void setPitchBend(float bend_amount);
 
     /**
+     * @brief Set personality for all voices
+     * @param personality Personality mode (0 = Resonator, 1 = Self-oscillator)
+     */
+    void setPersonality(node_personality_t personality);
+
+    /**
      * @brief Update all active voices (control rate)
      *
      * Should be called at control rate (500 Hz typically)
@@ -104,6 +110,7 @@ private:
 
     int8_t note_to_voice_[128];        ///< MIDI note → voice mapping (-1 = none)
     float pitch_bend_;                 ///< Current pitch bend amount
+    node_personality_t personality_;   ///< Current personality mode
 
     float sample_rate_;                ///< Current sample rate
     bool initialized_;                 ///< Initialization flag
