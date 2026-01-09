@@ -47,7 +47,84 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
             name: "Node Count",
             units: .indexed,
             valueRange: 1...16,
-            defaultValue: 16
+            defaultValue: 5,
+            flags: [.flag_IsReadable] // Read-only: always 5 nodes now
+        )
+    }
+
+    // MARK: - Node Character System
+    ParameterGroupSpec(identifier: "nodeCharacters", name: "Node Characters") {
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node0_Character,
+            identifier: "node0Character",
+            name: "Node 0",
+            units: .indexed,
+            valueRange: 0...4,
+            defaultValue: 0,
+            valueStrings: ["Vibrant Bass", "Dark Node", "Bright Bell", "Glassy Shimmer", "Drone Hub"]
+        )
+
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node1_Character,
+            identifier: "node1Character",
+            name: "Node 1",
+            units: .indexed,
+            valueRange: 0...4,
+            defaultValue: 1,
+            valueStrings: ["Vibrant Bass", "Dark Node", "Bright Bell", "Glassy Shimmer", "Drone Hub"]
+        )
+
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node2_Character,
+            identifier: "node2Character",
+            name: "Node 2",
+            units: .indexed,
+            valueRange: 0...4,
+            defaultValue: 2,
+            valueStrings: ["Vibrant Bass", "Dark Node", "Bright Bell", "Glassy Shimmer", "Drone Hub"]
+        )
+
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node3_Character,
+            identifier: "node3Character",
+            name: "Node 3",
+            units: .indexed,
+            valueRange: 0...4,
+            defaultValue: 3,
+            valueStrings: ["Vibrant Bass", "Dark Node", "Bright Bell", "Glassy Shimmer", "Drone Hub"]
+        )
+
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node4_Character,
+            identifier: "node4Character",
+            name: "Node 4",
+            units: .indexed,
+            valueRange: 0...4,
+            defaultValue: 4,
+            valueStrings: ["Vibrant Bass", "Dark Node", "Bright Bell", "Glassy Shimmer", "Drone Hub"]
+        )
+    }
+
+    // MARK: - Routing & Behavior
+    ParameterGroupSpec(identifier: "routing", name: "Routing") {
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_NoteRouting,
+            identifier: "noteRouting",
+            name: "Note Routing",
+            units: .indexed,
+            valueRange: 0...1,
+            defaultValue: 0,
+            valueStrings: ["Round-Robin", "Pitch Zones"]
+        )
+
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_MultiExcite,
+            identifier: "multiExcite",
+            name: "Multi-Excitation",
+            units: .indexed,
+            valueRange: 0...1,
+            defaultValue: 1,
+            valueStrings: ["Re-Trigger", "Accumulate"]
         )
     }
 

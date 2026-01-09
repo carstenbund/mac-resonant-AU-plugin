@@ -42,7 +42,19 @@ public struct ModalAttractorsExtensionMainView: View {
 
                 Divider()
 
-                // Mode 0-3 sections
+                // Node Character System
+                NodeCharactersView()
+
+                Divider()
+
+                // Routing & Behavior
+                RoutingControlsView()
+
+                Divider()
+
+                // Mode 0-3 sections (for Character Editor - hide in main view for now)
+                // TODO: Move these to a separate Character Editor page
+                /*
                 ModeControlsView(mode: parameterTree.mode0, modeLabel: "MODE 0")
                 ModeControlsView(mode: parameterTree.mode1, modeLabel: "MODE 1")
                 ModeControlsView(mode: parameterTree.mode2, modeLabel: "MODE 2")
@@ -59,6 +71,7 @@ public struct ModalAttractorsExtensionMainView: View {
                 VoiceControlsView()
 
                 Divider()
+                */
 
                 // Drive/Output section
                 DriveControlsView()
