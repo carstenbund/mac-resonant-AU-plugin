@@ -76,6 +76,6 @@ final class ModalAttractorsAUViewController: AUViewController {
                 .environmentObject(paramTree)
         )
 
-        hostingController.rootView = rootView
+        hostingController.rootView = rootView as! ModalAttractorsExtensionMainView
     }
 }
