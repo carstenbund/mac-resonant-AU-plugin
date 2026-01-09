@@ -11,7 +11,7 @@ import SwiftUI
 /// Custom AUViewController subclass that hosts the SwiftUI view
 /// Resilient to configure() / viewDidLoad() timing issues
 final class ModalAttractorsAUViewController: AUViewController {
-    private var hostingController: NSHostingController<ModalAttractorsExtensionMainView>!
+    private var hostingController: NSHostingController<AnyView>!
     private var paramTreeWrapper: ParameterTree?
 
     /// Configure the view controller with the parameter tree wrapper
@@ -34,20 +34,24 @@ final class ModalAttractorsAUViewController: AUViewController {
     }
 
     private func setupHostingController() {
-        // Create root view
-        let rootView = ModalAttractorsExtensionMainView()
+        // CRITICAL: Create root view with environment object if available
+        // Creating the view without the required @EnvironmentObject causes SwiftUI to fail,
+        // which results in the host showing a fallback default parameter tree view
+        let rootView: AnyView
 
-        // Create hosting controller
+        if let paramTree = paramTreeWrapper {
+            // Create hosting controller with environment object from the start
+            rootView = AnyView(ModalAttractorsExtensionMainView().environmentObject(paramTree))
+        } else {
+            // Fallback: create without environment object (view will fail until updateRootView is called)
+            rootView = AnyView(ModalAttractorsExtensionMainView())
+        }
+
         hostingController = NSHostingController(rootView: rootView)
         hostingController.preferredContentSize = NSSize(
             width: UIConstants.Sizes.windowMinWidth,
             height: UIConstants.Sizes.windowMinHeight
         )
-
-        // If we already have the parameter tree, inject it now
-        if let paramTree = paramTreeWrapper {
-            updateRootView()
-        }
 
         // Add hosting controller as child view controller
         addChild(hostingController)
@@ -67,8 +71,10 @@ final class ModalAttractorsAUViewController: AUViewController {
         guard let paramTree = paramTreeWrapper else { return }
 
         // Update the root view with the parameter tree
-        let rootView = ModalAttractorsExtensionMainView()
-            .environmentObject(paramTree)
+        let rootView = AnyView(
+            ModalAttractorsExtensionMainView()
+                .environmentObject(paramTree)
+        )
 
         hostingController.rootView = rootView
     }
