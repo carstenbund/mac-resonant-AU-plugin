@@ -132,6 +132,13 @@ float ModalVoice::getAmplitude() const {
     return modal_node_get_amplitude(&node_);
 }
 
+float ModalVoice::getBaseFrequency() const {
+    // Calculate base frequency with pitch bend
+    float base_freq = midi_to_freq(midi_note_);
+    float bend_factor = powf(2.0f, pitch_bend_ * 2.0f / 12.0f);
+    return base_freq * bend_factor;
+}
+
 void ModalVoice::setMode(uint8_t mode_idx, float freq_hz, float damping, float weight) {
     if (mode_idx >= MAX_MODES) return;
 
