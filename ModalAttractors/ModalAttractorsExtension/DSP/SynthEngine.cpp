@@ -251,11 +251,18 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
             if (newCount != nodeCount_) {
                 nodeCount_ = newCount;
 
-                // TODO: Full node architecture implementation
-                // For now, just store the value. Future refactor will:
-                // 1. Release nodes above newCount
-                // 2. Update allocator active limit
-                // 3. Regenerate topology for new node count
+                // Update voice allocator to limit active voices
+                if (voiceAllocator_) {
+                    voiceAllocator_->setNodeCount(newCount);
+                }
+
+                // Regenerate topology for new node count
+                if (topologyEngine_ && voiceAllocator_) {
+                    topologyEngine_->generateTopology(
+                        static_cast<TopologyType>(topologyType_),
+                        couplingStrength_
+                    );
+                }
             }
             break;
         }
