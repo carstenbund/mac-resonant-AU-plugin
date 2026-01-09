@@ -318,6 +318,9 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
             break;
         case kParam_Personality:
             personality_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setPersonality(static_cast<node_personality_t>(static_cast<int>(value)));
+            }
             break;
 
         default:
