@@ -43,7 +43,7 @@ struct RoutingControlsView: View {
             // Help text for routing
             Text(routingHelpText)
                 .font(.caption2)
-                .foregroundColor(UIConstants.Colors.textTertiary)
+                .foregroundColor(UIConstants.Colors.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
 
             Divider()
@@ -73,7 +73,7 @@ struct RoutingControlsView: View {
             // Help text for multi-excite
             Text(multiExciteHelpText)
                 .font(.caption2)
-                .foregroundColor(UIConstants.Colors.textTertiary)
+                .foregroundColor(UIConstants.Colors.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding()
