@@ -84,10 +84,10 @@ struct RoutingControlsView: View {
     private var routingHelpText: String {
         let mode = Int(parameterTree.routing.noteRouting.value)
         switch mode {
-        case 0: // Round-Robin
-            return "Notes distributed evenly across all 5 nodes in sequence."
-        case 1: // Pitch Zones
-            return "Low notes → Node 0 (bass), high notes → Node 4 (treble)."
+        case 0: // MIDI Channel
+            return "Route by MIDI channel: Ch 1 → Node 0, Ch 2 → Node 1, etc."
+        case 1: // All Nodes
+            return "All active nodes receive every note (rich, dense textures)."
         default:
             return ""
         }

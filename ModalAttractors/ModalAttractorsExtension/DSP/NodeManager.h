@@ -26,8 +26,8 @@
  * @brief Note routing strategies
  */
 enum class NoteRoutingMode : uint8_t {
-    RoundRobin = 0,    ///< Cycle through nodes sequentially
-    PitchZones = 1,    ///< Map note pitch to node (bass → node 0, treble → node 4)
+    MidiChannel = 0,   ///< Route by MIDI channel (Ch 1→Node 0, Ch 2→Node 1, etc.)
+    AllNodes = 1,      ///< All nodes receive every note
 };
 
 /**
@@ -125,6 +125,22 @@ public:
         return multi_excite_mode_;
     }
 
+    /**
+     * @brief Set active node count (1-5)
+     * @param count Number of active nodes
+     *
+     * Calling this will trigger allNotesOff() for safety.
+     */
+    void setNodeCount(uint8_t count);
+
+    /**
+     * @brief Get active node count
+     * @return Number of active nodes (1-5)
+     */
+    uint8_t getNodeCount() const {
+        return active_node_count_;
+    }
+
     // ========================================================================
     // Note Handling
     // ========================================================================
@@ -133,11 +149,12 @@ public:
      * @brief Handle MIDI note on
      * @param midi_note MIDI note number (0-127)
      * @param velocity Velocity (0.0-1.0 normalized)
+     * @param midi_channel MIDI channel (0-15, where 0 = channel 1)
      *
      * Routes note to node(s) based on routing mode.
      * Applies excitation according to multi-excite mode.
      */
-    void noteOn(uint8_t midi_note, float velocity);
+    void noteOn(uint8_t midi_note, float velocity, uint8_t midi_channel = 0);
 
     /**
      * @brief Handle MIDI note off
@@ -230,10 +247,11 @@ private:
     // Routing state
     NoteRoutingMode routing_mode_;          ///< Current routing strategy
     MultiExciteMode multi_excite_mode_;     ///< Current excitation behavior
-    uint32_t round_robin_counter_;          ///< Counter for round-robin routing
+    uint8_t active_node_count_;             ///< Number of active nodes (1-5)
 
     // Note tracking (for note-off routing)
     uint8_t note_to_node_[128];             ///< MIDI note → node mapping (-1 = none)
+    uint8_t note_to_channel_[128];          ///< MIDI note → channel mapping
 
     // Global state
     float pitch_bend_;                      ///< Current pitch bend amount
@@ -246,11 +264,13 @@ private:
     uint32_t max_buffer_size_;              ///< Max buffer size allocated
 
     /**
-     * @brief Route note to node index based on current routing mode
+     * @brief Route note to node index(es) based on current routing mode
      * @param midi_note MIDI note number
-     * @return Target node index (0-4)
+     * @param midi_channel MIDI channel (0-15)
+     * @param target_nodes Output array of node indices to excite
+     * @return Number of nodes to excite
      */
-    uint8_t routeNoteToNode(uint8_t midi_note);
+    uint8_t routeNoteToNodes(uint8_t midi_note, uint8_t midi_channel, uint8_t* target_nodes);
 
     /**
      * @brief Apply character parameters to node
