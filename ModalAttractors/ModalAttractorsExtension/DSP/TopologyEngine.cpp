@@ -100,6 +100,11 @@ void TopologyEngine::generateTopology(TopologyType type, float coupling_strength
 void TopologyEngine::updateCoupling(ModalVoice** voices, uint32_t num_voices) {
     if (!voices || num_voices != num_voices_) return;
 
+    // OPTIMIZATION: Skip coupling entirely if strength is near zero or topology is None
+    if (coupling_strength_ < 0.001f || topology_type_ == TopologyType::None) {
+        return;
+    }
+
     // Apply coupling for each voice
     for (uint32_t i = 0; i < num_voices; i++) {
         if (!voices[i]->isActive()) continue;
@@ -111,17 +116,18 @@ void TopologyEngine::updateCoupling(ModalVoice** voices, uint32_t num_voices) {
             if (i == j || !voices[j]->isActive()) continue;
 
             float coupling_weight = coupling_matrix_[i][j];
-            if (coupling_weight > 0.0f) {
-                // Get mode 0 amplitude from neighbor voice
-                modal_complex_t neighbor_amp = voices[j]->getMode0Amplitude();
+            // OPTIMIZATION: Skip if coupling weight is negligible
+            if (coupling_weight < 0.001f) continue;
 
-                // Diffusive coupling: (neighbor - self) * weight
-                modal_complex_t self_amp = voices[i]->getMode0Amplitude();
-                modal_complex_t diff = neighbor_amp - self_amp;
+            // Get mode 0 amplitude from neighbor voice
+            modal_complex_t neighbor_amp = voices[j]->getMode0Amplitude();
 
-                // Apply to mode 0 (can extend to all modes)
-                coupling_inputs[0] += std::abs(diff) * coupling_weight * coupling_strength_;
-            }
+            // Diffusive coupling: (neighbor - self) * weight
+            modal_complex_t self_amp = voices[i]->getMode0Amplitude();
+            modal_complex_t diff = neighbor_amp - self_amp;
+
+            // Apply to mode 0 (can extend to all modes)
+            coupling_inputs[0] += std::abs(diff) * coupling_weight * coupling_strength_;
         }
 
         // Apply coupling inputs to voice

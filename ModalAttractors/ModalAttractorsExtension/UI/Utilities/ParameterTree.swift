@@ -14,6 +14,8 @@ import SwiftUI
 /// This bridges the AU parameter tree to SwiftUI's observable system
 public class ParameterTree: ObservableObject {
     public let global: GlobalParameters
+    public let nodeCharacters: NodeCharacterParameters
+    public let routing: RoutingParameters
     public let mode0: ModeParameters
     public let mode1: ModeParameters
     public let mode2: ModeParameters
@@ -26,6 +28,8 @@ public class ParameterTree: ObservableObject {
     public init(auParameterTree: AUParameterTree) {
         self.auParameterTree = auParameterTree
         self.global = GlobalParameters(auParameterTree: auParameterTree)
+        self.nodeCharacters = NodeCharacterParameters(auParameterTree: auParameterTree)
+        self.routing = RoutingParameters(auParameterTree: auParameterTree)
         self.mode0 = ModeParameters(auParameterTree: auParameterTree, modeIndex: 0)
         self.mode1 = ModeParameters(auParameterTree: auParameterTree, modeIndex: 1)
         self.mode2 = ModeParameters(auParameterTree: auParameterTree, modeIndex: 2)
@@ -60,6 +64,43 @@ public class GlobalParameters: ObservableObject {
         self.couplingStrength = ParameterWrapper(parameter: coupling)
         self.topology = ParameterWrapper(parameter: topo)
         self.nodeCount = ParameterWrapper(parameter: nodes)
+    }
+}
+
+/// Node Character parameter group (5 nodes)
+public class NodeCharacterParameters: ObservableObject {
+    @Published public var node0: ParameterWrapper
+    @Published public var node1: ParameterWrapper
+    @Published public var node2: ParameterWrapper
+    @Published public var node3: ParameterWrapper
+    @Published public var node4: ParameterWrapper
+
+    init(auParameterTree: AUParameterTree) {
+        let n0 = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_Node0_Character.rawValue)!
+        let n1 = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_Node1_Character.rawValue)!
+        let n2 = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_Node2_Character.rawValue)!
+        let n3 = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_Node3_Character.rawValue)!
+        let n4 = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_Node4_Character.rawValue)!
+
+        self.node0 = ParameterWrapper(parameter: n0)
+        self.node1 = ParameterWrapper(parameter: n1)
+        self.node2 = ParameterWrapper(parameter: n2)
+        self.node3 = ParameterWrapper(parameter: n3)
+        self.node4 = ParameterWrapper(parameter: n4)
+    }
+}
+
+/// Routing & behavior parameter group
+public class RoutingParameters: ObservableObject {
+    @Published public var noteRouting: ParameterWrapper
+    @Published public var multiExcite: ParameterWrapper
+
+    init(auParameterTree: AUParameterTree) {
+        let routing = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_NoteRouting.rawValue)!
+        let excite = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_MultiExcite.rawValue)!
+
+        self.noteRouting = ParameterWrapper(parameter: routing)
+        self.multiExcite = ParameterWrapper(parameter: excite)
     }
 }
 
@@ -148,8 +189,11 @@ public class ParameterWrapper: ObservableObject {
     /// The current parameter value
     @Published public var value: Float {
         didSet {
-            // Update the AU parameter when SwiftUI changes the value
-            parameter.value = value
+            // Only update the parameter if it's actually different
+            // This prevents feedback loops when the observer updates self.value
+            if parameter.value != value {
+                parameter.value = value
+            }
         }
     }
 
@@ -192,7 +236,8 @@ public class ParameterWrapper: ObservableObject {
         parameter.implementorValueObserver = { [weak self] (param: AUParameter, newValue: AUValue) in
             DispatchQueue.main.async {
                 guard let self = self else { return }
-                // Only update if the value actually changed to avoid feedback loops
+                // Only update if the value actually changed
+                // The didSet will NOT update the parameter again because oldValue == newValue
                 if self.value != newValue {
                     self.value = newValue
                 }

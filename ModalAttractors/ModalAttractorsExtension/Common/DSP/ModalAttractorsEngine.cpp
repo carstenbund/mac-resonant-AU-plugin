@@ -76,7 +76,8 @@ void modal_attractors_engine_begin_events(ModalAttractorsEngine* engine) {
 void modal_attractors_engine_push_note_on(ModalAttractorsEngine* engine,
                                           int32_t sample_offset,
                                           uint8_t note,
-                                          float velocity) {
+                                          float velocity,
+                                          uint8_t channel) {
     if (!engine || !engine->initialized) return;
 
     SynthEvent event;
@@ -84,6 +85,7 @@ void modal_attractors_engine_push_note_on(ModalAttractorsEngine* engine,
     event.sampleOffset = sample_offset;
     event.noteOn.note = note;
     event.noteOn.velocity = velocity;
+    event.noteOn.channel = channel;
 
     engine->event_queue->push(event);
 }

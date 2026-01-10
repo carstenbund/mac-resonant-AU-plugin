@@ -1,25 +1,20 @@
 /**
  * @file SynthEngine.cpp
  * @brief Implementation of the Modal Attractors synthesis engine
- *
- * Updated for Node Character System - 5 fixed nodes with selectable characters
  */
 
 #include "SynthEngine.h"
-#include "NodeManager.h"
+#include "VoiceAllocator.h"
 #include "TopologyEngine.h"
 #include "ModalVoice.h"
 #include <algorithm>
 
 // Parameter IDs (should match ModalAttractorsExtensionParameterAddresses.h)
 enum ParamID {
-    // Global
     kParam_MasterGain = 0,
     kParam_CouplingStrength = 1,
     kParam_Topology = 2,
-    kParam_NodeCount = 3,  // Deprecated: always 5
-
-    // Mode parameters (for Character Editor)
+    kParam_NodeCount = 3,
     kParam_Mode0_Frequency = 4,
     kParam_Mode0_Damping = 5,
     kParam_Mode0_Weight = 6,
@@ -34,44 +29,26 @@ enum ParamID {
     kParam_Mode3_Weight = 15,
     kParam_PokeStrength = 16,
     kParam_PokeDuration = 17,
-
-    // Deprecated
     kParam_Polyphony = 18,
-    kParam_Personality = 19,
-
-    // Node Character System
-    kParam_Node0_Character = 20,
-    kParam_Node1_Character = 21,
-    kParam_Node2_Character = 22,
-    kParam_Node3_Character = 23,
-    kParam_Node4_Character = 24,
-    kParam_NoteRouting = 25,
-    kParam_MultiExcite = 26
+    kParam_Personality = 19
 };
 
 SynthEngine::SynthEngine(uint32_t maxPolyphony)
-    : nodeManager_(nullptr)
+    : voiceAllocator_(nullptr)
     , topologyEngine_(nullptr)
-    , nodePointers_(nullptr)
+    , voicePointers_(nullptr)
+    , maxPolyphony_(maxPolyphony)
     , sampleRate_(44100.0)
     , maxFrames_(0)
     , channels_(2)
     , initialized_(false)
     , controlRateCounter_(0)
-    // Global parameters
+    // Global parameters - match defaults from Parameters.swift
     , masterGain_(0.7f)
     , couplingStrength_(0.3f)
     , topologyType_(0)
-    // Node characters (default: each node gets its own character 0-4)
-    , node0_character_(0)
-    , node1_character_(1)
-    , node2_character_(2)
-    , node3_character_(3)
-    , node4_character_(4)
-    // Routing
-    , noteRouting_(0)      // RoundRobin
-    , multiExcite_(1)      // Accumulate
-    // Mode parameters (for Character Editor)
+    , nodeCount_(16)
+    // Mode parameters - match defaults from Parameters.swift
     , mode0_frequency_(1.0f)
     , mode0_damping_(1.0f)
     , mode0_weight_(1.0f)
@@ -84,29 +61,30 @@ SynthEngine::SynthEngine(uint32_t maxPolyphony)
     , mode3_frequency_(4.5f)
     , mode3_damping_(2.0f)
     , mode3_weight_(0.4f)
-    // Excitation parameters (for Character Editor)
+    // Excitation parameters
     , pokeStrength_(0.5f)
     , pokeDuration_(10.0f)
-    // Deprecated
+    // Voice parameters
+    , polyphony_(16.0f)
     , personality_(0.0f)
 {
-    // Allocate DSP components (always 5 nodes)
-    nodeManager_ = new NodeManager();
-    topologyEngine_ = new TopologyEngine(5);  // Fixed 5 nodes
+    // Allocate DSP components (done once at construction)
+    voiceAllocator_ = new VoiceAllocator(maxPolyphony);
+    topologyEngine_ = new TopologyEngine(maxPolyphony);
 
-    // Pre-allocate node pointer array (no allocation in render!)
-    nodePointers_ = new ModalVoice*[5];
+    // Pre-allocate voice pointer array (CRITICAL: no allocation in render!)
+    voicePointers_ = new ModalVoice*[maxPolyphony];
 }
 
 SynthEngine::~SynthEngine() {
-    if (nodePointers_) {
-        delete[] nodePointers_;
-        nodePointers_ = nullptr;
+    if (voicePointers_) {
+        delete[] voicePointers_;
+        voicePointers_ = nullptr;
     }
 
-    if (nodeManager_) {
-        delete nodeManager_;
-        nodeManager_ = nullptr;
+    if (voiceAllocator_) {
+        delete voiceAllocator_;
+        voiceAllocator_ = nullptr;
     }
 
     if (topologyEngine_) {
@@ -120,13 +98,8 @@ void SynthEngine::prepare(double sampleRate, uint32_t maxFrames, uint32_t channe
     maxFrames_ = maxFrames;
     channels_ = channels;
 
-    // Initialize node manager
-    nodeManager_->initialize(static_cast<float>(sampleRate));
-
-    // Apply default characters to all nodes
-    for (uint8_t i = 0; i < 5; i++) {
-        nodeManager_->setNodeCharacter(i, i);  // Node i gets character i
-    }
+    // Initialize voice allocator
+    voiceAllocator_->initialize(static_cast<float>(sampleRate));
 
     // Set default topology
     topologyEngine_->generateTopology(TopologyType::Ring, couplingStrength_);
@@ -137,8 +110,8 @@ void SynthEngine::prepare(double sampleRate, uint32_t maxFrames, uint32_t channe
 void SynthEngine::reset() {
     if (!initialized_) return;
 
-    // Release all nodes
-    nodeManager_->allNotesOff();
+    // Release all voices
+    voiceAllocator_->allNotesOff();
     controlRateCounter_ = 0;
 }
 
@@ -187,15 +160,15 @@ void SynthEngine::render(const EventQueue& events, float* outL, float* outR, uin
 void SynthEngine::processEvent(const SynthEvent& event) {
     switch (event.type) {
         case EventType::NoteOn:
-            nodeManager_->noteOn(event.noteOn.note, event.noteOn.velocity, event.noteOn.channel);
+            voiceAllocator_->noteOn(event.noteOn.note, event.noteOn.velocity);
             break;
 
         case EventType::NoteOff:
-            nodeManager_->noteOff(event.noteOff.note);
+            voiceAllocator_->noteOff(event.noteOff.note);
             break;
 
         case EventType::PitchBend:
-            nodeManager_->setPitchBend(event.pitchBend.value);
+            voiceAllocator_->setPitchBend(event.pitchBend.value);
             break;
 
         case EventType::CC:
@@ -217,8 +190,8 @@ void SynthEngine::renderSlice(float* outL, float* outR, uint32_t startFrame, uin
         controlRateCounter_ = 0;
     }
 
-    // Render nodes
-    nodeManager_->renderAudio(outL, outR, numFrames);
+    // Render voices
+    voiceAllocator_->renderAudio(outL, outR, numFrames);
 
     // Apply master gain
     for (uint32_t i = 0; i < numFrames; i++) {
@@ -230,14 +203,14 @@ void SynthEngine::renderSlice(float* outL, float* outR, uint32_t startFrame, uin
 }
 
 void SynthEngine::updateControlRate() {
-    // Update node state at control rate
-    nodeManager_->updateNodes();
+    // Update voice state at control rate
+    voiceAllocator_->updateVoices();
 
-    // Update coupling (fixed 5 nodes)
-    for (uint8_t i = 0; i < 5; i++) {
-        nodePointers_[i] = nodeManager_->getNode(i);
+    // Update coupling (FIXED: no allocation, use pre-allocated array)
+    for (uint32_t i = 0; i < maxPolyphony_; i++) {
+        voicePointers_[i] = voiceAllocator_->getVoice(i);
     }
-    topologyEngine_->updateCoupling(nodePointers_, 5);
+    topologyEngine_->updateCoupling(voicePointers_, maxPolyphony_);
 }
 
 void SynthEngine::setParameter(uint32_t paramId, float value) {
@@ -270,121 +243,133 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
             break;
         }
 
-        case kParam_NodeCount:
-            // Set active node count (1-5)
-            if (nodeManager_) {
-                nodeManager_->setNodeCount(static_cast<uint8_t>(value));
+        case kParam_NodeCount: {
+            uint32_t newCount = static_cast<uint32_t>(value);
+            if (newCount < 1) newCount = 1;
+            if (newCount > 16) newCount = 16;
+
+            if (newCount != nodeCount_) {
+                nodeCount_ = newCount;
+
+                // Update voice allocator to limit active voices
+                if (voiceAllocator_) {
+                    voiceAllocator_->setNodeCount(newCount);
+                }
+
+                // Regenerate topology for new node count
+                if (topologyEngine_ && voiceAllocator_) {
+                    topologyEngine_->generateTopology(
+                        static_cast<TopologyType>(topologyType_),
+                        couplingStrength_
+                    );
+                }
             }
             break;
+        }
 
-        // Node Character parameters
-        case kParam_Node0_Character:
-            node0_character_ = static_cast<uint8_t>(value);
-            if (nodeManager_) {
-                nodeManager_->setNodeCharacter(0, node0_character_);
-            }
-            break;
-
-        case kParam_Node1_Character:
-            node1_character_ = static_cast<uint8_t>(value);
-            if (nodeManager_) {
-                nodeManager_->setNodeCharacter(1, node1_character_);
-            }
-            break;
-
-        case kParam_Node2_Character:
-            node2_character_ = static_cast<uint8_t>(value);
-            if (nodeManager_) {
-                nodeManager_->setNodeCharacter(2, node2_character_);
-            }
-            break;
-
-        case kParam_Node3_Character:
-            node3_character_ = static_cast<uint8_t>(value);
-            if (nodeManager_) {
-                nodeManager_->setNodeCharacter(3, node3_character_);
-            }
-            break;
-
-        case kParam_Node4_Character:
-            node4_character_ = static_cast<uint8_t>(value);
-            if (nodeManager_) {
-                nodeManager_->setNodeCharacter(4, node4_character_);
-            }
-            break;
-
-        // Routing parameters
-        case kParam_NoteRouting:
-            noteRouting_ = static_cast<uint8_t>(value);
-            if (nodeManager_) {
-                nodeManager_->setRoutingMode(static_cast<NoteRoutingMode>(noteRouting_));
-            }
-            break;
-
-        case kParam_MultiExcite:
-            multiExcite_ = static_cast<uint8_t>(value);
-            if (nodeManager_) {
-                nodeManager_->setMultiExciteMode(static_cast<MultiExciteMode>(multiExcite_));
-            }
-            break;
-
-        // Mode parameters (for Character Editor - not directly used)
-        // These are kept for future Character Editor implementation
+        // Mode 0 parameters
         case kParam_Mode0_Frequency:
             mode0_frequency_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(0, value, mode0_damping_, mode0_weight_);
+            }
             break;
         case kParam_Mode0_Damping:
             mode0_damping_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(0, mode0_frequency_, value, mode0_weight_);
+            }
             break;
         case kParam_Mode0_Weight:
             mode0_weight_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(0, mode0_frequency_, mode0_damping_, value);
+            }
             break;
 
+        // Mode 1 parameters
         case kParam_Mode1_Frequency:
             mode1_frequency_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(1, value, mode1_damping_, mode1_weight_);
+            }
             break;
         case kParam_Mode1_Damping:
             mode1_damping_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(1, mode1_frequency_, value, mode1_weight_);
+            }
             break;
         case kParam_Mode1_Weight:
             mode1_weight_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(1, mode1_frequency_, mode1_damping_, value);
+            }
             break;
 
+        // Mode 2 parameters
         case kParam_Mode2_Frequency:
             mode2_frequency_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(2, value, mode2_damping_, mode2_weight_);
+            }
             break;
         case kParam_Mode2_Damping:
             mode2_damping_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(2, mode2_frequency_, value, mode2_weight_);
+            }
             break;
         case kParam_Mode2_Weight:
             mode2_weight_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(2, mode2_frequency_, mode2_damping_, value);
+            }
             break;
 
+        // Mode 3 parameters
         case kParam_Mode3_Frequency:
             mode3_frequency_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(3, value, mode3_damping_, mode3_weight_);
+            }
             break;
         case kParam_Mode3_Damping:
             mode3_damping_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(3, mode3_frequency_, value, mode3_weight_);
+            }
             break;
         case kParam_Mode3_Weight:
             mode3_weight_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setMode(3, mode3_frequency_, mode3_damping_, value);
+            }
             break;
 
-        // Excitation parameters (for Character Editor)
+        // Excitation parameters
         case kParam_PokeStrength:
             pokeStrength_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setPokeStrength(value);
+            }
             break;
         case kParam_PokeDuration:
             pokeDuration_ = value;
+            if (voiceAllocator_) {
+                voiceAllocator_->setPokeDuration(value);
+            }
             break;
 
-        // Deprecated parameters
+        // Voice parameters
         case kParam_Polyphony:
-            // Always 5 nodes
+            polyphony_ = value;
             break;
         case kParam_Personality:
             personality_ = value;
-            // Per-character now, not global
+            if (voiceAllocator_) {
+                voiceAllocator_->setPersonality(static_cast<node_personality_t>(static_cast<int>(value)));
+            }
             break;
 
         default:
@@ -402,27 +387,9 @@ float SynthEngine::getParameter(uint32_t paramId) const {
         case kParam_Topology:
             return static_cast<float>(topologyType_);
         case kParam_NodeCount:
-            return nodeManager_ ? static_cast<float>(nodeManager_->getNodeCount()) : 5.0f;
+            return static_cast<float>(nodeCount_);
 
-        // Node Character parameters
-        case kParam_Node0_Character:
-            return static_cast<float>(node0_character_);
-        case kParam_Node1_Character:
-            return static_cast<float>(node1_character_);
-        case kParam_Node2_Character:
-            return static_cast<float>(node2_character_);
-        case kParam_Node3_Character:
-            return static_cast<float>(node3_character_);
-        case kParam_Node4_Character:
-            return static_cast<float>(node4_character_);
-
-        // Routing parameters
-        case kParam_NoteRouting:
-            return static_cast<float>(noteRouting_);
-        case kParam_MultiExcite:
-            return static_cast<float>(multiExcite_);
-
-        // Mode parameters (for Character Editor)
+        // Mode 0 parameters
         case kParam_Mode0_Frequency:
             return mode0_frequency_;
         case kParam_Mode0_Damping:
@@ -430,6 +397,7 @@ float SynthEngine::getParameter(uint32_t paramId) const {
         case kParam_Mode0_Weight:
             return mode0_weight_;
 
+        // Mode 1 parameters
         case kParam_Mode1_Frequency:
             return mode1_frequency_;
         case kParam_Mode1_Damping:
@@ -437,6 +405,7 @@ float SynthEngine::getParameter(uint32_t paramId) const {
         case kParam_Mode1_Weight:
             return mode1_weight_;
 
+        // Mode 2 parameters
         case kParam_Mode2_Frequency:
             return mode2_frequency_;
         case kParam_Mode2_Damping:
@@ -444,6 +413,7 @@ float SynthEngine::getParameter(uint32_t paramId) const {
         case kParam_Mode2_Weight:
             return mode2_weight_;
 
+        // Mode 3 parameters
         case kParam_Mode3_Frequency:
             return mode3_frequency_;
         case kParam_Mode3_Damping:
@@ -451,15 +421,15 @@ float SynthEngine::getParameter(uint32_t paramId) const {
         case kParam_Mode3_Weight:
             return mode3_weight_;
 
-        // Excitation parameters (for Character Editor)
+        // Excitation parameters
         case kParam_PokeStrength:
             return pokeStrength_;
         case kParam_PokeDuration:
             return pokeDuration_;
 
-        // Deprecated parameters
+        // Voice parameters
         case kParam_Polyphony:
-            return 5.0f;  // Always 5 nodes
+            return polyphony_;
         case kParam_Personality:
             return personality_;
 

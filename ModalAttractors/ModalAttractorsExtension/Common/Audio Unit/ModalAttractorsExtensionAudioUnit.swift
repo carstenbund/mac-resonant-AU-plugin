@@ -35,6 +35,9 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
 
     private var _parameterTree: AUParameterTree?
 
+    /// SwiftUI parameter tree wrapper - created once and reused for all UI instances
+    private var paramTreeWrapper: ParameterTree?
+
     // MARK: - Constants
 
     private let maxPolyphony: UInt32 = 16
@@ -73,6 +76,11 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
 
         // Create parameter tree internally
         _parameterTree = ModalAttractorsExtensionParameterSpecs.createAUParameterTree()
+
+        // Create SwiftUI wrapper once for all UI instances
+        if let paramTree = _parameterTree {
+            paramTreeWrapper = ParameterTree(auParameterTree: paramTree)
+        }
 
         // Set default values from parameter tree
         if let paramTree = _parameterTree {
@@ -158,6 +166,29 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
         }
     }
 
+    private func ensureParameterTree() -> AUParameterTree {
+        if let paramTree = _parameterTree {
+            return paramTree
+        }
+
+        let paramTree = ModalAttractorsExtensionParameterSpecs.createAUParameterTree()
+        _parameterTree = paramTree
+
+        // Create wrapper if it doesn't exist
+        if paramTreeWrapper == nil {
+            paramTreeWrapper = ParameterTree(auParameterTree: paramTree)
+        }
+
+        if let engine = engine {
+            for param in paramTree.allParameters {
+                modal_attractors_engine_set_parameter(engine, UInt32(param.address), param.value)
+            }
+        }
+
+        setupParameterCallbacks(paramTree)
+        return paramTree
+    }
+
     // MARK: - Resource Management
 
     public override func allocateRenderResources() throws {
@@ -229,12 +260,13 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
                     let status = d.0
                     let data1  = d.1
                     let data2  = d.2
+                    let channel = status & 0x0F  // Extract MIDI channel (0-15)
 
                     switch status & 0xF0 {
                     case 0x90:
                         if data2 > 0 {
                             modal_attractors_engine_push_note_on(
-                                enginePtr, offset, data1, Float(data2) * (1.0 / 127.0)
+                                enginePtr, offset, data1, Float(data2) * (1.0 / 127.0), channel
                             )
                         } else {
                             modal_attractors_engine_push_note_off(enginePtr, offset, data1)
@@ -365,19 +397,23 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
     // MARK: - UI Integration
 
     public override func requestViewController(completionHandler: @escaping (AUViewController?) -> Void) {
-        guard let paramTree = parameterTree else {
+        // Ensure parameter tree exists
+        let _ = ensureParameterTree()
+
+        // Ensure we have the wrapper (should be created in init)
+        guard let wrapper = paramTreeWrapper else {
             completionHandler(nil)
             return
         }
 
-        // Create parameter tree wrapper for SwiftUI
-        let paramTreeWrapper = ParameterTree(auParameterTree: paramTree)
+        // Ensure UI creation happens on main thread
+        DispatchQueue.main.async {
+            // Create and configure our custom AUViewController subclass
+            // Use the persistent wrapper so SwiftUI bindings work correctly
+            let vc = ModalAttractorsAUViewController()
+            vc.configure(paramTreeWrapper: wrapper)
 
-        // Create and configure our custom AUViewController subclass
-        // that hosts the SwiftUI view internally
-        let vc = ModalAttractorsAUViewController()
-        vc.configure(paramTreeWrapper: paramTreeWrapper)
-
-        completionHandler(vc)
+            completionHandler(vc)
+        }
     }
 }

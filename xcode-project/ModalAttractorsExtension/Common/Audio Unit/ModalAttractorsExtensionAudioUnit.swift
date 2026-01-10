@@ -152,6 +152,16 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
         }
     }
 
+    private func ensureParameterTree() -> AUParameterTree {
+        if let paramTree = parameterTree {
+            return paramTree
+        }
+
+        let paramTree = ModalAttractorsExtensionParameterSpecs.createAUParameterTree()
+        setupParameterTree(paramTree)
+        return paramTree
+    }
+
     // MARK: - Resource Management
 
     public override func allocateRenderResources() throws {
