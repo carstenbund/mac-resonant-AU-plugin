@@ -369,7 +369,12 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
     // MARK: - UI Integration
 
     public override func requestViewController(completionHandler: @escaping (AUViewController?) -> Void) {
-        let paramTree = ensureParameterTree()
+        NSLog("ModalAttractorsAudioUnit requestViewController called")
+
+        guard let paramTree = parameterTree else {
+            completionHandler(nil)
+            return
+        }
 
         // Create parameter tree wrapper for SwiftUI
         let paramTreeWrapper = ParameterTree(auParameterTree: paramTree)
