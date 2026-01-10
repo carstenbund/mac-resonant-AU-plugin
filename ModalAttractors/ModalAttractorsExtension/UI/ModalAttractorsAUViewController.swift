@@ -10,6 +10,10 @@ import SwiftUI
 import Combine
 import os
 
+#if os(macOS)
+import AppKit
+#endif
+
 private let log = Logger(subsystem: "com.bund.media.ModalAttractorsExtension", category: "AUViewController")
 
 /// Custom AUViewController subclass that hosts the SwiftUI view
@@ -20,7 +24,19 @@ private let log = Logger(subsystem: "com.bund.media.ModalAttractorsExtension", c
 /// - The view MUST be set up immediately in viewDidLoad (not lazily)
 /// - The audio unit binding happens after view setup
 /// - preferredContentSize must be overridden
+/// - Class must be @objc for runtime discovery via NSExtensionPrincipalClass
 public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFactory {
+
+    // MARK: - Initialization
+
+    /// Initialize without a nib - view is created programmatically in loadView()
+    public override init(nibName nibNameOrNil: NSNib.Name?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
 
     // MARK: - Audio Unit Factory
 
@@ -92,6 +108,18 @@ public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFacto
     }
 
     // MARK: - View Lifecycle
+
+    /// Override loadView to create the view programmatically
+    /// This is REQUIRED for NSViewController subclasses that don't use a nib
+    public override func loadView() {
+        log.info("loadView called - creating view programmatically")
+        // Create a plain NSView as the root view
+        // The hosting controller will be added as a subview in viewDidLoad
+        self.view = NSView(frame: NSRect(x: 0, y: 0,
+                                         width: UIConstants.Sizes.windowMinWidth,
+                                         height: UIConstants.Sizes.windowMinHeight))
+        self.view.wantsLayer = true
+    }
 
     public override func viewDidLoad() {
         super.viewDidLoad()
