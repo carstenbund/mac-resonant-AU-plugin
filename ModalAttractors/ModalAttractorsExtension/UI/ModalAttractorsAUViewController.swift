@@ -7,75 +7,156 @@
 
 import CoreAudioKit
 import SwiftUI
+import os
+
+private let log = Logger(subsystem: "com.bund.media.ModalAttractorsExtension", category: "AUViewController")
 
 /// Custom AUViewController subclass that hosts the SwiftUI view
-/// Resilient to configure() / viewDidLoad() timing issues
-final class ModalAttractorsAUViewController: AUViewController {
-    private var hostingController: NSHostingController<AnyView>!
+/// This is the principal class for the extension - it conforms to AUAudioUnitFactory
+/// to properly support both in-process and out-of-process instantiation.
+public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFactory {
+
+    // MARK: - Audio Unit Factory
+
+    /// The audio unit instance created by this factory
+    var audioUnit: ModalAttractorsExtensionAudioUnit?
+
+    /// Observation token for parameter value changes
+    private var observation: NSKeyValueObservation?
+
+    /// Creates the audio unit when requested by the host
+    /// This is called by the system when the AU is instantiated
+    @objc
+    public func createAudioUnit(with componentDescription: AudioComponentDescription) throws -> AUAudioUnit {
+        log.info("Creating audio unit...")
+
+        let au = try ModalAttractorsExtensionAudioUnit(
+            componentDescription: componentDescription,
+            options: []
+        )
+
+        audioUnit = au
+
+        // Observe allParameterValues to ensure host can set initial values
+        observation = au.observe(\.allParameterValues, options: [.new]) { [weak au] _, _ in
+            guard let audioUnit = au, let tree = audioUnit.parameterTree else { return }
+            // This ensures the Audio Unit gets initial values from the host
+            for param in tree.allParameters {
+                param.value = param.value
+            }
+        }
+
+        log.info("Audio unit created successfully")
+
+        // Configure the view with the parameter tree if view is already loaded
+        DispatchQueue.main.async { [weak self] in
+            self?.configureViewIfNeeded()
+        }
+
+        return au
+    }
+
+    // MARK: - View Controller
+
+    private var hostingController: NSHostingController<AnyView>?
     private var paramTreeWrapper: ParameterTree?
+    private var isConfigured = false
 
-    /// Configure the view controller with the parameter tree wrapper
-    /// Can be called before or after viewDidLoad()
-    func configure(paramTreeWrapper: ParameterTree) {
-        self.paramTreeWrapper = paramTreeWrapper
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        log.info("viewDidLoad called")
 
-        // If view is already loaded, update the environment object
-        if isViewLoaded {
-            updateRootView()
+        // Try to configure immediately if audio unit is already available
+        configureViewIfNeeded()
+    }
+
+    /// Configures the view with the parameter tree from the audio unit
+    /// Safe to call multiple times - will only configure once
+    private func configureViewIfNeeded() {
+        guard !isConfigured else { return }
+        guard isViewLoaded else { return }
+
+        // Try to get parameter tree from our audio unit
+        if let au = audioUnit, let paramTree = au.parameterTree {
+            log.info("Configuring view with parameter tree")
+            paramTreeWrapper = ParameterTree(auParameterTree: paramTree)
+            setupHostingController()
+            isConfigured = true
+        } else {
+            log.warning("Audio unit or parameter tree not available yet - view will be configured later")
+            // Set up a placeholder or empty view that will be replaced
+            setupPlaceholderView()
         }
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    private func setupPlaceholderView() {
+        // Show a loading indicator while waiting for the audio unit
+        let placeholderView = NSHostingController(rootView:
+            AnyView(
+                VStack {
+                    ProgressView()
+                    Text("Loading...")
+                        .foregroundColor(.secondary)
+                }
+                .frame(minWidth: UIConstants.Sizes.windowMinWidth,
+                       minHeight: UIConstants.Sizes.windowMinHeight)
+            )
+        )
 
-        // Create hosting controller immediately (even if paramTree not ready yet)
-        // This prevents empty view / generic UI fallback
-        setupHostingController()
+        addChild(placeholderView)
+        view.addSubview(placeholderView.view)
+
+        placeholderView.view.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            placeholderView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            placeholderView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            placeholderView.view.topAnchor.constraint(equalTo: view.topAnchor),
+            placeholderView.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+
+        hostingController = placeholderView
     }
 
     private func setupHostingController() {
-        // CRITICAL: Create root view with environment object if available
-        // Creating the view without the required @EnvironmentObject causes SwiftUI to fail,
-        // which results in the host showing a fallback default parameter tree view
-        let rootView: AnyView
-
-        if let paramTree = paramTreeWrapper {
-            // Create hosting controller with environment object from the start
-            rootView = AnyView(ModalAttractorsExtensionMainView().environmentObject(paramTree))
-        } else {
-            // Fallback: create without environment object (view will fail until updateRootView is called)
-            rootView = AnyView(ModalAttractorsExtensionMainView())
+        guard let paramTree = paramTreeWrapper else {
+            log.error("Cannot setup hosting controller without parameter tree")
+            return
         }
 
-        hostingController = NSHostingController(rootView: rootView)
-        hostingController.preferredContentSize = NSSize(
-            width: UIConstants.Sizes.windowMinWidth,
-            height: UIConstants.Sizes.windowMinHeight
-        )
+        log.info("Setting up hosting controller with custom tabbed view")
 
-        // Add hosting controller as child view controller
-        addChild(hostingController)
-        view.addSubview(hostingController.view)
+        // Remove placeholder if it exists
+        if let existing = hostingController {
+            existing.view.removeFromSuperview()
+            existing.removeFromParent()
+        }
 
-        // Set up auto-layout constraints to fill the parent view
-        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            hostingController.view.topAnchor.constraint(equalTo: view.topAnchor),
-            hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-    }
-
-    private func updateRootView() {
-        guard let paramTree = paramTreeWrapper else { return }
-
-        // Update the root view with the parameter tree
+        // Create the main view with the parameter tree environment object
         let rootView = AnyView(
             ModalAttractorsExtensionMainView()
                 .environmentObject(paramTree)
         )
 
-        hostingController.rootView = rootView 
+        let hosting = NSHostingController(rootView: rootView)
+        hosting.preferredContentSize = NSSize(
+            width: UIConstants.Sizes.windowMinWidth,
+            height: UIConstants.Sizes.windowMinHeight
+        )
+
+        // Add hosting controller as child view controller
+        addChild(hosting)
+        view.addSubview(hosting.view)
+
+        // Set up auto-layout constraints to fill the parent view
+        hosting.view.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            hosting.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            hosting.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            hosting.view.topAnchor.constraint(equalTo: view.topAnchor),
+            hosting.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+
+        hostingController = hosting
+        log.info("Hosting controller setup complete")
     }
 }
