@@ -262,12 +262,13 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
                     let status = d.0
                     let data1  = d.1
                     let data2  = d.2
+                    let channel = status & 0x0F  // Extract MIDI channel (0-15)
 
                     switch status & 0xF0 {
                     case 0x90:
                         if data2 > 0 {
                             modal_attractors_engine_push_note_on(
-                                enginePtr, offset, data1, Float(data2) * (1.0 / 127.0)
+                                enginePtr, offset, data1, Float(data2) * (1.0 / 127.0), channel
                             )
                         } else {
                             modal_attractors_engine_push_note_off(enginePtr, offset, data1)

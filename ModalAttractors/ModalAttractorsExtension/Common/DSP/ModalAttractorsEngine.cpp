@@ -65,7 +65,8 @@ void modal_attractors_engine_begin_events(ModalAttractorsEngine* engine) {
 void modal_attractors_engine_push_note_on(ModalAttractorsEngine* engine,
                                          int32_t sampleOffset,
                                          uint8_t note,
-                                         float velocity) {
+                                         float velocity,
+                                         uint8_t channel) {
     if (!engine || !engine->synthEngine) return;
 
     EngineState* state = (EngineState*)engine->synthEngine;
@@ -74,7 +75,7 @@ void modal_attractors_engine_push_note_on(ModalAttractorsEngine* engine,
     event.sampleOffset = sampleOffset;
     event.noteOn.note = note;
     event.noteOn.velocity = velocity;
-    event.noteOn.channel = 0;
+    event.noteOn.channel = channel;  // Use actual MIDI channel
     state->eventQueue.push(event);
 }
 

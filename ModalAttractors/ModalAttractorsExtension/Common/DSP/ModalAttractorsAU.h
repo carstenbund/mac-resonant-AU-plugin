@@ -73,11 +73,13 @@ void modal_attractors_engine_begin_events(ModalAttractorsEngine* engine);
  * @param sampleOffset Sample offset (0 to bufferSize-1)
  * @param note MIDI note number (0-127)
  * @param velocity Velocity (0.0-1.0 normalized)
+ * @param channel MIDI channel (0-15, where 0 = channel 1)
  */
 void modal_attractors_engine_push_note_on(ModalAttractorsEngine* engine,
                                          int32_t sampleOffset,
                                          uint8_t note,
-                                         float velocity);
+                                         float velocity,
+                                         uint8_t channel);
 
 /**
  * @brief Push note off event to queue
