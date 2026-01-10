@@ -185,6 +185,7 @@ public class VoiceParameters: ObservableObject {
 /// Wrapper around an AUParameter that provides SwiftUI-compatible binding
 public class ParameterWrapper: ObservableObject {
     private let parameter: AUParameter
+    private var observerToken: AUParameterObserverToken?
 
     /// The current parameter value
     @Published public var value: Float {
@@ -231,17 +232,25 @@ public class ParameterWrapper: ObservableObject {
         self.parameter = parameter
         self.value = parameter.value
 
-        // Observe parameter changes from DSP/host automation
-        // This ensures the UI updates when the parameter changes externally
-        parameter.implementorValueObserver = { [weak self] (param: AUParameter, newValue: AUValue) in
+        // Use token-based observation instead of implementorValueObserver
+        // This allows multiple observers and doesn't override the AudioUnit's tree-level observer
+        // CRITICAL: token(byAddingParameterObserver:) allows the AudioUnit's implementorValueObserver
+        // to continue working while also updating the UI
+        observerToken = parameter.token(byAddingParameterObserver: { [weak self] address, value in
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 // Only update if the value actually changed
-                // The didSet will NOT update the parameter again because oldValue == newValue
-                if self.value != newValue {
-                    self.value = newValue
+                if self.value != value {
+                    self.value = value
                 }
             }
+        })
+    }
+
+    deinit {
+        // Clean up observer token
+        if let token = observerToken {
+            parameter.removeParameterObserver(token)
         }
     }
 
