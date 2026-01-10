@@ -151,6 +151,14 @@ public:
     void setPersonality(node_personality_t personality);
 
     /**
+     * @brief Get pointer to modal node for direct parameter access
+     * @return Pointer to internal modal_node_t
+     */
+    modal_node_t* getModalNode() {
+        return &node_;
+    }
+
+    /**
      * @brief Reset voice state
      */
     void reset();
