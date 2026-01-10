@@ -186,18 +186,14 @@ public class VoiceParameters: ObservableObject {
 public class ParameterWrapper: ObservableObject {
     private let parameter: AUParameter
 
-    /// Flag to prevent feedback loops when updating from observer
-    private var isUpdatingFromParameter = false
-
     /// The current parameter value
     @Published public var value: Float {
         didSet {
-            // Only update the AU parameter if this change came from the UI,
-            // not from the parameter observer (prevents feedback loops)
-            guard !isUpdatingFromParameter else { return }
-
-            // Update the AU parameter when SwiftUI changes the value
-            parameter.value = value
+            // Only update the parameter if it's actually different
+            // This prevents feedback loops when the observer updates self.value
+            if parameter.value != value {
+                parameter.value = value
+            }
         }
     }
 
@@ -240,12 +236,10 @@ public class ParameterWrapper: ObservableObject {
         parameter.implementorValueObserver = { [weak self] (param: AUParameter, newValue: AUValue) in
             DispatchQueue.main.async {
                 guard let self = self else { return }
-                // Only update if the value actually changed to avoid feedback loops
+                // Only update if the value actually changed
+                // The didSet will NOT update the parameter again because oldValue == newValue
                 if self.value != newValue {
-                    // Set flag to prevent didSet from writing back to parameter
-                    self.isUpdatingFromParameter = true
                     self.value = newValue
-                    self.isUpdatingFromParameter = false
                 }
             }
         }
