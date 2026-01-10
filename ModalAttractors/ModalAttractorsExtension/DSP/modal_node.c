@@ -91,6 +91,7 @@ void modal_node_init(modal_node_t* node, uint8_t node_id, node_personality_t per
         node->modes[k].a = real + I * imag;
         node->modes[k].a_dot = 0.0f;
         node->modes[k].params.active = false;
+        node->modes[k].params.shape = WAVE_SHAPE_SINE;  // Default to sine wave
     }
 
     node->coupling_strength = 0.3f;
@@ -109,6 +110,7 @@ void modal_node_set_mode(modal_node_t* node, uint8_t mode_idx,
     mode->params.gamma = gamma;
     mode->params.weight = weight;
     mode->params.active = true;
+    // Note: shape is not set here - preserves existing shape or uses default from init
 }
 
 void modal_node_set_neighbors(modal_node_t* node,

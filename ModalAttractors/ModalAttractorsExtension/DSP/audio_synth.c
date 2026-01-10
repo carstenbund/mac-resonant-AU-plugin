@@ -57,6 +57,55 @@ float envelope_hann(float t) {
 }
 
 // ============================================================================
+// Oscillator Functions
+// ============================================================================
+
+/**
+ * @brief Sine oscillator
+ * @param phase Phase in radians [0, 2π)
+ * @return Sample value [-1, 1]
+ */
+static inline float osc_sine(float phase) {
+    return sinf(phase);
+}
+
+/**
+ * @brief Sawtooth oscillator (naive, will alias)
+ * @param phase Phase in radians [0, 2π)
+ * @return Sample value [-1, 1]
+ */
+static inline float osc_sawtooth(float phase) {
+    // Descending sawtooth: 1 at phase=0, -1 at phase=2π
+    return 1.0f - (phase / M_PI);
+}
+
+/**
+ * @brief Triangle oscillator
+ * @param phase Phase in radians [0, 2π)
+ * @return Sample value [-1, 1]
+ */
+static inline float osc_triangle(float phase) {
+    if (phase < M_PI) {
+        // Rising edge: -1 to +1
+        return -1.0f + (2.0f * phase / M_PI);
+    } else {
+        // Falling edge: +1 to -1
+        return 3.0f - (2.0f * phase / M_PI);
+    }
+}
+
+/**
+ * @brief Square/pulse oscillator
+ * @param phase Phase in radians [0, 2π)
+ * @param pulse_width Pulse width [0, 1], where 0.5 = square
+ * @return Sample value [-1, 1]
+ */
+static inline float osc_pulse(float phase, float pulse_width) {
+    float threshold = pulse_width * 2.0f * M_PI;
+    return (phase < threshold) ? 1.0f : -1.0f;
+}
+
+// ============================================================================
 // Initialization
 // ============================================================================
 
@@ -159,8 +208,34 @@ void audio_synth_render(audio_synth_t* synth,
             // Note: Do NOT add modal phase cargf(a_k) here - it causes discontinuities
             // The amplitude already captures the modal dynamics
 
-            // Generate sample with continuous phase
-            float sample_f = amplitude * sinf(phase);
+            // Generate sample with selected wave shape
+            float oscillator_out;
+            wave_shape_t shape = node->modes[k].params.shape;
+
+            switch (shape) {
+                case WAVE_SHAPE_SINE:
+                    oscillator_out = osc_sine(phase);
+                    break;
+                case WAVE_SHAPE_SAWTOOTH:
+                    oscillator_out = osc_sawtooth(phase);
+                    break;
+                case WAVE_SHAPE_TRIANGLE:
+                    oscillator_out = osc_triangle(phase);
+                    break;
+                case WAVE_SHAPE_SQUARE:
+                    oscillator_out = osc_pulse(phase, 0.5f);
+                    break;
+                case WAVE_SHAPE_PULSE_25:
+                    oscillator_out = osc_pulse(phase, 0.25f);
+                    break;
+                case WAVE_SHAPE_PULSE_10:
+                    oscillator_out = osc_pulse(phase, 0.1f);
+                    break;
+                default:
+                    oscillator_out = osc_sine(phase);  // Fallback to sine
+            }
+
+            float sample_f = amplitude * oscillator_out;
 
             // Add to mix
             sample_sum += sample_f;

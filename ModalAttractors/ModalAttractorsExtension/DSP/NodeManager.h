@@ -89,6 +89,14 @@ public:
      */
     uint8_t getNodeCharacterID(uint8_t node_idx) const;
 
+    /**
+     * @brief Set wave shape for a specific mode
+     * @param node_idx Node index (0-4)
+     * @param mode_idx Mode index (0-3)
+     * @param shape Wave shape to use
+     */
+    void setModeWaveShape(uint32_t node_idx, uint32_t mode_idx, wave_shape_t shape);
+
     // ========================================================================
     // Routing Configuration
     // ========================================================================

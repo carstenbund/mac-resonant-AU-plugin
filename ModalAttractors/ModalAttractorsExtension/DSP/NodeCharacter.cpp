@@ -35,6 +35,14 @@ const NodeCharacter CHARACTER_VIBRANT_BASS = {
         0.4f    // Subtle fifth
     },
 
+    // Mode wave shapes - default to sine
+    .mode_shape = {
+        WAVE_SHAPE_SINE,
+        WAVE_SHAPE_SINE,
+        WAVE_SHAPE_SINE,
+        WAVE_SHAPE_SINE
+    },
+
     .personality = PERSONALITY_RESONATOR,
     .poke_strength = 0.7f,
     .poke_duration_ms = 15.0f,
@@ -67,6 +75,14 @@ const NodeCharacter CHARACTER_DARK_NODE = {
         0.4f,   // Subdued mid
         0.2f,   // Very quiet upper
         0.1f    // Almost silent high
+    },
+
+    // Mode wave shapes - default to sine
+    .mode_shape = {
+        WAVE_SHAPE_SINE,
+        WAVE_SHAPE_SINE,
+        WAVE_SHAPE_SINE,
+        WAVE_SHAPE_SINE
     },
 
     .personality = PERSONALITY_RESONATOR,
@@ -104,6 +120,14 @@ const NodeCharacter CHARACTER_BRIGHT_BELL = {
         0.8f    // Strong fourth
     },
 
+    // Mode wave shapes - default to sine
+    .mode_shape = {
+        WAVE_SHAPE_SINE,
+        WAVE_SHAPE_SINE,
+        WAVE_SHAPE_SINE,
+        WAVE_SHAPE_SINE
+    },
+
     .personality = PERSONALITY_RESONATOR,
     .poke_strength = 0.6f,
     .poke_duration_ms = 5.0f,  // Sharp attack
@@ -136,6 +160,14 @@ const NodeCharacter CHARACTER_GLASSY_SHIMMER = {
         0.7f,   // Good octave presence
         0.6f,   // Moderate double octave
         0.9f    // Strong high (shimmer effect)
+    },
+
+    // Mode wave shapes - default to sine
+    .mode_shape = {
+        WAVE_SHAPE_SINE,
+        WAVE_SHAPE_SINE,
+        WAVE_SHAPE_SINE,
+        WAVE_SHAPE_SINE
     },
 
     .personality = PERSONALITY_RESONATOR,
@@ -172,6 +204,14 @@ const NodeCharacter CHARACTER_DRONE_HUB = {
         0.5f     // Moderate octave
     },
 
+    // Mode wave shapes - default to sine
+    .mode_shape = {
+        WAVE_SHAPE_SINE,
+        WAVE_SHAPE_SINE,
+        WAVE_SHAPE_SINE,
+        WAVE_SHAPE_SINE
+    },
+
     .personality = PERSONALITY_SELF_OSCILLATOR,  // Sustains continuously
     .poke_strength = 0.3f,      // Gentle - it sustains anyway
     .poke_duration_ms = 20.0f,  // Slow onset
@@ -185,6 +225,7 @@ const NodeCharacter CHARACTER_METALLIC_STRIKE = {
     .mode_freq_mult = { 1.0f, 3.14f, 5.87f, 8.23f },
     .mode_damping = { 2.0f, 2.5f, 3.0f, 3.5f },
     .mode_weight = { 0.6f, 0.8f, 1.0f, 0.7f },
+    .mode_shape = { WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE },
     .personality = PERSONALITY_RESONATOR,
     .poke_strength = 0.9f,
     .poke_duration_ms = 5.0f,
@@ -197,6 +238,7 @@ const NodeCharacter CHARACTER_WARM_PAD = {
     .mode_freq_mult = { 1.0f, 2.0f, 3.0f, 4.0f },
     .mode_damping = { 0.2f, 0.25f, 0.3f, 0.4f },
     .mode_weight = { 1.0f, 0.85f, 0.7f, 0.5f },
+    .mode_shape = { WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE },
     .personality = PERSONALITY_RESONATOR,
     .poke_strength = 0.3f,
     .poke_duration_ms = 30.0f,
@@ -209,6 +251,7 @@ const NodeCharacter CHARACTER_PERCUSSIVE_HIT = {
     .mode_freq_mult = { 1.0f, 2.5f, 4.2f, 6.7f },
     .mode_damping = { 3.0f, 3.5f, 4.0f, 4.5f },
     .mode_weight = { 1.0f, 0.6f, 0.4f, 0.2f },
+    .mode_shape = { WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE },
     .personality = PERSONALITY_RESONATOR,
     .poke_strength = 1.0f,
     .poke_duration_ms = 3.0f,
@@ -221,6 +264,7 @@ const NodeCharacter CHARACTER_RESONANT_BELL = {
     .mode_freq_mult = { 1.0f, 2.0f, 3.0f, 4.0f },
     .mode_damping = { 0.6f, 0.7f, 0.8f, 1.0f },
     .mode_weight = { 1.0f, 0.9f, 0.8f, 0.7f },
+    .mode_shape = { WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE },
     .personality = PERSONALITY_RESONATOR,
     .poke_strength = 0.75f,
     .poke_duration_ms = 12.0f,
@@ -233,6 +277,7 @@ const NodeCharacter CHARACTER_DEEP_RUMBLE = {
     .mode_freq_mult = { 0.5f, 1.0f, 1.5f, 2.0f },
     .mode_damping = { 0.5f, 0.6f, 0.8f, 1.0f },
     .mode_weight = { 1.0f, 0.9f, 0.6f, 0.4f },
+    .mode_shape = { WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE },
     .personality = PERSONALITY_RESONATOR,
     .poke_strength = 0.6f,
     .poke_duration_ms = 20.0f,
@@ -245,6 +290,7 @@ const NodeCharacter CHARACTER_HARMONIC_STACK = {
     .mode_freq_mult = { 1.0f, 2.0f, 3.0f, 4.0f },
     .mode_damping = { 1.0f, 1.0f, 1.0f, 1.0f },
     .mode_weight = { 1.0f, 0.8f, 0.6f, 0.4f },
+    .mode_shape = { WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE },
     .personality = PERSONALITY_RESONATOR,
     .poke_strength = 0.65f,
     .poke_duration_ms = 15.0f,
@@ -257,6 +303,7 @@ const NodeCharacter CHARACTER_DETUNED_CHORUS = {
     .mode_freq_mult = { 1.0f, 1.99f, 2.98f, 4.03f },
     .mode_damping = { 0.7f, 0.7f, 0.8f, 0.9f },
     .mode_weight = { 1.0f, 0.85f, 0.7f, 0.5f },
+    .mode_shape = { WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE },
     .personality = PERSONALITY_RESONATOR,
     .poke_strength = 0.5f,
     .poke_duration_ms = 18.0f,
@@ -269,6 +316,7 @@ const NodeCharacter CHARACTER_MALLET_TONE = {
     .mode_freq_mult = { 1.0f, 2.76f, 4.18f, 5.94f },
     .mode_damping = { 1.5f, 1.8f, 2.2f, 2.5f },
     .mode_weight = { 1.0f, 0.7f, 0.5f, 0.3f },
+    .mode_shape = { WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE },
     .personality = PERSONALITY_RESONATOR,
     .poke_strength = 0.85f,
     .poke_duration_ms = 8.0f,
@@ -281,6 +329,7 @@ const NodeCharacter CHARACTER_WIND_CHIME = {
     .mode_freq_mult = { 3.0f, 4.5f, 6.2f, 8.7f },
     .mode_damping = { 0.9f, 1.0f, 1.1f, 1.3f },
     .mode_weight = { 0.7f, 0.8f, 1.0f, 0.8f },
+    .mode_shape = { WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE },
     .personality = PERSONALITY_RESONATOR,
     .poke_strength = 0.4f,
     .poke_duration_ms = 14.0f,
@@ -293,6 +342,7 @@ const NodeCharacter CHARACTER_GONG_WASH = {
     .mode_freq_mult = { 1.0f, 2.37f, 3.86f, 5.19f },
     .mode_damping = { 0.4f, 0.5f, 0.6f, 0.7f },
     .mode_weight = { 0.8f, 1.0f, 0.9f, 0.7f },
+    .mode_shape = { WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE },
     .personality = PERSONALITY_RESONATOR,
     .poke_strength = 0.7f,
     .poke_duration_ms = 35.0f,

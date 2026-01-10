@@ -378,17 +378,29 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
             pokeDuration_ = value;
             break;
 
-        // Deprecated parameters
-        case kParam_Polyphony:
-            // Always 5 nodes
-            break;
-        case kParam_Personality:
-            personality_ = value;
-            // Per-character now, not global
-            break;
-
+        // Wave Shape parameters (20 parameters: 5 nodes × 4 modes)
+        // Handle all wave shape parameters in a range check
         default:
+            if (paramId >= kParam_Node0_Mode0_WaveShape && paramId <= kParam_Node4_Mode3_WaveShape) {
+                uint32_t paramOffset = paramId - kParam_Node0_Mode0_WaveShape;
+                uint32_t nodeIndex = paramOffset / 4;  // 0-4
+                uint32_t modeIndex = paramOffset % 4;  // 0-3
+                wave_shape_t shape = static_cast<wave_shape_t>(static_cast<int>(value));
+
+                if (nodeManager_) {
+                    nodeManager_->setModeWaveShape(nodeIndex, modeIndex, shape);
+                }
+            }
+            // Note: Also handles deprecated parameters below
             break;
+    }
+
+    // Handle deprecated parameters separately (outside switch for clarity)
+    if (paramId == kParam_Polyphony) {
+        // Always 5 nodes
+    } else if (paramId == kParam_Personality) {
+        personality_ = value;
+        // Per-character now, not global
     }
 }
 

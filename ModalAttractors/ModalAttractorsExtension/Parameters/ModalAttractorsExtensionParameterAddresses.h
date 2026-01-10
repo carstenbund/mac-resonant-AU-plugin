@@ -55,5 +55,36 @@ typedef NS_ENUM(AUParameterAddress, ModalAttractorsExtensionParameterAddress) {
 
     // Routing and behavior
     kParam_NoteRouting = 25,      // Routing mode: 0=RoundRobin, 1=PitchZones
-    kParam_MultiExcite = 26       // Multi-excite: 0=ReTrigger, 1=Accumulate
+    kParam_MultiExcite = 26,      // Multi-excite: 0=ReTrigger, 1=Accumulate
+
+    // Wave Shape Selection (20 parameters: 5 nodes × 4 modes)
+    // Node 0 wave shapes
+    kParam_Node0_Mode0_WaveShape = 27,
+    kParam_Node0_Mode1_WaveShape = 28,
+    kParam_Node0_Mode2_WaveShape = 29,
+    kParam_Node0_Mode3_WaveShape = 30,
+
+    // Node 1 wave shapes
+    kParam_Node1_Mode0_WaveShape = 31,
+    kParam_Node1_Mode1_WaveShape = 32,
+    kParam_Node1_Mode2_WaveShape = 33,
+    kParam_Node1_Mode3_WaveShape = 34,
+
+    // Node 2 wave shapes
+    kParam_Node2_Mode0_WaveShape = 35,
+    kParam_Node2_Mode1_WaveShape = 36,
+    kParam_Node2_Mode2_WaveShape = 37,
+    kParam_Node2_Mode3_WaveShape = 38,
+
+    // Node 3 wave shapes
+    kParam_Node3_Mode0_WaveShape = 39,
+    kParam_Node3_Mode1_WaveShape = 40,
+    kParam_Node3_Mode2_WaveShape = 41,
+    kParam_Node3_Mode3_WaveShape = 42,
+
+    // Node 4 wave shapes
+    kParam_Node4_Mode0_WaveShape = 43,
+    kParam_Node4_Mode1_WaveShape = 44,
+    kParam_Node4_Mode2_WaveShape = 45,
+    kParam_Node4_Mode3_WaveShape = 46
 };

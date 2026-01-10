@@ -104,6 +104,20 @@ uint8_t NodeManager::getNodeCharacterID(uint8_t node_idx) const {
     return node_character_ids_[node_idx];
 }
 
+void NodeManager::setModeWaveShape(uint32_t node_idx, uint32_t mode_idx, wave_shape_t shape) {
+    if (node_idx >= NUM_NETWORK_NODES) return;
+    if (mode_idx >= MAX_MODES) return;
+
+    ModalVoice* node = nodes_[node_idx];
+    if (!node) return;
+
+    // Set wave shape for the specified mode
+    modal_node_t* modal = node->getModalNode();
+    if (modal) {
+        modal->modes[mode_idx].params.shape = shape;
+    }
+}
+
 void NodeManager::applyCharacterToNode(uint8_t node_idx, const NodeCharacter* character) {
     if (!initialized_) return;
 
@@ -117,6 +131,14 @@ void NodeManager::applyCharacterToNode(uint8_t node_idx, const NodeCharacter* ch
     // Note: We'll apply frequency multipliers on note-on when we know the base frequency
     // For now, just store them in the character struct
     // The frequencies will be applied in exciteNode()
+
+    // Apply wave shapes from character to each mode
+    modal_node_t* modal = node->getModalNode();
+    if (modal) {
+        for (int i = 0; i < MAX_MODES; i++) {
+            modal->modes[i].params.shape = character->mode_shape[i];
+        }
+    }
 
     // Store the character data for use during excitation
     current_characters_[node_idx] = *character;

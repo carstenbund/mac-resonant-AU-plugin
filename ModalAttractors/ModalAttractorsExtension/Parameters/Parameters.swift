@@ -137,6 +137,199 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
         )
     }
 
+    // MARK: - Wave Shapes (20 parameters: 5 nodes × 4 modes)
+    ParameterGroupSpec(identifier: "waveShapes", name: "Wave Shapes") {
+        // Node 0 wave shapes
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node0_Mode0_WaveShape,
+            identifier: "node0Mode0WaveShape",
+            name: "Node 0 Mode 0 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node0_Mode1_WaveShape,
+            identifier: "node0Mode1WaveShape",
+            name: "Node 0 Mode 1 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node0_Mode2_WaveShape,
+            identifier: "node0Mode2WaveShape",
+            name: "Node 0 Mode 2 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node0_Mode3_WaveShape,
+            identifier: "node0Mode3WaveShape",
+            name: "Node 0 Mode 3 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+
+        // Node 1 wave shapes
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node1_Mode0_WaveShape,
+            identifier: "node1Mode0WaveShape",
+            name: "Node 1 Mode 0 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node1_Mode1_WaveShape,
+            identifier: "node1Mode1WaveShape",
+            name: "Node 1 Mode 1 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node1_Mode2_WaveShape,
+            identifier: "node1Mode2WaveShape",
+            name: "Node 1 Mode 2 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node1_Mode3_WaveShape,
+            identifier: "node1Mode3WaveShape",
+            name: "Node 1 Mode 3 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+
+        // Node 2 wave shapes
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node2_Mode0_WaveShape,
+            identifier: "node2Mode0WaveShape",
+            name: "Node 2 Mode 0 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node2_Mode1_WaveShape,
+            identifier: "node2Mode1WaveShape",
+            name: "Node 2 Mode 1 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node2_Mode2_WaveShape,
+            identifier: "node2Mode2WaveShape",
+            name: "Node 2 Mode 2 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node2_Mode3_WaveShape,
+            identifier: "node2Mode3WaveShape",
+            name: "Node 2 Mode 3 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+
+        // Node 3 wave shapes
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node3_Mode0_WaveShape,
+            identifier: "node3Mode0WaveShape",
+            name: "Node 3 Mode 0 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node3_Mode1_WaveShape,
+            identifier: "node3Mode1WaveShape",
+            name: "Node 3 Mode 1 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node3_Mode2_WaveShape,
+            identifier: "node3Mode2WaveShape",
+            name: "Node 3 Mode 2 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node3_Mode3_WaveShape,
+            identifier: "node3Mode3WaveShape",
+            name: "Node 3 Mode 3 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+
+        // Node 4 wave shapes
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node4_Mode0_WaveShape,
+            identifier: "node4Mode0WaveShape",
+            name: "Node 4 Mode 0 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node4_Mode1_WaveShape,
+            identifier: "node4Mode1WaveShape",
+            name: "Node 4 Mode 1 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node4_Mode2_WaveShape,
+            identifier: "node4Mode2WaveShape",
+            name: "Node 4 Mode 2 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node4_Mode3_WaveShape,
+            identifier: "node4Mode3WaveShape",
+            name: "Node 4 Mode 3 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+    }
+
     // MARK: - Mode 0 Parameters
     ParameterGroupSpec(identifier: "mode0", name: "Mode 0") {
         ParameterSpec(
