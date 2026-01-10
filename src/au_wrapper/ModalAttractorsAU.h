@@ -52,6 +52,8 @@ struct ModalAttractorsEngine {
     float master_gain;
     float coupling_strength;
     int topology_type;
+    int wave_shape;          // Wave shape (0-5)
+    float pulse_width;       // Pulse width [0.01-0.99]
 
     bool initialized;
 };

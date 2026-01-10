@@ -145,6 +145,18 @@ public:
     void setPersonality(node_personality_t personality);
 
     /**
+     * @brief Set wave shape for oscillator
+     * @param shape Wave shape (WAVE_SHAPE_SINE, etc.)
+     */
+    void setWaveShape(wave_shape_t shape);
+
+    /**
+     * @brief Set pulse width for pulse wave shapes
+     * @param width Pulse width [0.01-0.99]
+     */
+    void setPulseWidth(float width);
+
+    /**
      * @brief Reset voice state
      */
     void reset();

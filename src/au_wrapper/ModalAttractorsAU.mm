@@ -131,18 +131,47 @@
                                                                 valueStrings:nil
                                                          dependentParameters:nil];
 
+    AUParameter *waveShape = [AUParameterTree createParameterWithIdentifier:@"waveShape"
+                                                                        name:@(kParamName_WaveShape)
+                                                                     address:kParam_WaveShape
+                                                                         min:kWaveShape_Min
+                                                                         max:kWaveShape_Max
+                                                                        unit:kAudioUnitParameterUnit_Indexed
+                                                                    unitName:nil
+                                                                       flags:kAudioUnitParameterFlag_IsWritable |
+                                                                             kAudioUnitParameterFlag_IsReadable
+                                                                valueStrings:@[@"Sine", @"Sawtooth", @"Triangle",
+                                                                              @"Square", @"Pulse 25%", @"Pulse 10%"]
+                                                         dependentParameters:nil];
+
+    AUParameter *pulseWidth = [AUParameterTree createParameterWithIdentifier:@"pulseWidth"
+                                                                         name:@(kParamName_PulseWidth)
+                                                                      address:kParam_PulseWidth
+                                                                          min:kPulseWidth_Min
+                                                                          max:kPulseWidth_Max
+                                                                         unit:kAudioUnitParameterUnit_Generic
+                                                                     unitName:nil
+                                                                        flags:kAudioUnitParameterFlag_IsWritable |
+                                                                              kAudioUnitParameterFlag_IsReadable
+                                                                 valueStrings:nil
+                                                          dependentParameters:nil];
+
     // Set default values
     masterGain.value = kMasterGain_Default;
     couplingStrength.value = kCouplingStrength_Default;
     topology.value = kTopology_Default;
     polyphony.value = kPolyphony_Default;
+    waveShape.value = kWaveShape_Default;
+    pulseWidth.value = kPulseWidth_Default;
 
     // Create parameter tree
     _parameterTree = [AUParameterTree createTreeWithChildren:@[
         masterGain,
         couplingStrength,
         topology,
-        polyphony
+        polyphony,
+        waveShape,
+        pulseWidth
     ]];
 
     // Set up parameter observation

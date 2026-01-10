@@ -33,6 +33,8 @@ void modal_attractors_engine_init(ModalAttractorsEngine* engine,
     engine->master_gain = kMasterGain_Default;
     engine->coupling_strength = kCouplingStrength_Default;
     engine->topology_type = kTopology_Default;
+    engine->wave_shape = kWaveShape_Default;
+    engine->pulse_width = kPulseWidth_Default;
 
     // Set default topology
     engine->topology_engine->generateTopology(
@@ -138,6 +140,31 @@ void modal_attractors_engine_set_parameter(ModalAttractorsEngine* engine,
                 case 6: topo = TopologyType::None; break;
             }
             engine->topology_engine->generateTopology(topo, engine->coupling_strength);
+            break;
+        }
+
+        case kParam_WaveShape: {
+            engine->wave_shape = static_cast<int>(value);
+            wave_shape_t shape = static_cast<wave_shape_t>(engine->wave_shape);
+            // Apply to all voices
+            for (uint32_t i = 0; i < engine->max_polyphony; i++) {
+                ModalVoice* voice = engine->voice_allocator->getVoice(i);
+                if (voice) {
+                    voice->setWaveShape(shape);
+                }
+            }
+            break;
+        }
+
+        case kParam_PulseWidth: {
+            engine->pulse_width = value;
+            // Apply to all voices
+            for (uint32_t i = 0; i < engine->max_polyphony; i++) {
+                ModalVoice* voice = engine->voice_allocator->getVoice(i);
+                if (voice) {
+                    voice->setPulseWidth(value);
+                }
+            }
             break;
         }
 

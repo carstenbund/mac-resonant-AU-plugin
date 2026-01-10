@@ -36,6 +36,19 @@ extern "C" {
 // ============================================================================
 
 /**
+ * @brief Oscillator wave shapes
+ */
+typedef enum {
+    WAVE_SHAPE_SINE = 0,      ///< Sine wave (pure fundamental)
+    WAVE_SHAPE_SAWTOOTH,      ///< Sawtooth (all harmonics, bright)
+    WAVE_SHAPE_TRIANGLE,      ///< Triangle (odd harmonics, soft)
+    WAVE_SHAPE_SQUARE,        ///< Square wave (odd harmonics, aggressive)
+    WAVE_SHAPE_PULSE_25,      ///< Pulse 25% duty cycle
+    WAVE_SHAPE_PULSE_10,      ///< Pulse 10% duty cycle (thin)
+    WAVE_SHAPE_COUNT          ///< Total number of shapes
+} wave_shape_t;
+
+/**
  * @brief Audio synthesis parameters
  */
 typedef struct {
@@ -43,6 +56,8 @@ typedef struct {
     uint32_t phase_accumulator[MAX_MODES]; ///< Phase accumulators (one per mode)
     float mode_gains[MAX_MODES];          ///< Per-mode gains [0,1]
     float master_gain;                    ///< Master output gain [0,1]
+    wave_shape_t wave_shape;              ///< Global oscillator wave shape
+    float pulse_width;                    ///< Pulse width for pulse shapes [0.01-0.99]
     bool muted;                           ///< Mute flag
 } audio_synth_params_t;
 
@@ -126,6 +141,22 @@ void audio_synth_set_mute(audio_synth_t* synth, bool mute);
  * @param synth Pointer to synthesis state
  */
 void audio_synth_reset_phase(audio_synth_t* synth);
+
+/**
+ * @brief Set wave shape
+ *
+ * @param synth Pointer to synthesis state
+ * @param shape Wave shape (WAVE_SHAPE_SINE, etc.)
+ */
+void audio_synth_set_wave_shape(audio_synth_t* synth, wave_shape_t shape);
+
+/**
+ * @brief Set pulse width for pulse wave shapes
+ *
+ * @param synth Pointer to synthesis state
+ * @param width Pulse width [0.01-0.99] (0.5 = square wave)
+ */
+void audio_synth_set_pulse_width(audio_synth_t* synth, float width);
 
 // ============================================================================
 // Synthesis Helpers

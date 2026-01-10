@@ -47,6 +47,10 @@ enum {
     kParam_Polyphony,
     kParam_Personality,
 
+    // Wave shape parameters
+    kParam_WaveShape,
+    kParam_PulseWidth,
+
     kNumParams
 };
 
@@ -106,6 +110,16 @@ enum {
 #define kPersonality_Max 1
 #define kPersonality_Default 0
 
+// Wave shape: 0-5 (indexed: Sine, Saw, Tri, Square, Pulse25, Pulse10)
+#define kWaveShape_Min 0
+#define kWaveShape_Max 5
+#define kWaveShape_Default 0  // Sine
+
+// Pulse width: 0.01 to 0.99 (0.5 = square wave)
+#define kPulseWidth_Min 0.01f
+#define kPulseWidth_Max 0.99f
+#define kPulseWidth_Default 0.5f
+
 // ============================================================================
 // Parameter Names
 // ============================================================================
@@ -118,5 +132,7 @@ enum {
 #define kParamName_PokeDuration "Poke Duration"
 #define kParamName_Polyphony "Polyphony"
 #define kParamName_Personality "Personality"
+#define kParamName_WaveShape "Wave Shape"
+#define kParamName_PulseWidth "Pulse Width"
 
 #endif // MODAL_PARAMETERS_H

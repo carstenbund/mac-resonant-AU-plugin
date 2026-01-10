@@ -57,6 +57,57 @@ float envelope_hann(float t) {
 }
 
 // ============================================================================
+// Oscillator Functions
+// ============================================================================
+
+/**
+ * @brief Sine wave oscillator
+ * @param phase Phase in radians [0, 2π)
+ * @return Sample value [-1, 1]
+ */
+static inline float osc_sine(float phase) {
+    return sinf(phase);
+}
+
+/**
+ * @brief Sawtooth wave oscillator (naive implementation)
+ * @param phase Phase in radians [0, 2π)
+ * @return Sample value [-1, 1]
+ * @note Will alias above Nyquist/harmonic_number. Use low-pass filtering if needed.
+ */
+static inline float osc_sawtooth(float phase) {
+    // Naive sawtooth: descending ramp from 1 to -1
+    return 1.0f - (phase / M_PI);
+}
+
+/**
+ * @brief Triangle wave oscillator
+ * @param phase Phase in radians [0, 2π)
+ * @return Sample value [-1, 1]
+ */
+static inline float osc_triangle(float phase) {
+    if (phase < M_PI) {
+        // Rising edge: -1 to +1
+        return -1.0f + (2.0f * phase / M_PI);
+    } else {
+        // Falling edge: +1 to -1
+        return 3.0f - (2.0f * phase / M_PI);
+    }
+}
+
+/**
+ * @brief Square/pulse wave oscillator
+ * @param phase Phase in radians [0, 2π)
+ * @param pulse_width Pulse width [0.01-0.99] (0.5 = square wave)
+ * @return Sample value [-1, 1]
+ * @note Will alias above Nyquist/harmonic_number. Use low-pass filtering if needed.
+ */
+static inline float osc_square(float phase, float pulse_width) {
+    float threshold = pulse_width * 2.0f * M_PI;
+    return (phase < threshold) ? 1.0f : -1.0f;
+}
+
+// ============================================================================
 // Initialization
 // ============================================================================
 
@@ -69,6 +120,8 @@ void audio_synth_init(audio_synth_t* synth,
     synth->params.sample_rate = sample_rate;
     synth->params.master_gain = 1.0f;
     synth->params.muted = false;
+    synth->params.wave_shape = WAVE_SHAPE_SINE;  // Default to sine wave
+    synth->params.pulse_width = 0.5f;             // Default to square wave (50% duty)
 
     // Initialize per-mode parameters
     for (int k = 0; k < MAX_MODES; k++) {
@@ -159,8 +212,32 @@ void audio_synth_render(audio_synth_t* synth,
             // Note: Do NOT add modal phase cargf(a_k) here - it causes discontinuities
             // The amplitude already captures the modal dynamics
 
-            // Generate sample with continuous phase
-            float sample_f = amplitude * sinf(phase);
+            // Generate sample with selected wave shape
+            float sample_f;
+            switch (synth->params.wave_shape) {
+                case WAVE_SHAPE_SINE:
+                    sample_f = amplitude * osc_sine(phase);
+                    break;
+                case WAVE_SHAPE_SAWTOOTH:
+                    sample_f = amplitude * osc_sawtooth(phase);
+                    break;
+                case WAVE_SHAPE_TRIANGLE:
+                    sample_f = amplitude * osc_triangle(phase);
+                    break;
+                case WAVE_SHAPE_SQUARE:
+                    sample_f = amplitude * osc_square(phase, 0.5f);
+                    break;
+                case WAVE_SHAPE_PULSE_25:
+                    sample_f = amplitude * osc_square(phase, 0.25f);
+                    break;
+                case WAVE_SHAPE_PULSE_10:
+                    sample_f = amplitude * osc_square(phase, 0.1f);
+                    break;
+                default:
+                    // Fallback to sine for safety
+                    sample_f = amplitude * osc_sine(phase);
+                    break;
+            }
 
             // Add to mix
             sample_sum += sample_f;
@@ -207,4 +284,17 @@ void audio_synth_reset_phase(audio_synth_t* synth) {
         // Also reset amplitude smoothing to prevent clicks
         synth->amplitude_smooth[k] = 0.0f;
     }
+}
+
+void audio_synth_set_wave_shape(audio_synth_t* synth, wave_shape_t shape) {
+    if (shape >= 0 && shape < WAVE_SHAPE_COUNT) {
+        synth->params.wave_shape = shape;
+    }
+}
+
+void audio_synth_set_pulse_width(audio_synth_t* synth, float width) {
+    // Clamp to valid range [0.01, 0.99]
+    if (width < 0.01f) width = 0.01f;
+    if (width > 0.99f) width = 0.99f;
+    synth->params.pulse_width = width;
 }

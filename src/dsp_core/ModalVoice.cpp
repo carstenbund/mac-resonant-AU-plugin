@@ -143,6 +143,14 @@ void ModalVoice::setPersonality(node_personality_t personality) {
     node_.personality = personality;
 }
 
+void ModalVoice::setWaveShape(wave_shape_t shape) {
+    audio_synth_set_wave_shape(&synth_, shape);
+}
+
+void ModalVoice::setPulseWidth(float width) {
+    audio_synth_set_pulse_width(&synth_, width);
+}
+
 void ModalVoice::reset() {
     modal_node_reset(&node_);
     state_ = State::Inactive;

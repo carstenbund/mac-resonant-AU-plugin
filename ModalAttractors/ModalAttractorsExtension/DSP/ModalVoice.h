@@ -12,8 +12,8 @@
 #ifndef MODAL_VOICE_H
 #define MODAL_VOICE_H
 
-#include "../../../src/esp32_port/modal_node.h"
-#include "../../../src/esp32_port/audio_synth.h"
+#include "../esp32_port/modal_node.h"
+#include "../esp32_port/audio_synth.h"
 #include <cstdint>
 
 class ModalVoice {
@@ -122,12 +122,6 @@ public:
     float getAmplitude() const;
 
     /**
-     * @brief Get base frequency (from MIDI note + pitch bend)
-     * @return Base frequency in Hz
-     */
-    float getBaseFrequency() const;
-
-    /**
      * @brief Get mode 0 complex amplitude (for coupling broadcast)
      * @return Complex amplitude
      */
@@ -149,6 +143,18 @@ public:
      * @param personality Resonator or self-oscillator
      */
     void setPersonality(node_personality_t personality);
+
+    /**
+     * @brief Set wave shape for oscillator
+     * @param shape Wave shape (WAVE_SHAPE_SINE, etc.)
+     */
+    void setWaveShape(wave_shape_t shape);
+
+    /**
+     * @brief Set pulse width for pulse wave shapes
+     * @param width Pulse width [0.01-0.99]
+     */
+    void setPulseWidth(float width);
 
     /**
      * @brief Reset voice state

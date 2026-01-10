@@ -107,6 +107,12 @@ float ModalAttractorsDSPKernel::getParameter(uint32_t address) {
         case kParam_Polyphony:
             return static_cast<float>(engine_.max_polyphony);
 
+        case kParam_WaveShape:
+            return static_cast<float>(engine_.wave_shape);
+
+        case kParam_PulseWidth:
+            return engine_.pulse_width;
+
         default:
             return 0.0f;
     }
