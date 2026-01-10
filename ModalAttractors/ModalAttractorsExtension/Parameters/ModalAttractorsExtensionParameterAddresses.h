@@ -55,5 +55,9 @@ typedef NS_ENUM(AUParameterAddress, ModalAttractorsExtensionParameterAddress) {
 
     // Routing and behavior
     kParam_NoteRouting = 25,      // Routing mode: 0=RoundRobin, 1=PitchZones
-    kParam_MultiExcite = 26       // Multi-excite: 0=ReTrigger, 1=Accumulate
+    kParam_MultiExcite = 26,      // Multi-excite: 0=ReTrigger, 1=Accumulate
+
+    // Wave shape parameters
+    kParam_WaveShape = 27,        // Wave shape: 0-5 (Sine, Saw, Tri, Square, Pulse25, Pulse10)
+    kParam_PulseWidth = 28        // Pulse width: 0.01-0.99 (for pulse shapes)
 };

@@ -1,176 +1,152 @@
 /**
  * @file ModalAttractorsEngine.cpp
- * @brief C++ implementation of DSP engine interface
+ * @brief C API implementation wrapping SynthEngine
  *
- * This provides a C-compatible interface to the C++ DSP engine
- * so it can be called from Objective-C++ AU wrapper.
+ * Provides a C-compatible interface for Swift AU wrapper.
  */
 
 #include "ModalAttractorsAU.h"
-#include "../../Parameters/ModalParameters.h"
-#include "../../DSP/VoiceAllocator.h"
-#include "../../DSP/TopologyEngine.h"
+#include "../../DSP/SynthEngine.h"
 #include <cstring>
 
+// Event queue stored in engine for sample-accurate processing
+struct EngineState {
+    SynthEngine* synthEngine;
+    EventQueue eventQueue;
+};
+
 void modal_attractors_engine_init(ModalAttractorsEngine* engine,
-                                  float sample_rate,
-                                  uint32_t max_polyphony) {
+                                  double sampleRate,
+                                  uint32_t maxFrames,
+                                  uint32_t maxPolyphony) {
     if (!engine) return;
 
-    memset(engine, 0, sizeof(ModalAttractorsEngine));
+    // Create engine state
+    EngineState* state = new EngineState();
+    state->synthEngine = new SynthEngine(maxPolyphony);
+    state->synthEngine->prepare(sampleRate, maxFrames, 2); // stereo
 
-    engine->sample_rate = sample_rate;
-    engine->max_polyphony = max_polyphony;
+    engine->synthEngine = (SynthEngine*)state; // Store as opaque pointer
+}
 
-    // Create DSP components
-    engine->voice_allocator = new VoiceAllocator(max_polyphony);
-    engine->topology_engine = new TopologyEngine(max_polyphony);
+void modal_attractors_engine_prepare(ModalAttractorsEngine* engine,
+                                    double sampleRate,
+                                    uint32_t maxFrames,
+                                    uint32_t maxPolyphony) {
+    if (!engine || !engine->synthEngine) return;
 
-    // Initialize
-    engine->voice_allocator->initialize(sample_rate);
-
-    // Set default parameters
-    engine->master_gain = kMasterGain_Default;
-    engine->coupling_strength = kCouplingStrength_Default;
-    engine->topology_type = kTopology_Default;
-    engine->wave_shape = kWaveShape_Default;
-    engine->pulse_width = kPulseWidth_Default;
-
-    // Set default topology
-    engine->topology_engine->generateTopology(
-        TopologyType::Ring,
-        engine->coupling_strength
-    );
-
-    engine->initialized = true;
+    EngineState* state = (EngineState*)engine->synthEngine;
+    state->synthEngine->prepare(sampleRate, maxFrames, 2);
 }
 
 void modal_attractors_engine_cleanup(ModalAttractorsEngine* engine) {
-    if (!engine) return;
+    if (!engine || !engine->synthEngine) return;
 
-    if (engine->voice_allocator) {
-        delete engine->voice_allocator;
-        engine->voice_allocator = nullptr;
-    }
-
-    if (engine->topology_engine) {
-        delete engine->topology_engine;
-        engine->topology_engine = nullptr;
-    }
-
-    engine->initialized = false;
+    EngineState* state = (EngineState*)engine->synthEngine;
+    delete state->synthEngine;
+    delete state;
+    engine->synthEngine = nullptr;
 }
 
-void modal_attractors_engine_note_on(ModalAttractorsEngine* engine,
-                                     uint8_t note,
-                                     uint8_t velocity) {
-    if (!engine || !engine->initialized) return;
+void modal_attractors_engine_reset(ModalAttractorsEngine* engine) {
+    if (!engine || !engine->synthEngine) return;
 
-    // Normalize MIDI velocity (0-127) to float (0.0-1.0)
-    float velocity_normalized = velocity / 127.0f;
-    engine->voice_allocator->noteOn(note, velocity_normalized);
+    EngineState* state = (EngineState*)engine->synthEngine;
+    state->synthEngine->reset();
 }
 
-void modal_attractors_engine_note_off(ModalAttractorsEngine* engine,
-                                      uint8_t note) {
-    if (!engine || !engine->initialized) return;
+void modal_attractors_engine_begin_events(ModalAttractorsEngine* engine) {
+    if (!engine || !engine->synthEngine) return;
 
-    engine->voice_allocator->noteOff(note);
+    EngineState* state = (EngineState*)engine->synthEngine;
+    state->eventQueue.clear();
+}
+
+void modal_attractors_engine_push_note_on(ModalAttractorsEngine* engine,
+                                         int32_t sampleOffset,
+                                         uint8_t note,
+                                         float velocity) {
+    if (!engine || !engine->synthEngine) return;
+
+    EngineState* state = (EngineState*)engine->synthEngine;
+    SynthEvent event;
+    event.type = EventType::NoteOn;
+    event.sampleOffset = sampleOffset;
+    event.noteOn.note = note;
+    event.noteOn.velocity = velocity;
+    event.noteOn.channel = 0;
+    state->eventQueue.push(event);
+}
+
+void modal_attractors_engine_push_note_off(ModalAttractorsEngine* engine,
+                                          int32_t sampleOffset,
+                                          uint8_t note) {
+    if (!engine || !engine->synthEngine) return;
+
+    EngineState* state = (EngineState*)engine->synthEngine;
+    SynthEvent event;
+    event.type = EventType::NoteOff;
+    event.sampleOffset = sampleOffset;
+    event.noteOff.note = note;
+    state->eventQueue.push(event);
+}
+
+void modal_attractors_engine_push_pitch_bend(ModalAttractorsEngine* engine,
+                                            int32_t sampleOffset,
+                                            float value) {
+    if (!engine || !engine->synthEngine) return;
+
+    EngineState* state = (EngineState*)engine->synthEngine;
+    SynthEvent event;
+    event.type = EventType::PitchBend;
+    event.sampleOffset = sampleOffset;
+    event.pitchBend.value = value;
+    state->eventQueue.push(event);
+}
+
+void modal_attractors_engine_push_parameter(ModalAttractorsEngine* engine,
+                                           int32_t sampleOffset,
+                                           uint32_t paramId,
+                                           float value) {
+    if (!engine || !engine->synthEngine) return;
+
+    EngineState* state = (EngineState*)engine->synthEngine;
+    SynthEvent event;
+    event.type = EventType::Parameter;
+    event.sampleOffset = sampleOffset;
+    event.parameter.paramId = paramId;
+    event.parameter.value = value;
+    state->eventQueue.push(event);
 }
 
 void modal_attractors_engine_render(ModalAttractorsEngine* engine,
-                                    float* outL,
-                                    float* outR,
-                                    uint32_t num_frames) {
-    if (!engine || !engine->initialized) {
-        // Return silence
-        memset(outL, 0, num_frames * sizeof(float));
-        memset(outR, 0, num_frames * sizeof(float));
+                                   float* outL,
+                                   float* outR,
+                                   uint32_t numFrames) {
+    if (!engine || !engine->synthEngine) {
+        // Return silence if not initialized
+        memset(outL, 0, numFrames * sizeof(float));
+        memset(outR, 0, numFrames * sizeof(float));
         return;
     }
 
-    // Update voices at control rate
-    // (simplified - in real implementation, only update at control rate intervals)
-    engine->voice_allocator->updateVoices();
-
-    // Update coupling between voices
-    ModalVoice** voices = new ModalVoice*[engine->max_polyphony];
-    for (uint32_t i = 0; i < engine->max_polyphony; i++) {
-        voices[i] = engine->voice_allocator->getVoice(i);
-    }
-    engine->topology_engine->updateCoupling(voices, engine->max_polyphony);
-    delete[] voices;
-
-    // Render audio
-    engine->voice_allocator->renderAudio(outL, outR, num_frames);
-
-    // Apply master gain
-    for (uint32_t i = 0; i < num_frames; i++) {
-        outL[i] *= engine->master_gain;
-        outR[i] *= engine->master_gain;
-    }
+    EngineState* state = (EngineState*)engine->synthEngine;
+    state->synthEngine->render(state->eventQueue, outL, outR, numFrames);
 }
 
 void modal_attractors_engine_set_parameter(ModalAttractorsEngine* engine,
-                                           uint32_t param_id,
-                                           float value) {
-    if (!engine || !engine->initialized) return;
+                                          uint32_t paramId,
+                                          float value) {
+    if (!engine || !engine->synthEngine) return;
 
-    switch (param_id) {
-        case kParam_MasterGain:
-            engine->master_gain = value;
-            break;
+    EngineState* state = (EngineState*)engine->synthEngine;
+    state->synthEngine->setParameter(paramId, value);
+}
 
-        case kParam_CouplingStrength:
-            engine->coupling_strength = value;
-            engine->topology_engine->setCouplingStrength(value);
-            break;
+float modal_attractors_engine_get_parameter(ModalAttractorsEngine* engine,
+                                            uint32_t paramId) {
+    if (!engine || !engine->synthEngine) return 0.0f;
 
-        case kParam_Topology: {
-            engine->topology_type = static_cast<int>(value);
-            // Map int to topology type
-            TopologyType topo = TopologyType::Ring;
-            switch (engine->topology_type) {
-                case 0: topo = TopologyType::Ring; break;
-                case 1: topo = TopologyType::SmallWorld; break;
-                case 2: topo = TopologyType::Clustered; break;
-                case 3: topo = TopologyType::HubSpoke; break;
-                case 4: topo = TopologyType::Random; break;
-                case 5: topo = TopologyType::Complete; break;
-                case 6: topo = TopologyType::None; break;
-            }
-            engine->topology_engine->generateTopology(topo, engine->coupling_strength);
-            break;
-        }
-
-        case kParam_WaveShape: {
-            engine->wave_shape = static_cast<int>(value);
-            wave_shape_t shape = static_cast<wave_shape_t>(engine->wave_shape);
-            // Apply to all voices
-            for (uint32_t i = 0; i < engine->max_polyphony; i++) {
-                ModalVoice* voice = engine->voice_allocator->getVoice(i);
-                if (voice) {
-                    voice->setWaveShape(shape);
-                }
-            }
-            break;
-        }
-
-        case kParam_PulseWidth: {
-            engine->pulse_width = value;
-            // Apply to all voices
-            for (uint32_t i = 0; i < engine->max_polyphony; i++) {
-                ModalVoice* voice = engine->voice_allocator->getVoice(i);
-                if (voice) {
-                    voice->setPulseWidth(value);
-                }
-            }
-            break;
-        }
-
-        // TODO: Add other parameter cases
-
-        default:
-            break;
-    }
+    EngineState* state = (EngineState*)engine->synthEngine;
+    return state->synthEngine->getParameter(paramId);
 }

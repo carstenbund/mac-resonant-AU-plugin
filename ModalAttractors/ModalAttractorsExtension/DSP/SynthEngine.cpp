@@ -89,6 +89,9 @@ SynthEngine::SynthEngine(uint32_t maxPolyphony)
     , pokeDuration_(10.0f)
     // Deprecated
     , personality_(0.0f)
+    // Wave shape parameters
+    , waveShape_(0)        // Default to sine
+    , pulseWidth_(0.5f)    // Default to square wave (50% duty)
 {
     // Allocate DSP components (always 5 nodes)
     nodeManager_ = new NodeManager();
@@ -328,6 +331,33 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
             }
             break;
 
+        case kParam_WaveShape:
+            waveShape_ = static_cast<int>(value);
+            // Apply to all nodes
+            if (nodeManager_) {
+                wave_shape_t shape = static_cast<wave_shape_t>(waveShape_);
+                for (uint32_t i = 0; i < 5; i++) {
+                    ModalVoice* node = nodeManager_->getNode(i);
+                    if (node) {
+                        node->setWaveShape(shape);
+                    }
+                }
+            }
+            break;
+
+        case kParam_PulseWidth:
+            pulseWidth_ = value;
+            // Apply to all nodes
+            if (nodeManager_) {
+                for (uint32_t i = 0; i < 5; i++) {
+                    ModalVoice* node = nodeManager_->getNode(i);
+                    if (node) {
+                        node->setPulseWidth(value);
+                    }
+                }
+            }
+            break;
+
         // Mode parameters (for Character Editor - not directly used)
         // These are kept for future Character Editor implementation
         case kParam_Mode0_Frequency:
@@ -421,6 +451,12 @@ float SynthEngine::getParameter(uint32_t paramId) const {
             return static_cast<float>(noteRouting_);
         case kParam_MultiExcite:
             return static_cast<float>(multiExcite_);
+
+        // Wave shape parameters
+        case kParam_WaveShape:
+            return static_cast<float>(waveShape_);
+        case kParam_PulseWidth:
+            return pulseWidth_;
 
         // Mode parameters (for Character Editor)
         case kParam_Mode0_Frequency:

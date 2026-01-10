@@ -233,6 +233,10 @@ private:
     // Parameter cache - Deprecated
     float personality_;
 
+    // Parameter cache - Wave shape
+    int waveShape_;                // 0-5 (Sine, Saw, Tri, Square, Pulse25, Pulse10)
+    float pulseWidth_;             // 0.01-0.99
+
     /**
      * @brief Process single event (real-time safe)
      */
