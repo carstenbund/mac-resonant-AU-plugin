@@ -7,8 +7,6 @@
 
 import AVFoundation
 import CoreAudioKit
-import SwiftUI
-import AppKit
 
 /// AUv3 Instrument implementation for Modal Attractors synthesis engine
 ///
