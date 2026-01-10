@@ -122,6 +122,12 @@ public:
     float getAmplitude() const;
 
     /**
+     * @brief Get base frequency (MIDI note frequency with pitch bend applied)
+     * @return Base frequency in Hz
+     */
+    float getBaseFrequency() const;
+
+    /**
      * @brief Get mode 0 complex amplitude (for coupling broadcast)
      * @return Complex amplitude
      */
