@@ -359,6 +359,8 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
     // MARK: - UI Integration
 
     public override func requestViewController(completionHandler: @escaping (AUViewController?) -> Void) {
+        NSLog("ModalAttractorsAudioUnit requestViewController called")
+
         guard let paramTree = parameterTree else {
             completionHandler(nil)
             return
