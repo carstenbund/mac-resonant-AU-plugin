@@ -46,7 +46,29 @@ enum ParamID {
     kParam_Node3_Character = 23,
     kParam_Node4_Character = 24,
     kParam_NoteRouting = 25,
-    kParam_MultiExcite = 26
+    kParam_MultiExcite = 26,
+
+    // Wave Shape Selection (20 parameters: 5 nodes × 4 modes)
+    kParam_Node0_Mode0_WaveShape = 27,
+    kParam_Node0_Mode1_WaveShape = 28,
+    kParam_Node0_Mode2_WaveShape = 29,
+    kParam_Node0_Mode3_WaveShape = 30,
+    kParam_Node1_Mode0_WaveShape = 31,
+    kParam_Node1_Mode1_WaveShape = 32,
+    kParam_Node1_Mode2_WaveShape = 33,
+    kParam_Node1_Mode3_WaveShape = 34,
+    kParam_Node2_Mode0_WaveShape = 35,
+    kParam_Node2_Mode1_WaveShape = 36,
+    kParam_Node2_Mode2_WaveShape = 37,
+    kParam_Node2_Mode3_WaveShape = 38,
+    kParam_Node3_Mode0_WaveShape = 39,
+    kParam_Node3_Mode1_WaveShape = 40,
+    kParam_Node3_Mode2_WaveShape = 41,
+    kParam_Node3_Mode3_WaveShape = 42,
+    kParam_Node4_Mode0_WaveShape = 43,
+    kParam_Node4_Mode1_WaveShape = 44,
+    kParam_Node4_Mode2_WaveShape = 45,
+    kParam_Node4_Mode3_WaveShape = 46
 };
 
 SynthEngine::SynthEngine(uint32_t maxPolyphony)
