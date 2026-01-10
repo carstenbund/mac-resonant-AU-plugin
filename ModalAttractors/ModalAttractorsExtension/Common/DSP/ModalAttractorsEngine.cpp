@@ -7,9 +7,9 @@
  */
 
 #include "ModalAttractorsAU.h"
-#include "ModalParameters.h"
-#include "../dsp_core/VoiceAllocator.h"
-#include "../dsp_core/TopologyEngine.h"
+#include "../../Parameters/ModalParameters.h"
+#include "../../DSP/VoiceAllocator.h"
+#include "../../DSP/TopologyEngine.h"
 #include <cstring>
 
 void modal_attractors_engine_init(ModalAttractorsEngine* engine,
