@@ -1,20 +1,25 @@
 /**
  * @file SynthEngine.cpp
  * @brief Implementation of the Modal Attractors synthesis engine
+ *
+ * Updated for Node Character System - 5 fixed nodes with selectable characters
  */
 
 #include "SynthEngine.h"
-#include "VoiceAllocator.h"
+#include "NodeManager.h"
 #include "TopologyEngine.h"
 #include "ModalVoice.h"
 #include <algorithm>
 
 // Parameter IDs (should match ModalAttractorsExtensionParameterAddresses.h)
 enum ParamID {
+    // Global
     kParam_MasterGain = 0,
     kParam_CouplingStrength = 1,
     kParam_Topology = 2,
-    kParam_NodeCount = 3,
+    kParam_NodeCount = 3,  // Deprecated: always 5
+
+    // Mode parameters (for Character Editor)
     kParam_Mode0_Frequency = 4,
     kParam_Mode0_Damping = 5,
     kParam_Mode0_Weight = 6,
@@ -29,26 +34,66 @@ enum ParamID {
     kParam_Mode3_Weight = 15,
     kParam_PokeStrength = 16,
     kParam_PokeDuration = 17,
+
+    // Deprecated
     kParam_Polyphony = 18,
-    kParam_Personality = 19
+    kParam_Personality = 19,
+
+    // Node Character System
+    kParam_Node0_Character = 20,
+    kParam_Node1_Character = 21,
+    kParam_Node2_Character = 22,
+    kParam_Node3_Character = 23,
+    kParam_Node4_Character = 24,
+    kParam_NoteRouting = 25,
+    kParam_MultiExcite = 26,
+    // Wave Shape Selection (20 parameters: 5 nodes × 4 modes)
+    kParam_Node0_Mode0_WaveShape = 27,
+    kParam_Node0_Mode1_WaveShape = 28,
+    kParam_Node0_Mode2_WaveShape = 29,
+    kParam_Node0_Mode3_WaveShape = 30,
+    kParam_Node1_Mode0_WaveShape = 31,
+    kParam_Node1_Mode1_WaveShape = 32,
+    kParam_Node1_Mode2_WaveShape = 33,
+    kParam_Node1_Mode3_WaveShape = 34,
+    kParam_Node2_Mode0_WaveShape = 35,
+    kParam_Node2_Mode1_WaveShape = 36,
+    kParam_Node2_Mode2_WaveShape = 37,
+    kParam_Node2_Mode3_WaveShape = 38,
+    kParam_Node3_Mode0_WaveShape = 39,
+    kParam_Node3_Mode1_WaveShape = 40,
+    kParam_Node3_Mode2_WaveShape = 41,
+    kParam_Node3_Mode3_WaveShape = 42,
+    kParam_Node4_Mode0_WaveShape = 43,
+    kParam_Node4_Mode1_WaveShape = 44,
+    kParam_Node4_Mode2_WaveShape = 45,
+    kParam_Node4_Mode3_WaveShape = 46
 };
 
 SynthEngine::SynthEngine(uint32_t maxPolyphony)
-    : voiceAllocator_(nullptr)
+    : nodeManager_(nullptr)
     , topologyEngine_(nullptr)
-    , voicePointers_(nullptr)
-    , maxPolyphony_(maxPolyphony)
+    , nodePointers_(nullptr)
     , sampleRate_(44100.0)
     , maxFrames_(0)
     , channels_(2)
     , initialized_(false)
     , controlRateCounter_(0)
-    // Global parameters - match defaults from Parameters.swift
+    // Global parameters
     , masterGain_(0.7f)
     , couplingStrength_(0.3f)
     , topologyType_(0)
-    , nodeCount_(16)
-    // Mode parameters - match defaults from Parameters.swift
+    , couplingMode_(ModalVoice::CouplingMode::ComplexDiffusion)  // Testing new phase-preserving coupling
+    // Node characters (default: each node gets its own character 0-4)
+    , node0_character_(0)
+    , node1_character_(1)
+    , node2_character_(2)
+    , node3_character_(3)
+    , node4_character_(4)
+    // Routing
+    , noteRouting_(0)      // RoundRobin
+    , multiExcite_(1)      // Accumulate
+    // Mode parameters (for Character Editor)
     , mode0_frequency_(1.0f)
     , mode0_damping_(1.0f)
     , mode0_weight_(1.0f)
@@ -61,30 +106,29 @@ SynthEngine::SynthEngine(uint32_t maxPolyphony)
     , mode3_frequency_(4.5f)
     , mode3_damping_(2.0f)
     , mode3_weight_(0.4f)
-    // Excitation parameters
+    // Excitation parameters (for Character Editor)
     , pokeStrength_(0.5f)
     , pokeDuration_(10.0f)
-    // Voice parameters
-    , polyphony_(16.0f)
+    // Deprecated
     , personality_(0.0f)
 {
-    // Allocate DSP components (done once at construction)
-    voiceAllocator_ = new VoiceAllocator(maxPolyphony);
-    topologyEngine_ = new TopologyEngine(maxPolyphony);
+    // Allocate DSP components (always 5 nodes)
+    nodeManager_ = new NodeManager();
+    topologyEngine_ = new TopologyEngine(5);  // Fixed 5 nodes
 
-    // Pre-allocate voice pointer array (CRITICAL: no allocation in render!)
-    voicePointers_ = new ModalVoice*[maxPolyphony];
+    // Pre-allocate node pointer array (no allocation in render!)
+    nodePointers_ = new ModalVoice*[5];
 }
 
 SynthEngine::~SynthEngine() {
-    if (voicePointers_) {
-        delete[] voicePointers_;
-        voicePointers_ = nullptr;
+    if (nodePointers_) {
+        delete[] nodePointers_;
+        nodePointers_ = nullptr;
     }
 
-    if (voiceAllocator_) {
-        delete voiceAllocator_;
-        voiceAllocator_ = nullptr;
+    if (nodeManager_) {
+        delete nodeManager_;
+        nodeManager_ = nullptr;
     }
 
     if (topologyEngine_) {
@@ -98,11 +142,20 @@ void SynthEngine::prepare(double sampleRate, uint32_t maxFrames, uint32_t channe
     maxFrames_ = maxFrames;
     channels_ = channels;
 
-    // Initialize voice allocator
-    voiceAllocator_->initialize(static_cast<float>(sampleRate));
+    // Initialize node manager
+    nodeManager_->initialize(static_cast<float>(sampleRate));
+
+    // Apply default characters to all nodes
+    for (uint8_t i = 0; i < 5; i++) {
+        nodeManager_->setNodeCharacter(i, i);  // Node i gets character i
+    }
 
     // Set default topology
     topologyEngine_->generateTopology(TopologyType::Ring, couplingStrength_);
+
+    // Initialize global damping from volume control (0.0-1.0 range → 1.0-0.0 damping)
+    float global_damping = 1.0f - masterGain_;
+    nodeManager_->setGlobalDamping(global_damping);
 
     initialized_ = true;
 }
@@ -110,8 +163,8 @@ void SynthEngine::prepare(double sampleRate, uint32_t maxFrames, uint32_t channe
 void SynthEngine::reset() {
     if (!initialized_) return;
 
-    // Release all voices
-    voiceAllocator_->allNotesOff();
+    // Release all nodes
+    nodeManager_->allNotesOff();
     controlRateCounter_ = 0;
 }
 
@@ -160,15 +213,15 @@ void SynthEngine::render(const EventQueue& events, float* outL, float* outR, uin
 void SynthEngine::processEvent(const SynthEvent& event) {
     switch (event.type) {
         case EventType::NoteOn:
-            voiceAllocator_->noteOn(event.noteOn.note, event.noteOn.velocity);
+            nodeManager_->noteOn(event.noteOn.note, event.noteOn.velocity, event.noteOn.channel);
             break;
 
         case EventType::NoteOff:
-            voiceAllocator_->noteOff(event.noteOff.note);
+            nodeManager_->noteOff(event.noteOff.note);
             break;
 
         case EventType::PitchBend:
-            voiceAllocator_->setPitchBend(event.pitchBend.value);
+            nodeManager_->setPitchBend(event.pitchBend.value);
             break;
 
         case EventType::CC:
@@ -190,34 +243,48 @@ void SynthEngine::renderSlice(float* outL, float* outR, uint32_t startFrame, uin
         controlRateCounter_ = 0;
     }
 
-    // Render voices
-    voiceAllocator_->renderAudio(outL, outR, numFrames);
+    // Render nodes
+    nodeManager_->renderAudio(outL, outR, numFrames);
 
-    // Apply master gain
-    for (uint32_t i = 0; i < numFrames; i++) {
-        outL[i] *= masterGain_;
-        if (outR != outL) {
-            outR[i] *= masterGain_;
-        }
-    }
+    // Note: Volume control now functions as global damping (circuit energy control)
+    // Output level is controlled in the DAW, not here
 }
 
 void SynthEngine::updateControlRate() {
-    // Update voice state at control rate
-    voiceAllocator_->updateVoices();
+    // Update node state at control rate
+    nodeManager_->updateNodes();
 
-    // Update coupling (FIXED: no allocation, use pre-allocated array)
-    for (uint32_t i = 0; i < maxPolyphony_; i++) {
-        voicePointers_[i] = voiceAllocator_->getVoice(i);
+    // Update coupling (fixed 5 nodes)
+    for (uint8_t i = 0; i < 5; i++) {
+        nodePointers_[i] = nodeManager_->getNode(i);
     }
-    topologyEngine_->updateCoupling(voicePointers_, maxPolyphony_);
+
+    // Choose coupling method based on mode
+    switch (couplingMode_) {
+        case ModalVoice::CouplingMode::ComplexDiffusion:
+            topologyEngine_->updateCouplingComplex(nodePointers_, 5);
+            break;
+        case ModalVoice::CouplingMode::MagnitudePressure:
+        default:
+            topologyEngine_->updateCoupling(nodePointers_, 5);
+            break;
+    }
 }
 
 void SynthEngine::setParameter(uint32_t paramId, float value) {
     switch (paramId) {
-        case kParam_MasterGain:
+        case kParam_MasterGain: {
             masterGain_ = value;
+            // Convert volume (0.0-1.0) to global damping (1.0-0.0)
+            // Volume = 1.0 → damping = 0.0 (no damping, full resonance)
+            // Volume = 0.5 → damping = 0.5 (moderate damping)
+            // Volume = 0.0 → damping = 1.0 (maximum damping, fast cooldown)
+            float global_damping = 1.0f - value;
+            if (nodeManager_) {
+                nodeManager_->setGlobalDamping(global_damping);
+            }
             break;
+        }
 
         case kParam_CouplingStrength:
             couplingStrength_ = value;
@@ -243,137 +310,137 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
             break;
         }
 
-        case kParam_NodeCount: {
-            uint32_t newCount = static_cast<uint32_t>(value);
-            if (newCount < 1) newCount = 1;
-            if (newCount > 16) newCount = 16;
-
-            if (newCount != nodeCount_) {
-                nodeCount_ = newCount;
-
-                // Update voice allocator to limit active voices
-                if (voiceAllocator_) {
-                    voiceAllocator_->setNodeCount(newCount);
-                }
-
-                // Regenerate topology for new node count
-                if (topologyEngine_ && voiceAllocator_) {
-                    topologyEngine_->generateTopology(
-                        static_cast<TopologyType>(topologyType_),
-                        couplingStrength_
-                    );
-                }
+        case kParam_NodeCount:
+            // Set active node count (1-5)
+            if (nodeManager_) {
+                nodeManager_->setNodeCount(static_cast<uint8_t>(value));
             }
             break;
-        }
 
-        // Mode 0 parameters
+        // Node Character parameters
+        case kParam_Node0_Character:
+            node0_character_ = static_cast<uint8_t>(value);
+            if (nodeManager_) {
+                nodeManager_->setNodeCharacter(0, node0_character_);
+            }
+            break;
+
+        case kParam_Node1_Character:
+            node1_character_ = static_cast<uint8_t>(value);
+            if (nodeManager_) {
+                nodeManager_->setNodeCharacter(1, node1_character_);
+            }
+            break;
+
+        case kParam_Node2_Character:
+            node2_character_ = static_cast<uint8_t>(value);
+            if (nodeManager_) {
+                nodeManager_->setNodeCharacter(2, node2_character_);
+            }
+            break;
+
+        case kParam_Node3_Character:
+            node3_character_ = static_cast<uint8_t>(value);
+            if (nodeManager_) {
+                nodeManager_->setNodeCharacter(3, node3_character_);
+            }
+            break;
+
+        case kParam_Node4_Character:
+            node4_character_ = static_cast<uint8_t>(value);
+            if (nodeManager_) {
+                nodeManager_->setNodeCharacter(4, node4_character_);
+            }
+            break;
+
+        // Routing parameters
+        case kParam_NoteRouting:
+            noteRouting_ = static_cast<uint8_t>(value);
+            if (nodeManager_) {
+                nodeManager_->setRoutingMode(static_cast<NoteRoutingMode>(noteRouting_));
+            }
+            break;
+
+        case kParam_MultiExcite:
+            multiExcite_ = static_cast<uint8_t>(value);
+            if (nodeManager_) {
+                nodeManager_->setMultiExciteMode(static_cast<MultiExciteMode>(multiExcite_));
+            }
+            break;
+
+        // Mode parameters (for Character Editor - not directly used)
+        // These are kept for future Character Editor implementation
         case kParam_Mode0_Frequency:
             mode0_frequency_ = value;
-            if (voiceAllocator_) {
-                voiceAllocator_->setMode(0, value, mode0_damping_, mode0_weight_);
-            }
             break;
         case kParam_Mode0_Damping:
             mode0_damping_ = value;
-            if (voiceAllocator_) {
-                voiceAllocator_->setMode(0, mode0_frequency_, value, mode0_weight_);
-            }
             break;
         case kParam_Mode0_Weight:
             mode0_weight_ = value;
-            if (voiceAllocator_) {
-                voiceAllocator_->setMode(0, mode0_frequency_, mode0_damping_, value);
-            }
             break;
 
-        // Mode 1 parameters
         case kParam_Mode1_Frequency:
             mode1_frequency_ = value;
-            if (voiceAllocator_) {
-                voiceAllocator_->setMode(1, value, mode1_damping_, mode1_weight_);
-            }
             break;
         case kParam_Mode1_Damping:
             mode1_damping_ = value;
-            if (voiceAllocator_) {
-                voiceAllocator_->setMode(1, mode1_frequency_, value, mode1_weight_);
-            }
             break;
         case kParam_Mode1_Weight:
             mode1_weight_ = value;
-            if (voiceAllocator_) {
-                voiceAllocator_->setMode(1, mode1_frequency_, mode1_damping_, value);
-            }
             break;
 
-        // Mode 2 parameters
         case kParam_Mode2_Frequency:
             mode2_frequency_ = value;
-            if (voiceAllocator_) {
-                voiceAllocator_->setMode(2, value, mode2_damping_, mode2_weight_);
-            }
             break;
         case kParam_Mode2_Damping:
             mode2_damping_ = value;
-            if (voiceAllocator_) {
-                voiceAllocator_->setMode(2, mode2_frequency_, value, mode2_weight_);
-            }
             break;
         case kParam_Mode2_Weight:
             mode2_weight_ = value;
-            if (voiceAllocator_) {
-                voiceAllocator_->setMode(2, mode2_frequency_, mode2_damping_, value);
-            }
             break;
 
-        // Mode 3 parameters
         case kParam_Mode3_Frequency:
             mode3_frequency_ = value;
-            if (voiceAllocator_) {
-                voiceAllocator_->setMode(3, value, mode3_damping_, mode3_weight_);
-            }
             break;
         case kParam_Mode3_Damping:
             mode3_damping_ = value;
-            if (voiceAllocator_) {
-                voiceAllocator_->setMode(3, mode3_frequency_, value, mode3_weight_);
-            }
             break;
         case kParam_Mode3_Weight:
             mode3_weight_ = value;
-            if (voiceAllocator_) {
-                voiceAllocator_->setMode(3, mode3_frequency_, mode3_damping_, value);
-            }
             break;
 
-        // Excitation parameters
+        // Excitation parameters (for Character Editor)
         case kParam_PokeStrength:
             pokeStrength_ = value;
-            if (voiceAllocator_) {
-                voiceAllocator_->setPokeStrength(value);
-            }
             break;
         case kParam_PokeDuration:
             pokeDuration_ = value;
-            if (voiceAllocator_) {
-                voiceAllocator_->setPokeDuration(value);
-            }
             break;
 
-        // Voice parameters
-        case kParam_Polyphony:
-            polyphony_ = value;
-            break;
-        case kParam_Personality:
-            personality_ = value;
-            if (voiceAllocator_) {
-                voiceAllocator_->setPersonality(static_cast<node_personality_t>(static_cast<int>(value)));
-            }
-            break;
-
+        // Wave Shape parameters (20 parameters: 5 nodes × 4 modes)
+        // Handle all wave shape parameters in a range check
         default:
+            if (paramId >= kParam_Node0_Mode0_WaveShape && paramId <= kParam_Node4_Mode3_WaveShape) {
+                uint32_t paramOffset = paramId - kParam_Node0_Mode0_WaveShape;
+                uint32_t nodeIndex = paramOffset / 4;  // 0-4
+                uint32_t modeIndex = paramOffset % 4;  // 0-3
+                wave_shape_t shape = static_cast<wave_shape_t>(static_cast<int>(value));
+
+                if (nodeManager_) {
+                    nodeManager_->setModeWaveShape(nodeIndex, modeIndex, shape);
+                }
+            }
+            // Note: Also handles deprecated parameters below
             break;
+    }
+
+    // Handle deprecated parameters separately (outside switch for clarity)
+    if (paramId == kParam_Polyphony) {
+        // Always 5 nodes
+    } else if (paramId == kParam_Personality) {
+        personality_ = value;
+        // Per-character now, not global
     }
 }
 
@@ -387,9 +454,27 @@ float SynthEngine::getParameter(uint32_t paramId) const {
         case kParam_Topology:
             return static_cast<float>(topologyType_);
         case kParam_NodeCount:
-            return static_cast<float>(nodeCount_);
+            return nodeManager_ ? static_cast<float>(nodeManager_->getNodeCount()) : 5.0f;
 
-        // Mode 0 parameters
+        // Node Character parameters
+        case kParam_Node0_Character:
+            return static_cast<float>(node0_character_);
+        case kParam_Node1_Character:
+            return static_cast<float>(node1_character_);
+        case kParam_Node2_Character:
+            return static_cast<float>(node2_character_);
+        case kParam_Node3_Character:
+            return static_cast<float>(node3_character_);
+        case kParam_Node4_Character:
+            return static_cast<float>(node4_character_);
+
+        // Routing parameters
+        case kParam_NoteRouting:
+            return static_cast<float>(noteRouting_);
+        case kParam_MultiExcite:
+            return static_cast<float>(multiExcite_);
+
+        // Mode parameters (for Character Editor)
         case kParam_Mode0_Frequency:
             return mode0_frequency_;
         case kParam_Mode0_Damping:
@@ -397,7 +482,6 @@ float SynthEngine::getParameter(uint32_t paramId) const {
         case kParam_Mode0_Weight:
             return mode0_weight_;
 
-        // Mode 1 parameters
         case kParam_Mode1_Frequency:
             return mode1_frequency_;
         case kParam_Mode1_Damping:
@@ -405,7 +489,6 @@ float SynthEngine::getParameter(uint32_t paramId) const {
         case kParam_Mode1_Weight:
             return mode1_weight_;
 
-        // Mode 2 parameters
         case kParam_Mode2_Frequency:
             return mode2_frequency_;
         case kParam_Mode2_Damping:
@@ -413,7 +496,6 @@ float SynthEngine::getParameter(uint32_t paramId) const {
         case kParam_Mode2_Weight:
             return mode2_weight_;
 
-        // Mode 3 parameters
         case kParam_Mode3_Frequency:
             return mode3_frequency_;
         case kParam_Mode3_Damping:
@@ -421,19 +503,30 @@ float SynthEngine::getParameter(uint32_t paramId) const {
         case kParam_Mode3_Weight:
             return mode3_weight_;
 
-        // Excitation parameters
+        // Excitation parameters (for Character Editor)
         case kParam_PokeStrength:
             return pokeStrength_;
         case kParam_PokeDuration:
             return pokeDuration_;
 
-        // Voice parameters
+        // Deprecated parameters
         case kParam_Polyphony:
-            return polyphony_;
+            return 5.0f;  // Always 5 nodes
         case kParam_Personality:
             return personality_;
 
+        // Wave Shape parameters (20 parameters: 5 nodes × 4 modes)
         default:
+            if (paramId >= kParam_Node0_Mode0_WaveShape && paramId <= kParam_Node4_Mode3_WaveShape) {
+                uint32_t paramOffset = paramId - kParam_Node0_Mode0_WaveShape;
+                uint32_t nodeIndex = paramOffset / 4;  // 0-4
+                uint32_t modeIndex = paramOffset % 4;  // 0-3
+
+                if (nodeManager_) {
+                    wave_shape_t shape = nodeManager_->getModeWaveShape(nodeIndex, modeIndex);
+                    return static_cast<float>(static_cast<int>(shape));
+                }
+            }
             return 0.0f;
     }
 }

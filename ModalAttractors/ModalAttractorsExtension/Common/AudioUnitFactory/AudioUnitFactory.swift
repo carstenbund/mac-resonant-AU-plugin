@@ -4,12 +4,20 @@
 //
 //  Created by Carsten on 1/7/26.
 //
+//  NOTE: This file is DEPRECATED.
+//  The AUAudioUnitFactory protocol is now implemented by ModalAttractorsAUViewController
+//  which is the extension's principal class. This allows proper out-of-process UI support.
+//  This file is kept for reference but is no longer used.
+//
 
 import CoreAudioKit
 import os
 
 private let log = Logger(subsystem: "com.bundle.id.ModalAttractorsExtension", category: "AudioUnitFactory")
 
+/// DEPRECATED: Use ModalAttractorsAUViewController instead.
+/// This class is no longer the principal class for the extension.
+@available(*, deprecated, message: "Use ModalAttractorsAUViewController which is now the principal class")
 public class AudioUnitFactory: NSObject, AUAudioUnitFactory {
     var auAudioUnit: AUAudioUnit?
 

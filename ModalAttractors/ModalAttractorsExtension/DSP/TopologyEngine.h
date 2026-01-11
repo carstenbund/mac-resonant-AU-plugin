@@ -58,6 +58,16 @@ public:
     void updateCoupling(ModalVoice** voices, uint32_t num_voices);
 
     /**
+     * @brief Update complex coupling (mode 0 only, phase-preserving)
+     * @param voices Array of voice pointers
+     * @param num_voices Number of voices
+     *
+     * Uses complex diffusive coupling: Δa_{i,0} = dt * g * Σ_j w_{ij}(a_{j,0} - a_{i,0})
+     * Preserves phase information for physically-realistic ensemble behavior.
+     */
+    void updateCouplingComplex(ModalVoice** voices, uint32_t num_voices);
+
+    /**
      * @brief Set coupling strength
      * @param strength Coupling strength (0.0-1.0)
      */

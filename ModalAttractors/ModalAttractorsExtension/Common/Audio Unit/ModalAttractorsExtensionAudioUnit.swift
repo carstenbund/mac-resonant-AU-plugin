@@ -7,8 +7,6 @@
 
 import AVFoundation
 import CoreAudioKit
-import SwiftUI
-import AppKit
 
 /// AUv3 Instrument implementation for Modal Attractors synthesis engine
 ///
@@ -158,6 +156,24 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
         }
     }
 
+    private func ensureParameterTree() -> AUParameterTree {
+        if let paramTree = _parameterTree {
+            return paramTree
+        }
+
+        let paramTree = ModalAttractorsExtensionParameterSpecs.createAUParameterTree()
+        _parameterTree = paramTree
+
+        if let engine = engine {
+            for param in paramTree.allParameters {
+                modal_attractors_engine_set_parameter(engine, UInt32(param.address), param.value)
+            }
+        }
+
+        setupParameterCallbacks(paramTree)
+        return paramTree
+    }
+
     // MARK: - Resource Management
 
     public override func allocateRenderResources() throws {
@@ -229,12 +245,13 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
                     let status = d.0
                     let data1  = d.1
                     let data2  = d.2
+                    let channel = status & 0x0F  // Extract MIDI channel (0-15)
 
                     switch status & 0xF0 {
                     case 0x90:
                         if data2 > 0 {
                             modal_attractors_engine_push_note_on(
-                                enginePtr, offset, data1, Float(data2) * (1.0 / 127.0)
+                                enginePtr, offset, data1, Float(data2) * (1.0 / 127.0), channel
                             )
                         } else {
                             modal_attractors_engine_push_note_off(enginePtr, offset, data1)
@@ -362,22 +379,7 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
         return result
     }
 
-    // MARK: - UI Integration
-
-    public override func requestViewController(completionHandler: @escaping (AUViewController?) -> Void) {
-        guard let paramTree = parameterTree else {
-            completionHandler(nil)
-            return
-        }
-
-        // Create parameter tree wrapper for SwiftUI
-        let paramTreeWrapper = ParameterTree(auParameterTree: paramTree)
-
-        // Create and configure our custom AUViewController subclass
-        // that hosts the SwiftUI view internally
-        let vc = ModalAttractorsAUViewController()
-        vc.configure(paramTreeWrapper: paramTreeWrapper)
-
-        completionHandler(vc)
-    }
+    // NOTE: UI Integration is handled by ModalAttractorsAUViewController
+    // which is the principal class and conforms to AUAudioUnitFactory.
+    // The system automatically uses the principal class for view controller requests.
 }

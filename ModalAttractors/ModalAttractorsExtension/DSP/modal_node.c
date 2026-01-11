@@ -91,9 +91,11 @@ void modal_node_init(modal_node_t* node, uint8_t node_id, node_personality_t per
         node->modes[k].a = real + I * imag;
         node->modes[k].a_dot = 0.0f;
         node->modes[k].params.active = false;
+        node->modes[k].params.shape = WAVE_SHAPE_SINE;  // Default to sine wave
     }
 
     node->coupling_strength = 0.3f;
+    node->global_damping = 0.0f;  // No extra damping by default
     node->carrier_freq_hz = 440.0f;
     node->audio_gain = 0.7f;
     node->running = false;
@@ -109,6 +111,7 @@ void modal_node_set_mode(modal_node_t* node, uint8_t mode_idx,
     mode->params.gamma = gamma;
     mode->params.weight = weight;
     mode->params.active = true;
+    // Note: shape is not set here - preserves existing shape or uses default from init
 }
 
 void modal_node_set_neighbors(modal_node_t* node,
@@ -148,6 +151,10 @@ void modal_node_step(modal_node_t* node) {
             // Van der Pol-like: γ_eff = -γ + β*|a|²
             effective_gamma = -gamma + 3.0f * gamma * (energy * energy) / (saturation_level * saturation_level);
         }
+
+        // Apply global damping (circuit energy control)
+        // This adds extra damping to all modes, allowing manual system calming
+        effective_gamma += node->global_damping;
 
         // Linear dynamics: ȧ = (-γ + iω)a
         float complex linear_term = (-effective_gamma + I * omega) * mode->a;

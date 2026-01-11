@@ -128,6 +128,16 @@ void ModalVoice::applyCoupling(const float coupling_inputs[MAX_MODES]) {
     }
 }
 
+void ModalVoice::applyCouplingMode0(modal_complex_t coupling0) {
+    // Apply complex diffusive coupling to mode 0 only
+    // This preserves phase information for physically-realistic ensemble coupling
+    if (!node_.modes[0].params.active) return;
+
+    // Direct application - coupling strength already applied in TopologyEngine
+    // node_.coupling_strength is kept at 1.0 for predictable behavior
+    node_.modes[0].a += coupling0 * CONTROL_DT;
+}
+
 float ModalVoice::getAmplitude() const {
     return modal_node_get_amplitude(&node_);
 }
@@ -148,6 +158,10 @@ void ModalVoice::setMode(uint8_t mode_idx, float freq_hz, float damping, float w
 
 void ModalVoice::setPersonality(node_personality_t personality) {
     node_.personality = personality;
+}
+
+void ModalVoice::setGlobalDamping(float damping) {
+    node_.global_damping = damping;
 }
 
 void ModalVoice::reset() {

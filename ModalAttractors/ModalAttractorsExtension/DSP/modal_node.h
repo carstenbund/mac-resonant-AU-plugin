@@ -57,13 +57,27 @@ typedef enum {
 } node_personality_t;
 
 /**
+ * @brief Oscillator wave shapes
+ */
+typedef enum {
+    WAVE_SHAPE_SINE = 0,      ///< Pure sine wave (default)
+    WAVE_SHAPE_SAWTOOTH,      ///< Sawtooth (all harmonics, 1/n amplitude)
+    WAVE_SHAPE_TRIANGLE,      ///< Triangle (odd harmonics, 1/n² amplitude)
+    WAVE_SHAPE_SQUARE,        ///< Square wave (odd harmonics, 1/n amplitude)
+    WAVE_SHAPE_PULSE_25,      ///< Pulse wave, 25% duty cycle
+    WAVE_SHAPE_PULSE_10,      ///< Pulse wave, 10% duty cycle (thin)
+    WAVE_SHAPE_COUNT          ///< Number of wave shapes
+} wave_shape_t;
+
+/**
  * @brief Single mode parameters
  */
 typedef struct {
-    float omega;      ///< Angular frequency (rad/s)
-    float gamma;      ///< Damping coefficient (>0 for stability)
-    float weight;     ///< Audio contribution weight [0,1]
-    bool active;      ///< Mode enabled flag
+    float omega;          ///< Angular frequency (rad/s)
+    float gamma;          ///< Damping coefficient (>0 for stability)
+    float weight;         ///< Audio contribution weight [0,1]
+    wave_shape_t shape;   ///< Oscillator wave shape for this mode
+    bool active;          ///< Mode enabled flag
 } mode_params_t;
 
 /**
@@ -97,6 +111,7 @@ typedef struct {
     excitation_envelope_t excitation;   ///< Current excitation envelope
 
     float coupling_strength;            ///< Global coupling coefficient
+    float global_damping;               ///< Global damping coefficient (added to all modes)
     uint8_t num_neighbors;              ///< Number of connected neighbors
     uint8_t neighbor_ids[MAX_NEIGHBORS];///< Neighbor node IDs
 

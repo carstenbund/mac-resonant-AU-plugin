@@ -12,8 +12,8 @@
 #ifndef MODAL_VOICE_H
 #define MODAL_VOICE_H
 
-#include "../../../src/esp32_port/modal_node.h"
-#include "../../../src/esp32_port/audio_synth.h"
+#include "modal_node.h"
+#include "audio_synth.h"
 #include <cstdint>
 
 class ModalVoice {
@@ -26,6 +26,14 @@ public:
         Attack,     ///< Note on, attack phase
         Sustain,    ///< Sustaining (self-oscillator only)
         Release     ///< Note off, release phase
+    };
+
+    /**
+     * @brief Coupling mode enumeration
+     */
+    enum class CouplingMode {
+        MagnitudePressure,  ///< Current behavior: abs(neighbor-self), always positive
+        ComplexDiffusion    ///< New: complex diffusive coupling with phase coherence
     };
 
     /**
@@ -82,6 +90,15 @@ public:
      * @param coupling_inputs Array of 4 coupling inputs (one per mode)
      */
     void applyCoupling(const float coupling_inputs[MAX_MODES]);
+
+    /**
+     * @brief Apply complex coupling to mode 0 only
+     * @param coupling0 Complex coupling value for mode 0
+     *
+     * This applies complex diffusive coupling directly to mode 0, preserving
+     * phase information. Used for physically-realistic ensemble coupling.
+     */
+    void applyCouplingMode0(modal_complex_t coupling0);
 
     /**
      * @brief Get voice state
@@ -149,6 +166,24 @@ public:
      * @param personality Resonator or self-oscillator
      */
     void setPersonality(node_personality_t personality);
+
+    /**
+     * @brief Set global damping coefficient
+     * @param damping Global damping value (>= 0.0)
+     *
+     * This adds extra damping to all modes, effectively removing energy
+     * from the system. Higher values cause faster decay and can be used
+     * to calm runaway oscillations.
+     */
+    void setGlobalDamping(float damping);
+
+    /**
+     * @brief Get pointer to modal node for direct parameter access
+     * @return Pointer to internal modal_node_t
+     */
+    modal_node_t* getModalNode() {
+        return &node_;
+    }
 
     /**
      * @brief Reset voice state

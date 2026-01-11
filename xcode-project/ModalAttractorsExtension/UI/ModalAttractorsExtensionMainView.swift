@@ -8,19 +8,65 @@
 import SwiftUI
 import AudioToolbox
 
-/// Main SwiftUI view for the Modal Attractors extension control panel
-///
-/// This view provides a comprehensive interface for controlling the Modal Attractors
-/// synthesis engine, organized into three main sections:
-/// - Network: Topology and coupling controls
-/// - Triggers: Excitation parameters
-/// - Output: Master gain control
+/// Root view for Modal Attractors AUv3 plugin
+/// Single view controller with internal tab/page switching
 public struct ModalAttractorsExtensionMainView: View {
     @EnvironmentObject var parameterTree: ParameterTree
+    @State private var selectedTab: Tab = .main
 
     public init() {}
 
+    // MARK: - Tab Definition
+
+    enum Tab: Int, CaseIterable, Identifiable {
+        case main
+        case characterEditor
+
+        var id: Int { rawValue }
+
+        var title: String {
+            switch self {
+            case .main: return "Main"
+            case .characterEditor: return "Character Editor"
+            }
+        }
+    }
+
+    // MARK: - Body
+
     public var body: some View {
+        VStack(spacing: 12) {
+            // Segmented tab picker
+            Picker("", selection: $selectedTab) {
+                ForEach(Tab.allCases) { tab in
+                    Text(tab.title).tag(tab)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            // Tab content
+            Group {
+                switch selectedTab {
+                case .main:
+                    MainTabView()
+                case .characterEditor:
+                    CharacterEditorTabView()
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .padding(12)
+        .frame(minWidth: 520, minHeight: 400)
+    }
+}
+
+// MARK: - Main Tab
+
+/// Main control page - simple interface for most users
+struct MainTabView: View {
+    @EnvironmentObject var parameterTree: ParameterTree
+
+    var body: some View {
         ScrollView {
             VStack(spacing: UIConstants.Spacing.large) {
                 // Header
@@ -33,7 +79,7 @@ public struct ModalAttractorsExtensionMainView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
-                .padding(.top, UIConstants.Spacing.medium)
+                .padding(.top, UIConstants.Spacing.small)
 
                 Divider()
 
@@ -42,21 +88,13 @@ public struct ModalAttractorsExtensionMainView: View {
 
                 Divider()
 
-                // Mode 0-3 sections
-                ModeControlsView(mode: parameterTree.mode0, modeLabel: "MODE 0")
-                ModeControlsView(mode: parameterTree.mode1, modeLabel: "MODE 1")
-                ModeControlsView(mode: parameterTree.mode2, modeLabel: "MODE 2")
-                ModeControlsView(mode: parameterTree.mode3, modeLabel: "MODE 3")
+                // Node Character System
+                NodeCharactersView()
 
                 Divider()
 
-                // Triggers section
-                TriggersControlsView()
-
-                Divider()
-
-                // Voice section
-                VoiceControlsView()
+                // Routing & Behavior
+                RoutingControlsView()
 
                 Divider()
 
@@ -65,15 +103,13 @@ public struct ModalAttractorsExtensionMainView: View {
             }
             .padding()
         }
-        .frame(
-            minWidth: UIConstants.Sizes.windowMinWidth,
-            minHeight: UIConstants.Sizes.windowMinHeight
-        )
     }
 }
+
+// MARK: - Preview
 
 #Preview {
     ModalAttractorsExtensionMainView()
         .environmentObject(ParameterTree.preview)
-        .frame(width: 500, height: 700)
+        .frame(width: 520, height: 400)
 }

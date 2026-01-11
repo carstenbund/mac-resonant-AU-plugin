@@ -31,7 +31,7 @@ class AudioUnitHostModel {
 
     let auValString: String
 
-    init(type: String = "aumi", subType: String = "Test", manufacturer: String = "Test") {
+    init(type: String = "aumi", subType: String = "Test", manufacturer: String = "Bund") {
         self.type = type
         self.subType = subType
         self.manufacturer = manufacturer

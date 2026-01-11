@@ -31,6 +31,11 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
 
     private var format: AVAudioFormat
 
+    // MARK: - Parameter Tree
+
+    /// SwiftUI parameter tree wrapper - created once and reused for all UI instances
+    private var paramTreeWrapper: ParameterTree?
+
     // MARK: - Constants
 
     private let maxPolyphony: UInt32 = 16
@@ -105,6 +110,9 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
     public func setupParameterTree(_ parameterTree: AUParameterTree) {
         self.parameterTree = parameterTree
 
+        // Create SwiftUI wrapper once for all UI instances
+        paramTreeWrapper = ParameterTree(auParameterTree: parameterTree)
+
         // Set default values from parameter tree
         guard let engine = engine else { return }
 
@@ -150,6 +158,20 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
                 return String(format: "%.2f", value)
             }
         }
+    }
+
+    private func ensureParameterTree() -> AUParameterTree {
+        if let paramTree = parameterTree {
+            // Create wrapper if it doesn't exist yet
+            if paramTreeWrapper == nil {
+                paramTreeWrapper = ParameterTree(auParameterTree: paramTree)
+            }
+            return paramTree
+        }
+
+        let paramTree = ModalAttractorsExtensionParameterSpecs.createAUParameterTree()
+        setupParameterTree(paramTree)
+        return paramTree
     }
 
     // MARK: - Resource Management
@@ -359,19 +381,26 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
     // MARK: - UI Integration
 
     public override func requestViewController(completionHandler: @escaping (AUViewController?) -> Void) {
-        guard let paramTree = parameterTree else {
+        NSLog("ModalAttractorsAudioUnit requestViewController called")
+
+        // Ensure parameter tree exists
+        let _ = ensureParameterTree()
+
+        // Ensure we have the wrapper (should be created in ensureParameterTree)
+        guard let wrapper = paramTreeWrapper else {
+            NSLog("ModalAttractorsAudioUnit: No paramTreeWrapper available")
             completionHandler(nil)
             return
         }
 
-        // Create parameter tree wrapper for SwiftUI
-        let paramTreeWrapper = ParameterTree(auParameterTree: paramTree)
+        // Ensure UI creation happens on main thread
+        DispatchQueue.main.async {
+            // Create and configure our custom AUViewController subclass
+            // Use the persistent wrapper so SwiftUI bindings work correctly
+            let vc = ModalAttractorsAUViewController()
+            vc.configure(paramTreeWrapper: wrapper)
 
-        // Create and configure our custom AUViewController subclass
-        // that hosts the SwiftUI view internally
-        let vc = ModalAttractorsAUViewController()
-        vc.configure(paramTreeWrapper: paramTreeWrapper)
-
-        completionHandler(vc)
+            completionHandler(vc)
+        }
     }
 }
