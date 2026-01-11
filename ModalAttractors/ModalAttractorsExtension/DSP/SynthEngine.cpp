@@ -83,6 +83,7 @@ SynthEngine::SynthEngine(uint32_t maxPolyphony)
     , masterGain_(0.7f)
     , couplingStrength_(0.3f)
     , topologyType_(0)
+    , couplingMode_(ModalVoice::CouplingMode::MagnitudePressure)  // Default to current behavior
     // Node characters (default: each node gets its own character 0-4)
     , node0_character_(0)
     , node1_character_(1)
@@ -257,7 +258,17 @@ void SynthEngine::updateControlRate() {
     for (uint8_t i = 0; i < 5; i++) {
         nodePointers_[i] = nodeManager_->getNode(i);
     }
-    topologyEngine_->updateCoupling(nodePointers_, 5);
+
+    // Choose coupling method based on mode
+    switch (couplingMode_) {
+        case ModalVoice::CouplingMode::ComplexDiffusion:
+            topologyEngine_->updateCouplingComplex(nodePointers_, 5);
+            break;
+        case ModalVoice::CouplingMode::MagnitudePressure:
+        default:
+            topologyEngine_->updateCoupling(nodePointers_, 5);
+            break;
+    }
 }
 
 void SynthEngine::setParameter(uint32_t paramId, float value) {

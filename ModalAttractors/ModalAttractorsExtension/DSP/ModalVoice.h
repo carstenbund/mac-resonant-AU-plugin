@@ -29,6 +29,14 @@ public:
     };
 
     /**
+     * @brief Coupling mode enumeration
+     */
+    enum class CouplingMode {
+        MagnitudePressure,  ///< Current behavior: abs(neighbor-self), always positive
+        ComplexDiffusion    ///< New: complex diffusive coupling with phase coherence
+    };
+
+    /**
      * @brief Constructor
      * @param voice_id Unique voice identifier (0-15 typically)
      */
@@ -82,6 +90,15 @@ public:
      * @param coupling_inputs Array of 4 coupling inputs (one per mode)
      */
     void applyCoupling(const float coupling_inputs[MAX_MODES]);
+
+    /**
+     * @brief Apply complex coupling to mode 0 only
+     * @param coupling0 Complex coupling value for mode 0
+     *
+     * This applies complex diffusive coupling directly to mode 0, preserving
+     * phase information. Used for physically-realistic ensemble coupling.
+     */
+    void applyCouplingMode0(modal_complex_t coupling0);
 
     /**
      * @brief Get voice state

@@ -169,6 +169,25 @@ public:
     float getParameter(uint32_t paramId) const;
 
     /**
+     * @brief Set coupling mode
+     * @param mode Coupling algorithm to use
+     *
+     * ComplexDiffusion: Phase-preserving, physically-realistic ensemble coupling
+     * MagnitudePressure: Current behavior (abs-based, always positive)
+     */
+    void setCouplingMode(ModalVoice::CouplingMode mode) {
+        couplingMode_ = mode;
+    }
+
+    /**
+     * @brief Get current coupling mode
+     * @return Active coupling algorithm
+     */
+    ModalVoice::CouplingMode getCouplingMode() const {
+        return couplingMode_;
+    }
+
+    /**
      * @brief Get maximum polyphony (always 5 nodes)
      */
     uint32_t getMaxPolyphony() const { return 5; }
@@ -200,6 +219,7 @@ private:
     float masterGain_;
     float couplingStrength_;
     int topologyType_;
+    ModalVoice::CouplingMode couplingMode_;  ///< Coupling algorithm selection
 
     // Parameter cache - Node Characters (5 nodes, IDs 0-4)
     uint8_t node0_character_;
