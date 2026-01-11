@@ -150,6 +150,10 @@ void ModalVoice::setPersonality(node_personality_t personality) {
     node_.personality = personality;
 }
 
+void ModalVoice::setGlobalDamping(float damping) {
+    node_.global_damping = damping;
+}
+
 void ModalVoice::reset() {
     modal_node_reset(&node_);
     state_ = State::Inactive;

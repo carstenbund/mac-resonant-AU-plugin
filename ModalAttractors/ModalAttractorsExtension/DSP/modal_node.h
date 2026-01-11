@@ -111,6 +111,7 @@ typedef struct {
     excitation_envelope_t excitation;   ///< Current excitation envelope
 
     float coupling_strength;            ///< Global coupling coefficient
+    float global_damping;               ///< Global damping coefficient (added to all modes)
     uint8_t num_neighbors;              ///< Number of connected neighbors
     uint8_t neighbor_ids[MAX_NEIGHBORS];///< Neighbor node IDs
 

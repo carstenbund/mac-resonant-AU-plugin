@@ -167,6 +167,17 @@ void NodeManager::setNodeCount(uint8_t count) {
     active_node_count_ = count;
 }
 
+void NodeManager::setGlobalDamping(float damping) {
+    if (!initialized_) return;
+
+    // Apply global damping to all nodes
+    for (uint8_t i = 0; i < NUM_NETWORK_NODES; i++) {
+        if (nodes_[i]) {
+            nodes_[i]->setGlobalDamping(damping);
+        }
+    }
+}
+
 // ============================================================================
 // Note Routing
 // ============================================================================

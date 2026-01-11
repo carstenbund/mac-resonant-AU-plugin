@@ -149,6 +149,16 @@ public:
         return active_node_count_;
     }
 
+    /**
+     * @brief Set global damping for all nodes
+     * @param damping Global damping coefficient (>= 0.0)
+     *
+     * This adds extra damping to all modal oscillators, effectively
+     * removing energy from the system. Can be used to calm runaway
+     * oscillations or control overall system energy.
+     */
+    void setGlobalDamping(float damping);
+
     // ========================================================================
     // Note Handling
     // ========================================================================

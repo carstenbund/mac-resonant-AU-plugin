@@ -151,6 +151,16 @@ public:
     void setPersonality(node_personality_t personality);
 
     /**
+     * @brief Set global damping coefficient
+     * @param damping Global damping value (>= 0.0)
+     *
+     * This adds extra damping to all modes, effectively removing energy
+     * from the system. Higher values cause faster decay and can be used
+     * to calm runaway oscillations.
+     */
+    void setGlobalDamping(float damping);
+
+    /**
      * @brief Get pointer to modal node for direct parameter access
      * @return Pointer to internal modal_node_t
      */

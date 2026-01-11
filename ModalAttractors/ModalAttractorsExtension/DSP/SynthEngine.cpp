@@ -152,6 +152,11 @@ void SynthEngine::prepare(double sampleRate, uint32_t maxFrames, uint32_t channe
     // Set default topology
     topologyEngine_->generateTopology(TopologyType::Ring, couplingStrength_);
 
+    // Initialize global damping from volume control
+    // Volume parameter functions as damping: 1.0 = no damping, 0.0 = max damping
+    float global_damping = (1.0f - masterGain_) * 8.0f;
+    nodeManager_->setGlobalDamping(global_damping);
+
     initialized_ = true;
 }
 
@@ -241,13 +246,8 @@ void SynthEngine::renderSlice(float* outL, float* outR, uint32_t startFrame, uin
     // Render nodes
     nodeManager_->renderAudio(outL, outR, numFrames);
 
-    // Apply master gain
-    for (uint32_t i = 0; i < numFrames; i++) {
-        outL[i] *= masterGain_;
-        if (outR != outL) {
-            outR[i] *= masterGain_;
-        }
-    }
+    // Note: Volume control now functions as global damping (circuit energy control)
+    // Output level is controlled in the DAW, not here
 }
 
 void SynthEngine::updateControlRate() {
@@ -263,9 +263,16 @@ void SynthEngine::updateControlRate() {
 
 void SynthEngine::setParameter(uint32_t paramId, float value) {
     switch (paramId) {
-        case kParam_MasterGain:
+        case kParam_MasterGain: {
             masterGain_ = value;
+            // Convert volume (0.0-1.0) to global damping
+            // Volume 1.0 = no damping, Volume 0.0 = maximum damping
+            float global_damping = (1.0f - value) * 8.0f;  // Scale factor of 8.0
+            if (nodeManager_) {
+                nodeManager_->setGlobalDamping(global_damping);
+            }
             break;
+        }
 
         case kParam_CouplingStrength:
             couplingStrength_ = value;
