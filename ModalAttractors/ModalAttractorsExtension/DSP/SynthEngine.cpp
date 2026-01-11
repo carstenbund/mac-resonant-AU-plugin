@@ -152,10 +152,10 @@ void SynthEngine::prepare(double sampleRate, uint32_t maxFrames, uint32_t channe
     // Set default topology
     topologyEngine_->generateTopology(TopologyType::Ring, couplingStrength_);
 
-    // Initialize global damping from volume control (0.9-1.0 range)
+    // Initialize global damping from volume control (0.9-1.0 range → 0.0-2.0 damping)
     float clamped_volume = std::max(0.9f, masterGain_);
     float normalized = (clamped_volume - 0.9f) / 0.1f;
-    float global_damping = (1.0f - normalized) * 8.0f;
+    float global_damping = (1.0f - normalized) * 2.0f;
     nodeManager_->setGlobalDamping(global_damping);
 
     initialized_ = true;
@@ -266,13 +266,13 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
     switch (paramId) {
         case kParam_MasterGain: {
             masterGain_ = value;
-            // Convert volume (0.9-1.0) to global damping
-            // Volume >= 1.0 = no damping
-            // Volume = 0.9 = maximum damping (8.0)
-            // Volume < 0.9 = maximum damping (clamped)
+            // Convert volume (0.9-1.0) to global damping (0.0-2.0)
+            // Volume = 1.0 → damping = 0.0 (no damping)
+            // Volume = 0.9 → damping = 2.0 (maximum damping)
+            // Volume < 0.9 → damping = 2.0 (clamped)
             float clamped_volume = std::max(0.9f, value);
             float normalized = (clamped_volume - 0.9f) / 0.1f;  // 0.0 at 0.9, 1.0 at 1.0
-            float global_damping = (1.0f - normalized) * 8.0f;
+            float global_damping = (1.0f - normalized) * 2.0f;
             if (nodeManager_) {
                 nodeManager_->setGlobalDamping(global_damping);
             }
