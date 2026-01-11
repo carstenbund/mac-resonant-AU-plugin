@@ -12,8 +12,8 @@
 #ifndef MODAL_VOICE_H
 #define MODAL_VOICE_H
 
-#include "../../../src/esp32_port/modal_node.h"
-#include "../../../src/esp32_port/audio_synth.h"
+#include "modal_node.h"
+#include "audio_synth.h"
 #include <cstdint>
 
 class ModalVoice {
