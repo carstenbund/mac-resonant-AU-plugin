@@ -83,7 +83,7 @@ SynthEngine::SynthEngine(uint32_t maxPolyphony)
     , masterGain_(0.7f)
     , couplingStrength_(0.3f)
     , topologyType_(0)
-    , couplingMode_(ModalVoice::CouplingMode::MagnitudePressure)  // Default to current behavior
+    , couplingMode_(ModalVoice::CouplingMode::ComplexDiffusion)  // Testing new phase-preserving coupling
     // Node characters (default: each node gets its own character 0-4)
     , node0_character_(0)
     , node1_character_(1)
