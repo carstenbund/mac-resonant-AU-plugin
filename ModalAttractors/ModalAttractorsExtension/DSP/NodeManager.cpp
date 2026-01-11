@@ -156,6 +156,14 @@ void NodeManager::setNodeCount(uint8_t count) {
     // Stop all nodes before changing count (safety)
     allNotesOff();
 
+    // Force reset nodes beyond active count to clear modal state
+    // This prevents inactive nodes from retaining energy and participating in coupling
+    for (uint8_t i = count; i < NUM_NETWORK_NODES; i++) {
+        if (nodes_[i]) {
+            nodes_[i]->reset();
+        }
+    }
+
     active_node_count_ = count;
 }
 
