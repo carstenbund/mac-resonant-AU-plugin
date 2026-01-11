@@ -97,6 +97,14 @@ public:
      */
     void setModeWaveShape(uint32_t node_idx, uint32_t mode_idx, wave_shape_t shape);
 
+    /**
+     * @brief Get wave shape for a specific mode
+     * @param node_idx Node index (0-4)
+     * @param mode_idx Mode index (0-3)
+     * @return Current wave shape
+     */
+    wave_shape_t getModeWaveShape(uint32_t node_idx, uint32_t mode_idx) const;
+
     // ========================================================================
     // Routing Configuration
     // ========================================================================

@@ -118,6 +118,21 @@ void NodeManager::setModeWaveShape(uint32_t node_idx, uint32_t mode_idx, wave_sh
     }
 }
 
+wave_shape_t NodeManager::getModeWaveShape(uint32_t node_idx, uint32_t mode_idx) const {
+    if (node_idx >= NUM_NETWORK_NODES) return WAVE_SHAPE_SINE;
+    if (mode_idx >= MAX_MODES) return WAVE_SHAPE_SINE;
+
+    ModalVoice* node = nodes_[node_idx];
+    if (!node) return WAVE_SHAPE_SINE;
+
+    // Get wave shape for the specified mode
+    modal_node_t* modal = node->getModalNode();
+    if (modal) {
+        return modal->modes[mode_idx].params.shape;
+    }
+    return WAVE_SHAPE_SINE;
+}
+
 void NodeManager::applyCharacterToNode(uint8_t node_idx, const NodeCharacter* character) {
     if (!initialized_) return;
 

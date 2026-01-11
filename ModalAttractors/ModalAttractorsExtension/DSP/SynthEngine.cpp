@@ -504,7 +504,18 @@ float SynthEngine::getParameter(uint32_t paramId) const {
         case kParam_Personality:
             return personality_;
 
+        // Wave Shape parameters (20 parameters: 5 nodes × 4 modes)
         default:
+            if (paramId >= kParam_Node0_Mode0_WaveShape && paramId <= kParam_Node4_Mode3_WaveShape) {
+                uint32_t paramOffset = paramId - kParam_Node0_Mode0_WaveShape;
+                uint32_t nodeIndex = paramOffset / 4;  // 0-4
+                uint32_t modeIndex = paramOffset % 4;  // 0-3
+
+                if (nodeManager_) {
+                    wave_shape_t shape = nodeManager_->getModeWaveShape(nodeIndex, modeIndex);
+                    return static_cast<float>(static_cast<int>(shape));
+                }
+            }
             return 0.0f;
     }
 }
