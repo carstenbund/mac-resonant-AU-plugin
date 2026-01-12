@@ -2,114 +2,125 @@
 //  ModalEffectExtensionMainView.swift
 //  ModalEffectExtension
 //
-//  Created by Carsten on 1/8/26.
+//  Simplified UI for ModalEffect audio effect
 //
 
 import SwiftUI
 import AudioToolbox
 
-/// Root view for Modal Attractors AUv3 plugin
-/// Single view controller with internal tab/page switching
+/// Root view for ModalEffect AUv3 plugin
+/// Simple single-page interface for the 5 effect parameters
 public struct ModalEffectExtensionMainView: View {
     @EnvironmentObject var parameterTree: ParameterTree
-    @State private var selectedTab: Tab = .main
 
     public init() {}
 
-    // MARK: - Tab Definition
-
-    enum Tab: Int, CaseIterable, Identifiable {
-        case main
-        case characterEditor
-
-        var id: Int { rawValue }
-
-        var title: String {
-            switch self {
-            case .main: return "Main"
-            case .characterEditor: return "Character Editor"
-            }
-        }
-    }
-
-    // MARK: - Body
-
     public var body: some View {
-        VStack(spacing: 12) {
-            // Segmented tab picker
-            Picker("", selection: $selectedTab) {
-                ForEach(Tab.allCases) { tab in
-                    Text(tab.title).tag(tab)
-                }
-            }
-            .pickerStyle(.segmented)
+        VStack(spacing: 20) {
+            // Header
+            VStack(spacing: 4) {
+                Text("ModalEffect")
+                    .font(.title2)
+                    .fontWeight(.bold)
 
-            // Tab content
-            Group {
-                switch selectedTab {
-                case .main:
-                    MainTabView()
-                case .characterEditor:
-                    CharacterEditorTabView()
-                }
+                Text("Resonant Body Effect")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.top, 12)
+
+            Divider()
+
+            // Effect Parameters
+            ScrollView {
+                VStack(spacing: 16) {
+                    EffectParameterRow(
+                        title: "Body Size",
+                        subtitle: "Small = High Pitch, Large = Low Pitch",
+                        parameter: parameterTree.effect.bodySize
+                    )
+
+                    EffectParameterRow(
+                        title: "Material",
+                        subtitle: "Soft = Short Decay, Hard = Long Ring",
+                        parameter: parameterTree.effect.material
+                    )
+
+                    EffectParameterRow(
+                        title: "Excite",
+                        subtitle: "How Much Input Drives the Resonator",
+                        parameter: parameterTree.effect.excite
+                    )
+
+                    EffectParameterRow(
+                        title: "Morph",
+                        subtitle: "Pitch Tracking: Fixed ← → Follows Input",
+                        parameter: parameterTree.effect.morph
+                    )
+
+                    EffectParameterRow(
+                        title: "Mix",
+                        subtitle: "Dry/Wet Balance",
+                        parameter: parameterTree.effect.mix
+                    )
+                }
+                .padding(.horizontal, 16)
+            }
+
+            Spacer()
         }
-        .padding(12)
-        .frame(minWidth: 520, minHeight: 400)
+        .frame(minWidth: 400, minHeight: 500)
+        .background(Color(NSColor.windowBackgroundColor))
     }
 }
 
-// MARK: - Main Tab
+// MARK: - Parameter Row Component
 
-/// Main control page - simple interface for most users
-struct MainTabView: View {
-    @EnvironmentObject var parameterTree: ParameterTree
+struct EffectParameterRow: View {
+    let title: String
+    let subtitle: String
+    @ObservedObject var parameter: ParameterWrapper
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: UIConstants.Spacing.large) {
-                // Header
-                VStack(spacing: UIConstants.Spacing.tiny) {
-                    Text("Modal Attractors")
-                        .font(.title2)
-                        .fontWeight(.bold)
-
-                    Text("Network-Coupled Resonator Synthesis")
+        VStack(alignment: .leading, spacing: 8) {
+            // Title and value
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.headline)
+                    Text(subtitle)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
-                .padding(.top, UIConstants.Spacing.small)
 
-                Divider()
+                Spacer()
 
-                // Network section
-                NetworkControlsView()
-
-                Divider()
-
-                // Node Character System
-                NodeCharactersView()
-
-                Divider()
-
-                // Routing & Behavior
-                RoutingControlsView()
-
-                Divider()
-
-                // Drive/Output section
-                DriveControlsView()
+                Text(String(format: "%.2f", parameter.value))
+                    .font(.system(.body, design: .monospaced))
+                    .foregroundColor(.secondary)
             }
-            .padding()
+
+            // Slider
+            Slider(
+                value: Binding(
+                    get: { parameter.value },
+                    set: { parameter.value = $0 }
+                ),
+                in: parameter.minValue...parameter.maxValue
+            )
         }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
+        .background(Color(NSColor.controlBackgroundColor))
+        .cornerRadius(8)
     }
 }
 
 // MARK: - Preview
 
-#Preview {
-    ModalEffectExtensionMainView()
-        .environmentObject(ParameterTree.preview)
-        .frame(width: 520, height: 400)
+struct ModalEffectExtensionMainView_Previews: PreviewProvider {
+    static var previews: some View {
+        ModalEffectExtensionMainView()
+            .environmentObject(ParameterTree.preview)
+    }
 }
