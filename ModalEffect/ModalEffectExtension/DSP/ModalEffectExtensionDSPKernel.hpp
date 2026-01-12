@@ -41,10 +41,19 @@ public:
     // Add a case for each parameter in ModalEffectExtensionParameterAddresses.h
     void setParameter(AUParameterAddress address, AUValue value) {
         switch (address) {
-            case ModalEffectExtensionParameterAddress::kParam_MasterGain:
+            case ModalEffectExtensionParameterAddress::kParam_BodySize:
                 // TODO: Implement parameter handling
                 break;
-            case ModalEffectExtensionParameterAddress::kParam_CouplingStrength:
+            case ModalEffectExtensionParameterAddress::kParam_Material:
+                // TODO: Implement parameter handling
+                break;
+            case ModalEffectExtensionParameterAddress::kParam_Excite:
+                // TODO: Implement parameter handling
+                break;
+            case ModalEffectExtensionParameterAddress::kParam_Morph:
+                // TODO: Implement parameter handling
+                break;
+            case ModalEffectExtensionParameterAddress::kParam_Mix:
                 // TODO: Implement parameter handling
                 break;
             default:
@@ -56,11 +65,20 @@ public:
         // Return the goal. It is not thread safe to return the ramping value.
 
         switch (address) {
-            case ModalEffectExtensionParameterAddress::kParam_MasterGain:
-                return 0.7f; // TODO: Return actual value
+            case ModalEffectExtensionParameterAddress::kParam_BodySize:
+                return 0.5f; // TODO: Return actual value
 
-            case ModalEffectExtensionParameterAddress::kParam_CouplingStrength:
-                return 0.3f; // TODO: Return actual value
+            case ModalEffectExtensionParameterAddress::kParam_Material:
+                return 0.5f; // TODO: Return actual value
+
+            case ModalEffectExtensionParameterAddress::kParam_Excite:
+                return 0.5f; // TODO: Return actual value
+
+            case ModalEffectExtensionParameterAddress::kParam_Morph:
+                return 0.0f; // TODO: Return actual value
+
+            case ModalEffectExtensionParameterAddress::kParam_Mix:
+                return 0.5f; // TODO: Return actual value
 
             default: return 0.f;
         }
