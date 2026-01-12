@@ -1,6 +1,6 @@
 //
 //  Parameters.swift
-//  ModatEffectExtension
+//  ModalEffectExtension
 //
 //  Resonant Body Effect Parameter Specification
 //
@@ -9,12 +9,12 @@ import Foundation
 import AudioToolbox
 
 // Parameter tree specification for Resonant Body Effect
-let ModatEffectExtensionParameterSpecs = ParameterTreeSpec {
+let ModalEffectExtensionParameterSpecs = ParameterTreeSpec {
 
     // MARK: - Effect Parameters
     ParameterGroupSpec(identifier: "effect", name: "Effect") {
         ParameterSpec(
-            address: ModatEffectExtensionParameterAddress.param_BodySize,
+            address: ModalEffectExtensionParameterAddress.param_BodySize,
             identifier: "bodySize",
             name: "Body Size",
             units: .generic,
@@ -23,7 +23,7 @@ let ModatEffectExtensionParameterSpecs = ParameterTreeSpec {
         )
 
         ParameterSpec(
-            address: ModatEffectExtensionParameterAddress.param_Material,
+            address: ModalEffectExtensionParameterAddress.param_Material,
             identifier: "material",
             name: "Material",
             units: .generic,
@@ -32,7 +32,7 @@ let ModatEffectExtensionParameterSpecs = ParameterTreeSpec {
         )
 
         ParameterSpec(
-            address: ModatEffectExtensionParameterAddress.param_Excite,
+            address: ModalEffectExtensionParameterAddress.param_Excite,
             identifier: "excite",
             name: "Excite",
             units: .generic,
@@ -41,7 +41,7 @@ let ModatEffectExtensionParameterSpecs = ParameterTreeSpec {
         )
 
         ParameterSpec(
-            address: ModatEffectExtensionParameterAddress.param_Morph,
+            address: ModalEffectExtensionParameterAddress.param_Morph,
             identifier: "morph",
             name: "Morph",
             units: .generic,
@@ -50,7 +50,7 @@ let ModatEffectExtensionParameterSpecs = ParameterTreeSpec {
         )
 
         ParameterSpec(
-            address: ModatEffectExtensionParameterAddress.param_Mix,
+            address: ModalEffectExtensionParameterAddress.param_Mix,
             identifier: "mix",
             name: "Mix",
             units: .generic,
@@ -63,7 +63,7 @@ let ModatEffectExtensionParameterSpecs = ParameterTreeSpec {
 // Extension to make parameter addresses work with ParameterSpec
 extension ParameterSpec {
     init(
-        address: ModatEffectExtensionParameterAddress,
+        address: ModalEffectExtensionParameterAddress,
         identifier: String,
         name: String,
         units: AudioUnitParameterUnit,
