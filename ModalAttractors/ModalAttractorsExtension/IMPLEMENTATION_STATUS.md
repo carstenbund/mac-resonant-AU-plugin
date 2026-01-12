@@ -135,9 +135,6 @@ ModalAttractorsExtension/
 │   ├── Audio Unit/
 │   │   └── ModalAttractorsExtensionAudioUnit.swift  ← REWRITTEN: Sample-accurate AU
 │   │
-│   ├── AudioUnitFactory/
-│   │   └── AudioUnitFactory.swift             (unchanged - works correctly)
-│   │
 │   ├── Parameters/
 │   │   └── ParameterSpecBase.swift            (unchanged - template code)
 │   │
