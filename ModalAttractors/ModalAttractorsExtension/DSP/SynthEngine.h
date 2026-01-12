@@ -9,6 +9,7 @@
 
 #ifndef SYNTH_ENGINE_H
 #define SYNTH_ENGINE_H
+#include "ModalVoice.h"
 
 #include <cstdint>
 #include <cstring>
