@@ -152,6 +152,40 @@ void modal_attractors_engine_render(ModalEffectEngine* engine,
     engine->synth_engine->render(*engine->event_queue, outL, outR, num_frames);
 }
 
+void modal_attractors_engine_process(ModalEffectEngine* engine,
+                                     const float* inL,
+                                     const float* inR,
+                                     float* outL,
+                                     float* outR,
+                                     uint32_t num_frames) {
+    if (!engine || !engine->initialized) {
+        // Return silence if not initialized
+        memset(outL, 0, num_frames * sizeof(float));
+        if (outR != outL) {
+            memset(outR, 0, num_frames * sizeof(float));
+        }
+        return;
+    }
+
+    // TODO: Integrate ResonantBodyProcessor and other DSP components here
+    // For now, implement simple passthrough with mix parameter
+
+    // Get mix parameter (0.0 = dry, 1.0 = wet)
+    float mix = engine->synth_engine->getParameter(4); // kParam_Mix = 4
+    float dryGain = 1.0f - mix;
+    float wetGain = mix;
+
+    // Simple passthrough for now (copy input to output with mix)
+    for (uint32_t i = 0; i < num_frames; ++i) {
+        outL[i] = inL[i] * dryGain;
+        outR[i] = inR[i] * dryGain;
+    }
+
+    // TODO: Add actual effect processing here
+    // The ResonantBodyProcessor should be called here to generate the wet signal
+    // and mix it with the dry signal
+}
+
 // ============================================================================
 // Parameter access
 // ============================================================================

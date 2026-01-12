@@ -8,10 +8,10 @@
 import AVFoundation
 import CoreAudioKit
 
-/// AUv3 Instrument implementation for Modal Attractors synthesis engine
+/// AUv3 Audio Effect implementation for Modal Effect
 ///
 /// This class implements the Audio Unit wrapper around the C++ DSP engine,
-/// providing sample-accurate MIDI and parameter event processing.
+/// providing sample-accurate parameter event processing and audio input/output.
 public class ModalEffectExtensionAudioUnit: AUAudioUnit, @unchecked Sendable {
 
     // MARK: - DSP Engine
@@ -24,7 +24,9 @@ public class ModalEffectExtensionAudioUnit: AUAudioUnit, @unchecked Sendable {
 
     // MARK: - Bus Configuration
 
+    private var inputBus: AUAudioUnitBus?
     private var outputBus: AUAudioUnitBus?
+    private var _inputBusses: AUAudioUnitBusArray!
     private var _outputBusses: AUAudioUnitBusArray!
 
     private var format: AVAudioFormat
@@ -49,7 +51,14 @@ public class ModalEffectExtensionAudioUnit: AUAudioUnit, @unchecked Sendable {
         // Call super
         try super.init(componentDescription: componentDescription, options: options)
 
-        // Create output bus (instrument has no input bus)
+        // Create input bus (audio effect needs input)
+        inputBus = try AUAudioUnitBus(format: self.format)
+        inputBus?.maximumChannelCount = 2
+        _inputBusses = AUAudioUnitBusArray(audioUnit: self,
+                                          busType: .input,
+                                          busses: [inputBus!])
+
+        // Create output bus
         outputBus = try AUAudioUnitBus(format: self.format)
         outputBus?.maximumChannelCount = 2
         _outputBusses = AUAudioUnitBusArray(audioUnit: self,
@@ -90,6 +99,10 @@ public class ModalEffectExtensionAudioUnit: AUAudioUnit, @unchecked Sendable {
     }
 
     // MARK: - AUAudioUnit Overrides
+
+    public override var inputBusses: AUAudioUnitBusArray {
+        return _inputBusses
+    }
 
     public override var outputBusses: AUAudioUnitBusArray {
         return _outputBusses
@@ -177,13 +190,20 @@ public class ModalEffectExtensionAudioUnit: AUAudioUnit, @unchecked Sendable {
     // MARK: - Resource Management
 
     public override func allocateRenderResources() throws {
-        guard let bus = outputBus else {
+        guard let inBus = inputBus, let outBus = outputBus else {
+            throw NSError(domain: NSOSStatusErrorDomain,
+                         code: Int(kAudioUnitErr_FormatNotSupported))
+        }
+
+        // For audio effects, input and output formats must match
+        if inBus.format.channelCount != outBus.format.channelCount ||
+           inBus.format.sampleRate != outBus.format.sampleRate {
             throw NSError(domain: NSOSStatusErrorDomain,
                          code: Int(kAudioUnitErr_FormatNotSupported))
         }
 
         // Update format
-        format = bus.format
+        format = outBus.format
 
         // Prepare engine with current format
         if let engine = engine {
@@ -294,6 +314,16 @@ public class ModalEffectExtensionAudioUnit: AUAudioUnit, @unchecked Sendable {
                 }
             }
 
+            // Pull input audio (audio effect needs to process input)
+            guard let pullInputBlock = pullInputBlock else {
+                return kAudioUnitErr_InvalidProperty
+            }
+
+            var pullFlags = AudioUnitRenderActionFlags(0)
+            let status = pullInputBlock(&pullFlags, timestamp, frameCount, 0, outputData)
+            guard status == noErr else { return status }
+
+            // Get output buffers
             let buffers = UnsafeMutableAudioBufferListPointer(outputData)
             guard buffers.count >= 1 else { return kAudioUnitErr_InvalidProperty }
 
@@ -303,13 +333,16 @@ public class ModalEffectExtensionAudioUnit: AUAudioUnit, @unchecked Sendable {
                     let outR = buffers[1].mData?.assumingMemoryBound(to: Float.self)
                 else { return kAudioUnitErr_InvalidProperty }
 
-                modal_attractors_engine_render(enginePtr, outL, outR, frameCount)
+                // Process audio effect (input is now in output buffers from pullInputBlock)
+                // We need to copy to temp buffers first, then process
+                // For in-place processing, we can use the same buffers as input and output
+                modal_attractors_engine_process(enginePtr, outL, outR, outL, outR, frameCount)
             } else {
                 guard
                     let out = buffers[0].mData?.assumingMemoryBound(to: Float.self)
                 else { return kAudioUnitErr_InvalidProperty }
 
-                modal_attractors_engine_render(enginePtr, out, out, frameCount)
+                modal_attractors_engine_process(enginePtr, out, out, out, out, frameCount)
             }
 
             return noErr
@@ -331,9 +364,9 @@ public class ModalEffectExtensionAudioUnit: AUAudioUnit, @unchecked Sendable {
             // REQUIRED: Add component identification for AUv3 validation
             // These must match the Info.plist AudioComponents entry
             // Note: type/subtype/manufacturer must be FourCharCode as Int, not String
-            state["type"] = Self.fourCharCode("aumi")        // 1635085673
-            state["subtype"] = Self.fourCharCode("Test")     // 1413829748
-            state["manufacturer"] = Self.fourCharCode("Test") // 1413829748
+            state["type"] = Self.fourCharCode("aufx")        // audio effect
+            state["subtype"] = Self.fourCharCode("MdlE")     // ModalEffect
+            state["manufacturer"] = Self.fourCharCode("Bund") // Bund
             state["version"] = 67072
 
             // Save all parameter values
