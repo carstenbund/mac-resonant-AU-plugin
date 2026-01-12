@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3513BE1B2F0F0FAB00716251 /* ModalAttractorsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3513BE1A2F0F0FAB00716251 /* ModalAttractorsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3513BE1B2F0F0FAB00716251 /* ModalEffectExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3513BE1A2F0F0FAB00716251 /* ModalEffectExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -16,7 +16,7 @@
 			containerPortal = 3513BDEB2F0F0FAA00716251 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 3513BE192F0F0FAB00716251;
-			remoteInfo = ModalAttractorsExtension;
+			remoteInfo = ModalEffectExtension;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -27,7 +27,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				3513BE1B2F0F0FAB00716251 /* ModalAttractorsExtension.appex in Embed Foundation Extensions */,
+				3513BE1B2F0F0FAB00716251 /* ModalEffectExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -35,44 +35,44 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		3513BDF32F0F0FAA00716251 /* ModalAttractors.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ModalAttractors.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		3513BE1A2F0F0FAB00716251 /* ModalAttractorsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ModalAttractorsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		3513BDF32F0F0FAA00716251 /* ModalEffect.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ModalEffect.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3513BE1A2F0F0FAB00716251 /* ModalEffectExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ModalEffectExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		3513BE3C2F0F0FAB00716251 /* Exceptions for "ModalAttractorsExtension" folder in "ModalAttractorsExtension" target */ = {
+		3513BE3C2F0F0FAB00716251 /* Exceptions for "ModalEffectExtension" folder in "ModalEffectExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 3513BE192F0F0FAB00716251 /* ModalAttractorsExtension */;
+			target = 3513BE192F0F0FAB00716251 /* ModalEffectExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		3513BE402F0F0FAB00716251 /* Exceptions for "ModalAttractorsExtension" folder in "Copy Bundle Resources" phase from "ModalAttractorsExtension" target */ = {
+		3513BE402F0F0FAB00716251 /* Exceptions for "ModalEffectExtension" folder in "Copy Bundle Resources" phase from "ModalEffectExtension" target */ = {
 			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
 			buildPhase = 3513BE182F0F0FAB00716251 /* Resources */;
 			membershipExceptions = (
-				Common/DSP/ModalAttractorsExtensionAUProcessHelper.hpp,
-				DSP/ModalAttractorsExtensionDSPKernel.hpp,
+				Common/DSP/ModalEffectExtensionAUProcessHelper.hpp,
+				DSP/ModalEffectExtensionDSPKernel.hpp,
 			);
 		};
 /* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		3513BDF52F0F0FAA00716251 /* ModalAttractors */ = {
+		3513BDF52F0F0FAA00716251 /* ModalEffect */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ModalAttractors;
+			path = ModalEffect;
 			sourceTree = "<group>";
 		};
-		3513BE1E2F0F0FAB00716251 /* ModalAttractorsExtension */ = {
+		3513BE1E2F0F0FAB00716251 /* ModalEffectExtension */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				3513BE3C2F0F0FAB00716251 /* Exceptions for "ModalAttractorsExtension" folder in "ModalAttractorsExtension" target */,
-				3513BE402F0F0FAB00716251 /* Exceptions for "ModalAttractorsExtension" folder in "Copy Bundle Resources" phase from "ModalAttractorsExtension" target */,
+				3513BE3C2F0F0FAB00716251 /* Exceptions for "ModalEffectExtension" folder in "ModalEffectExtension" target */,
+				3513BE402F0F0FAB00716251 /* Exceptions for "ModalEffectExtension" folder in "Copy Bundle Resources" phase from "ModalEffectExtension" target */,
 			);
-			path = ModalAttractorsExtension;
+			path = ModalEffectExtension;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -98,8 +98,8 @@
 		3513BDEA2F0F0FAA00716251 = {
 			isa = PBXGroup;
 			children = (
-				3513BDF52F0F0FAA00716251 /* ModalAttractors */,
-				3513BE1E2F0F0FAB00716251 /* ModalAttractorsExtension */,
+				3513BDF52F0F0FAA00716251 /* ModalEffect */,
+				3513BE1E2F0F0FAB00716251 /* ModalEffectExtension */,
 				3513BDF42F0F0FAA00716251 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -107,8 +107,8 @@
 		3513BDF42F0F0FAA00716251 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3513BDF32F0F0FAA00716251 /* ModalAttractors.app */,
-				3513BE1A2F0F0FAB00716251 /* ModalAttractorsExtension.appex */,
+				3513BDF32F0F0FAA00716251 /* ModalEffect.app */,
+				3513BE1A2F0F0FAB00716251 /* ModalEffectExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -116,9 +116,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		3513BDF22F0F0FAA00716251 /* ModalAttractors */ = {
+		3513BDF22F0F0FAA00716251 /* ModalEffect */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3513BE442F0F0FAB00716251 /* Build configuration list for PBXNativeTarget "ModalAttractors" */;
+			buildConfigurationList = 3513BE442F0F0FAB00716251 /* Build configuration list for PBXNativeTarget "ModalEffect" */;
 			buildPhases = (
 				3513BDEF2F0F0FAA00716251 /* Sources */,
 				3513BDF02F0F0FAA00716251 /* Frameworks */,
@@ -131,18 +131,18 @@
 				3513BE1D2F0F0FAB00716251 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				3513BDF52F0F0FAA00716251 /* ModalAttractors */,
+				3513BDF52F0F0FAA00716251 /* ModalEffect */,
 			);
-			name = ModalAttractors;
+			name = ModalEffect;
 			packageProductDependencies = (
 			);
-			productName = ModalAttractors;
-			productReference = 3513BDF32F0F0FAA00716251 /* ModalAttractors.app */;
+			productName = ModalEffect;
+			productReference = 3513BDF32F0F0FAA00716251 /* ModalEffect.app */;
 			productType = "com.apple.product-type.application";
 		};
-		3513BE192F0F0FAB00716251 /* ModalAttractorsExtension */ = {
+		3513BE192F0F0FAB00716251 /* ModalEffectExtension */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3513BE3D2F0F0FAB00716251 /* Build configuration list for PBXNativeTarget "ModalAttractorsExtension" */;
+			buildConfigurationList = 3513BE3D2F0F0FAB00716251 /* Build configuration list for PBXNativeTarget "ModalEffectExtension" */;
 			buildPhases = (
 				3513BE162F0F0FAB00716251 /* Sources */,
 				3513BE172F0F0FAB00716251 /* Frameworks */,
@@ -153,13 +153,13 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				3513BE1E2F0F0FAB00716251 /* ModalAttractorsExtension */,
+				3513BE1E2F0F0FAB00716251 /* ModalEffectExtension */,
 			);
-			name = ModalAttractorsExtension;
+			name = ModalEffectExtension;
 			packageProductDependencies = (
 			);
-			productName = ModalAttractorsExtension;
-			productReference = 3513BE1A2F0F0FAB00716251 /* ModalAttractorsExtension.appex */;
+			productName = ModalEffectExtension;
+			productReference = 3513BE1A2F0F0FAB00716251 /* ModalEffectExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -180,7 +180,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 3513BDEE2F0F0FAA00716251 /* Build configuration list for PBXProject "ModalAttractors" */;
+			buildConfigurationList = 3513BDEE2F0F0FAA00716251 /* Build configuration list for PBXProject "ModalEffect" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -194,8 +194,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				3513BDF22F0F0FAA00716251 /* ModalAttractors */,
-				3513BE192F0F0FAB00716251 /* ModalAttractorsExtension */,
+				3513BDF22F0F0FAA00716251 /* ModalEffect */,
+				3513BE192F0F0FAB00716251 /* ModalEffectExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -237,7 +237,7 @@
 /* Begin PBXTargetDependency section */
 		3513BE1D2F0F0FAB00716251 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 3513BE192F0F0FAB00716251 /* ModalAttractorsExtension */;
+			target = 3513BE192F0F0FAB00716251 /* ModalEffectExtension */;
 			targetProxy = 3513BE1C2F0F0FAB00716251 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -255,8 +255,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = ModalAttractorsExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = ModalAttractorsExtension;
+				INFOPLIST_FILE = ModalEffectExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ModalEffectExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -271,13 +271,13 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				MARKETING_VERSION = 1.2.1;
-				PRODUCT_BUNDLE_IDENTIFIER = bund.media.ModalAttractors.ModalAttractorsExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = bund.media.ModalEffect.ModalEffectExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "ModalAttractorsExtension/Common/ModalAttractorsExtension-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "ModalEffectExtension/Common/ModalEffectExtension-Bridging-Header.h";
 				SWIFT_OBJC_INTEROP_MODE = objcxx;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
@@ -297,8 +297,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = ModalAttractorsExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = ModalAttractorsExtension;
+				INFOPLIST_FILE = ModalEffectExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ModalEffectExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -313,13 +313,13 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				MARKETING_VERSION = 1.2.1;
-				PRODUCT_BUNDLE_IDENTIFIER = bund.media.ModalAttractors.ModalAttractorsExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = bund.media.ModalEffect.ModalEffectExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "ModalAttractorsExtension/Common/ModalAttractorsExtension-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "ModalEffectExtension/Common/ModalEffectExtension-Bridging-Header.h";
 				SWIFT_OBJC_INTEROP_MODE = objcxx;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
@@ -452,18 +452,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = ModalAttractors/ModalAttractors.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ModalEffect/ModalEffect.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"ModalAttractors/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"ModalEffect/Preview Content\"";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = ModalAttractors;
+				INFOPLIST_KEY_CFBundleDisplayName = ModalEffect;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -486,7 +486,7 @@
 					"-framework",
 					AVFoundation,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = bund.media.ModalAttractors;
+				PRODUCT_BUNDLE_IDENTIFIER = bund.media.ModalEffect;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -502,18 +502,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = ModalAttractors/ModalAttractors.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ModalEffect/ModalEffect.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"ModalAttractors/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"ModalEffect/Preview Content\"";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = ModalAttractors;
+				INFOPLIST_KEY_CFBundleDisplayName = ModalEffect;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -536,7 +536,7 @@
 					"-framework",
 					AVFoundation,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = bund.media.ModalAttractors;
+				PRODUCT_BUNDLE_IDENTIFIER = bund.media.ModalEffect;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -550,7 +550,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3513BDEE2F0F0FAA00716251 /* Build configuration list for PBXProject "ModalAttractors" */ = {
+		3513BDEE2F0F0FAA00716251 /* Build configuration list for PBXProject "ModalEffect" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3513BE412F0F0FAB00716251 /* Debug */,
@@ -559,7 +559,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3513BE3D2F0F0FAB00716251 /* Build configuration list for PBXNativeTarget "ModalAttractorsExtension" */ = {
+		3513BE3D2F0F0FAB00716251 /* Build configuration list for PBXNativeTarget "ModalEffectExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3513BE3E2F0F0FAB00716251 /* Debug */,
@@ -568,7 +568,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3513BE442F0F0FAB00716251 /* Build configuration list for PBXNativeTarget "ModalAttractors" */ = {
+		3513BE442F0F0FAB00716251 /* Build configuration list for PBXNativeTarget "ModalEffect" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3513BE452F0F0FAB00716251 /* Debug */,

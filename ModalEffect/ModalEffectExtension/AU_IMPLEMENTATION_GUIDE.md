@@ -7,7 +7,7 @@ This guide explains how to implement the AU wrapper for Modal Attractors followi
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  AU Wrapper (Objective-C++/Swift)                       │
-│  - ModalAttractorsExtensionAudioUnit.swift              │
+│  - ModalEffectExtensionAudioUnit.swift              │
 │  - AUParameterTree creation                             │
 │  - AURenderEvent parsing                                │
 └──────────────────┬──────────────────────────────────────┘
@@ -15,7 +15,7 @@ This guide explains how to implement the AU wrapper for Modal Attractors followi
                    ▼
 ┌─────────────────────────────────────────────────────────┐
 │  C API Bridge                                           │
-│  - ModalAttractorsEngine.cpp (C functions)              │
+│  - ModalEffectEngine.cpp (C functions)              │
 │  - Converts AU events → SynthEvent                      │
 └──────────────────┬──────────────────────────────────────┘
                    │ C++ API

@@ -2,7 +2,7 @@
 
 **Author:** Claude
 **Date:** January 10, 2026
-**Target:** ModalAttractorsExtension UI Layer
+**Target:** ModalEffectExtension UI Layer
 **Status:** Proposal for Review
 
 ---
@@ -23,7 +23,7 @@ This proposal outlines the design and implementation of a **radio-button-based m
 ## 1. Problem Statement
 
 ### Current Implementation
-**File:** `ModalAttractorsExtensionMainView.swift` (lines 46-49)
+**File:** `ModalEffectExtensionMainView.swift` (lines 46-49)
 
 ```swift
 // Mode 0-3 sections
@@ -310,7 +310,7 @@ struct ModeRadioButton: View {
 
 ### 3.3 Integration with Main View
 
-**File:** `ModalAttractorsExtensionMainView.swift` (MODIFIED)
+**File:** `ModalEffectExtensionMainView.swift` (MODIFIED)
 
 Replace lines 45-49 with:
 
@@ -547,7 +547,7 @@ Picker("Mode", selection: $selectedModeIndex) {
 1. ✅ Create `ModeSelectorView.swift` with radio buttons
 2. ✅ Create `ModeEditorView.swift` with shared control panel
 3. ✅ Implement dynamic binding to selected mode
-4. ✅ Update `ModalAttractorsExtensionMainView.swift` to use new component
+4. ✅ Update `ModalEffectExtensionMainView.swift` to use new component
 5. ✅ Test mode switching and parameter updates
 
 **Deliverable:** Basic mode editor with radio-button selection working.

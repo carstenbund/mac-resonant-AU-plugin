@@ -1,5 +1,5 @@
 /**
- * @file ModalAttractorsAU.h
+ * @file ModalEffectAU.h
  * @brief Bridge between AU wrapper and C++ DSP engine
  *
  * Provides a C-compatible interface for the AU wrapper to call the C++ DSP engine.
@@ -26,7 +26,7 @@ class EventQueue;
  * The AU wrapper holds a pointer to this struct.
  * Internally it wraps a C++ SynthEngine instance.
  */
-struct ModalAttractorsEngine {
+struct ModalEffectEngine {
     SynthEngine* synth_engine;  // C++ engine (opaque to C callers)
     EventQueue* event_queue;    // Render-time event queue
     bool initialized;
@@ -47,7 +47,7 @@ extern "C" {
  * @param max_frames Maximum frames per render call
  * @param max_polyphony Maximum number of voices
  */
-void modal_attractors_engine_init(ModalAttractorsEngine* engine,
+void modal_attractors_engine_init(ModalEffectEngine* engine,
                                   double sample_rate,
                                   uint32_t max_frames,
                                   uint32_t max_polyphony);
@@ -58,7 +58,7 @@ void modal_attractors_engine_init(ModalAttractorsEngine* engine,
  * @param sample_rate Sample rate in Hz
  * @param max_frames Maximum frames per render call
  */
-void modal_attractors_engine_prepare(ModalAttractorsEngine* engine,
+void modal_attractors_engine_prepare(ModalEffectEngine* engine,
                                      double sample_rate,
                                      uint32_t max_frames);
 
@@ -66,13 +66,13 @@ void modal_attractors_engine_prepare(ModalAttractorsEngine* engine,
  * @brief Reset engine state
  * @param engine Engine handle
  */
-void modal_attractors_engine_reset(ModalAttractorsEngine* engine);
+void modal_attractors_engine_reset(ModalEffectEngine* engine);
 
 /**
  * @brief Clean up engine resources
  * @param engine Engine handle
  */
-void modal_attractors_engine_cleanup(ModalAttractorsEngine* engine);
+void modal_attractors_engine_cleanup(ModalEffectEngine* engine);
 
 // ============================================================================
 // Event handling (for sample-accurate MIDI/automation)
@@ -82,7 +82,7 @@ void modal_attractors_engine_cleanup(ModalAttractorsEngine* engine);
  * @brief Begin event frame (clear event queue)
  * Call this at the start of each render call.
  */
-void modal_attractors_engine_begin_events(ModalAttractorsEngine* engine);
+void modal_attractors_engine_begin_events(ModalEffectEngine* engine);
 
 /**
  * @brief Push note on event
@@ -91,7 +91,7 @@ void modal_attractors_engine_begin_events(ModalAttractorsEngine* engine);
  * @param velocity Normalized velocity (0.0-1.0)
  * @param channel MIDI channel (0-15, where 0 = channel 1)
  */
-void modal_attractors_engine_push_note_on(ModalAttractorsEngine* engine,
+void modal_attractors_engine_push_note_on(ModalEffectEngine* engine,
                                           int32_t sample_offset,
                                           uint8_t note,
                                           float velocity,
@@ -102,7 +102,7 @@ void modal_attractors_engine_push_note_on(ModalAttractorsEngine* engine,
  * @param sample_offset Sample offset in current buffer
  * @param note MIDI note number (0-127)
  */
-void modal_attractors_engine_push_note_off(ModalAttractorsEngine* engine,
+void modal_attractors_engine_push_note_off(ModalEffectEngine* engine,
                                            int32_t sample_offset,
                                            uint8_t note);
 
@@ -111,7 +111,7 @@ void modal_attractors_engine_push_note_off(ModalAttractorsEngine* engine,
  * @param sample_offset Sample offset in current buffer
  * @param value Pitch bend value (-1.0 to +1.0)
  */
-void modal_attractors_engine_push_pitch_bend(ModalAttractorsEngine* engine,
+void modal_attractors_engine_push_pitch_bend(ModalEffectEngine* engine,
                                              int32_t sample_offset,
                                              float value);
 
@@ -121,7 +121,7 @@ void modal_attractors_engine_push_pitch_bend(ModalAttractorsEngine* engine,
  * @param param_id Parameter ID
  * @param value Parameter value
  */
-void modal_attractors_engine_push_parameter(ModalAttractorsEngine* engine,
+void modal_attractors_engine_push_parameter(ModalEffectEngine* engine,
                                             int32_t sample_offset,
                                             uint32_t param_id,
                                             float value);
@@ -141,7 +141,7 @@ void modal_attractors_engine_push_parameter(ModalAttractorsEngine* engine,
  * @param outR Right channel output buffer
  * @param num_frames Number of frames to render
  */
-void modal_attractors_engine_render(ModalAttractorsEngine* engine,
+void modal_attractors_engine_render(ModalEffectEngine* engine,
                                     float* outL,
                                     float* outR,
                                     uint32_t num_frames);
@@ -154,14 +154,14 @@ void modal_attractors_engine_render(ModalAttractorsEngine* engine,
  * @brief Set parameter immediately (not sample-accurate)
  * Use push_parameter for sample-accurate automation
  */
-void modal_attractors_engine_set_parameter(ModalAttractorsEngine* engine,
+void modal_attractors_engine_set_parameter(ModalEffectEngine* engine,
                                            uint32_t param_id,
                                            float value);
 
 /**
  * @brief Get parameter value
  */
-float modal_attractors_engine_get_parameter(ModalAttractorsEngine* engine,
+float modal_attractors_engine_get_parameter(ModalEffectEngine* engine,
                                             uint32_t param_id);
 
 #ifdef __cplusplus

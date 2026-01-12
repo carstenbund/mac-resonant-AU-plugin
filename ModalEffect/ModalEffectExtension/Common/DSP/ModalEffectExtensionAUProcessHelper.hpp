@@ -1,6 +1,6 @@
 //
-//  ModalAttractorsExtensionAUProcessHelper.hpp
-//  ModalAttractorsExtension
+//  ModalEffectExtensionAUProcessHelper.hpp
+//  ModalEffectExtension
 //
 //  Created by Carsten on 1/7/26.
 //
@@ -11,13 +11,13 @@
 #import <AVFoundation/AVFoundation.h>
 
 #include <vector>
-#include "ModalAttractorsExtensionDSPKernel.hpp"
+#include "ModalEffectExtensionDSPKernel.hpp"
 
 //MARK:- AUProcessHelper Utility Class
 class AUProcessHelper
 {
 public:
-    AUProcessHelper(ModalAttractorsExtensionDSPKernel& kernel)
+    AUProcessHelper(ModalEffectExtensionDSPKernel& kernel)
     : mKernel{kernel} {}
     
     /**
@@ -108,5 +108,5 @@ public:
         
     }
 private:
-    ModalAttractorsExtensionDSPKernel& mKernel;
+    ModalEffectExtensionDSPKernel& mKernel;
 };

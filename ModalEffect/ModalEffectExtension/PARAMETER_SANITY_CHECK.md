@@ -9,9 +9,9 @@ All 20 parameters are correctly defined and mapped across the parameter system a
 
 ## Parameter Address Verification
 
-### Header File (ModalAttractorsExtensionParameterAddresses.h)
+### Header File (ModalEffectExtensionParameterAddresses.h)
 ```c
-typedef NS_ENUM(AUParameterAddress, ModalAttractorsExtensionParameterAddress) {
+typedef NS_ENUM(AUParameterAddress, ModalEffectExtensionParameterAddress) {
     kParam_MasterGain = 0,           // → Swift: param_MasterGain
     kParam_CouplingStrength = 1,     // → Swift: param_CouplingStrength
     kParam_Topology = 2,             // → Swift: param_Topology

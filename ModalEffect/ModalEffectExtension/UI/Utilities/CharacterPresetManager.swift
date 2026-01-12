@@ -1,6 +1,6 @@
 //
 //  CharacterPresetManager.swift
-//  ModalAttractorsExtension
+//  ModalEffectExtension
 //
 //  Manages saving and loading of custom character presets
 //
@@ -106,7 +106,7 @@ class CharacterPresetManager: ObservableObject {
 
     @Published private(set) var presets: [CharacterPreset] = []
 
-    private let userDefaultsKey = "ModalAttractors.CustomCharacterPresets"
+    private let userDefaultsKey = "ModalEffect.CustomCharacterPresets"
 
     private init() {
         loadPresets()

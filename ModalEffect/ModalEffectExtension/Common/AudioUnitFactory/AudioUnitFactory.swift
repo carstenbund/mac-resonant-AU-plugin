@@ -1,11 +1,11 @@
 //
 //  AudioUnitFactory.swift
-//  ModalAttractorsExtension
+//  ModalEffectExtension
 //
 //  Created by Carsten on 1/7/26.
 //
 //  NOTE: This file is DEPRECATED.
-//  The AUAudioUnitFactory protocol is now implemented by ModalAttractorsAUViewController
+//  The AUAudioUnitFactory protocol is now implemented by ModalEffectAUViewController
 //  which is the extension's principal class. This allows proper out-of-process UI support.
 //  This file is kept for reference but is no longer used.
 //
@@ -13,11 +13,11 @@
 import CoreAudioKit
 import os
 
-private let log = Logger(subsystem: "com.bundle.id.ModalAttractorsExtension", category: "AudioUnitFactory")
+private let log = Logger(subsystem: "com.bundle.id.ModalEffectExtension", category: "AudioUnitFactory")
 
-/// DEPRECATED: Use ModalAttractorsAUViewController instead.
+/// DEPRECATED: Use ModalEffectAUViewController instead.
 /// This class is no longer the principal class for the extension.
-@available(*, deprecated, message: "Use ModalAttractorsAUViewController which is now the principal class")
+@available(*, deprecated, message: "Use ModalEffectAUViewController which is now the principal class")
 public class AudioUnitFactory: NSObject, AUAudioUnitFactory {
     var auAudioUnit: AUAudioUnit?
 
@@ -29,7 +29,7 @@ public class AudioUnitFactory: NSObject, AUAudioUnitFactory {
 
     @objc
     public func createAudioUnit(with componentDescription: AudioComponentDescription) throws -> AUAudioUnit {
-        auAudioUnit = try ModalAttractorsExtensionAudioUnit(
+        auAudioUnit = try ModalEffectExtensionAudioUnit(
             componentDescription: componentDescription,
             options: []
         )
@@ -38,7 +38,7 @@ public class AudioUnitFactory: NSObject, AUAudioUnitFactory {
             throw NSError(
                 domain: NSOSStatusErrorDomain,
                 code: Int(kAudioUnitErr_FailedInitialization),
-                userInfo: [NSLocalizedDescriptionKey: "Failed to create ModalAttractorsExtension"]
+                userInfo: [NSLocalizedDescriptionKey: "Failed to create ModalEffectExtension"]
             )
         }
 

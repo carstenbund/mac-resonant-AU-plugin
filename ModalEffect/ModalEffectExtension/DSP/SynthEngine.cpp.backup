@@ -9,7 +9,7 @@
 #include "ModalVoice.h"
 #include <algorithm>
 
-// Parameter IDs (should match ModalAttractorsExtensionParameterAddresses.h)
+// Parameter IDs (should match ModalEffectExtensionParameterAddresses.h)
 enum ParamID {
     kParam_MasterGain = 0,
     kParam_CouplingStrength = 1,

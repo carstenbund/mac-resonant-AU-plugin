@@ -1,6 +1,6 @@
 //
 //  CharacterEditorTabView.swift
-//  ModalAttractorsExtension
+//  ModalEffectExtension
 //
 //  Character editor tab for the main view
 //  Embedded version without navigation/dismiss - used as a tab

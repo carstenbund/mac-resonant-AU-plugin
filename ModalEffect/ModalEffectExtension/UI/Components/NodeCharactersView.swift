@@ -1,6 +1,6 @@
 //
 //  NodeCharactersView.swift
-//  ModalAttractorsExtension
+//  ModalEffectExtension
 //
 //  Node Character System controls
 //

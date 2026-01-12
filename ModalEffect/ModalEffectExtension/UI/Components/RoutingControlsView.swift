@@ -1,6 +1,6 @@
 //
 //  RoutingControlsView.swift
-//  ModalAttractorsExtension
+//  ModalEffectExtension
 //
 //  Routing and behavior controls
 //

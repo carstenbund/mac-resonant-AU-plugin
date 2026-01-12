@@ -11,7 +11,7 @@ All components of the AUv3 instrument plugin are now implemented and follow prof
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  Swift AU Wrapper                                           │
-│  ModalAttractorsExtensionAudioUnit.swift                    │
+│  ModalEffectExtensionAudioUnit.swift                    │
 │                                                             │
 │  • AURenderEvent parsing                                   │
 │  • Sample-accurate event queuing                           │
@@ -22,7 +22,7 @@ All components of the AUv3 instrument plugin are now implemented and follow prof
                      ▼
 ┌─────────────────────────────────────────────────────────────┐
 │  C API Bridge                                               │
-│  ModalAttractorsAU.h + ModalAttractorsEngine.cpp            │
+│  ModalEffectAU.h + ModalEffectEngine.cpp            │
 │                                                             │
 │  • modal_attractors_engine_init()                           │
 │  • modal_attractors_engine_begin_events()                   │
@@ -81,7 +81,7 @@ All components of the AUv3 instrument plugin are now implemented and follow prof
 - [x] Real-time safe (no allocations)
 
 ### ✅ Swift AU Wrapper
-- [x] ModalAttractorsExtensionAudioUnit implementation
+- [x] ModalEffectExtensionAudioUnit implementation
 - [x] AURenderEvent parsing
 - [x] Sample offset calculation
 - [x] MIDI message handling:
@@ -119,21 +119,21 @@ All components of the AUv3 instrument plugin are now implemented and follow prof
 ## File Structure
 
 ```
-ModalAttractorsExtension/
+ModalEffectExtension/
 ├── DSP/
 │   ├── SynthEngine.h/.cpp          ← NEW: Event-driven synthesis engine
 │   ├── ModalVoice.h/.cpp           ← Copied from src/dsp_core/
 │   ├── TopologyEngine.h/.cpp       ← Copied from src/dsp_core/
 │   ├── VoiceAllocator.h/.cpp       ← Copied from src/dsp_core/
-│   └── ModalAttractorsExtensionDSPKernel.hpp  (legacy, can be removed)
+│   └── ModalEffectExtensionDSPKernel.hpp  (legacy, can be removed)
 │
 ├── Common/
 │   ├── DSP/
-│   │   ├── ModalAttractorsAU.h                ← UPDATED: C API interface
-│   │   └── ModalAttractorsEngine.cpp          ← UPDATED: C API implementation
+│   │   ├── ModalEffectAU.h                ← UPDATED: C API interface
+│   │   └── ModalEffectEngine.cpp          ← UPDATED: C API implementation
 │   │
 │   ├── Audio Unit/
-│   │   └── ModalAttractorsExtensionAudioUnit.swift  ← REWRITTEN: Sample-accurate AU
+│   │   └── ModalEffectExtensionAudioUnit.swift  ← REWRITTEN: Sample-accurate AU
 │   │
 │   ├── AudioUnitFactory/
 │   │   └── AudioUnitFactory.swift             (unchanged - works correctly)
@@ -145,11 +145,11 @@ ModalAttractorsExtension/
 │   │   ├── CrossPlatform.swift                (unchanged - template code)
 │   │   └── String+Utils.swift                 (unchanged - template code)
 │   │
-│   └── ModalAttractorsExtension-Bridging-Header.h  ← Updated with new imports
+│   └── ModalEffectExtension-Bridging-Header.h  ← Updated with new imports
 │
 ├── Parameters/
 │   ├── Parameters.swift                       ← UPDATED: Full parameter tree
-│   ├── ModalAttractorsExtensionParameterAddresses.h  ← UPDATED: All 19 params
+│   ├── ModalEffectExtensionParameterAddresses.h  ← UPDATED: All 19 params
 │   └── ModalParameters.h                      ← Copied from src/au_wrapper/
 │
 ├── Info.plist
@@ -164,8 +164,8 @@ ModalAttractorsExtension/
 ### Phase 1: Build & Validation
 ```bash
 # 1. Build in Xcode
-open ModalAttractors.xcodeproj
-# Build scheme: ModalAttractorsExtension
+open ModalEffect.xcodeproj
+# Build scheme: ModalEffectExtension
 
 # 2. Run Audio Unit validation
 auval -v aumu Modl <YourManufacturerCode>
@@ -342,8 +342,8 @@ The implementation is considered **COMPLETE** when:
 
 1. **Build the Project**
    ```bash
-   cd ModalAttractors
-   xcodebuild -scheme ModalAttractorsExtension -configuration Debug
+   cd ModalEffect
+   xcodebuild -scheme ModalEffectExtension -configuration Debug
    ```
 
 2. **Run auval**
