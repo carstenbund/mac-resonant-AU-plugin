@@ -10,7 +10,7 @@
 			<array>
 				<dict>
 					<key>description</key>
-					<string>ModalEffectExtension</string>
+					<string>Resonant Body Effect</string>
 					<key>manufacturer</key>
 					<string>Bund</string>
 					<key>name</key>
@@ -18,13 +18,13 @@
 					<key>sandboxSafe</key>
 					<true/>
 					<key>subtype</key>
-					<string>Test</string>
+					<string>MdlE</string>
 					<key>tags</key>
 					<array>
-						<string>MIDI Processor</string>
+						<string>Effects</string>
 					</array>
 					<key>type</key>
-					<string>aumu</string>
+					<string>aufx</string>
 					<key>version</key>
 					<integer>67072</integer>
 				</dict>

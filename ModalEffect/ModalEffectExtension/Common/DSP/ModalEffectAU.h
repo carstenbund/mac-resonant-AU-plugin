@@ -131,7 +131,7 @@ void modal_attractors_engine_push_parameter(ModalEffectEngine* engine,
 // ============================================================================
 
 /**
- * @brief Render audio with queued events
+ * @brief Render audio with queued events (synthesizer mode - generates output)
  *
  * Process all events pushed since begin_events() call, applying them
  * at their sample offsets for sample-accurate timing.
@@ -145,6 +145,27 @@ void modal_attractors_engine_render(ModalEffectEngine* engine,
                                     float* outL,
                                     float* outR,
                                     uint32_t num_frames);
+
+/**
+ * @brief Process audio effect with queued events (effect mode - processes input)
+ *
+ * Process all events pushed since begin_events() call, applying them
+ * at their sample offsets for sample-accurate timing.
+ * Takes input audio and produces processed output.
+ *
+ * @param engine Engine handle
+ * @param inL Left channel input buffer
+ * @param inR Right channel input buffer
+ * @param outL Left channel output buffer
+ * @param outR Right channel output buffer
+ * @param num_frames Number of frames to process
+ */
+void modal_attractors_engine_process(ModalEffectEngine* engine,
+                                     const float* inL,
+                                     const float* inR,
+                                     float* outL,
+                                     float* outR,
+                                     uint32_t num_frames);
 
 // ============================================================================
 // Parameter access (for host automation)
