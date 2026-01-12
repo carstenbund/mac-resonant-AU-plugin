@@ -1,14 +1,14 @@
-# ModatEffect - Resonant Body Effect Plugin
+# ModalEffect - Resonant Body Effect Plugin
 
 ## Overview
 
-ModatEffect is an audio effect plugin based on modal synthesis that transforms input audio through a physically-modeled resonant body. Unlike the ModalAttractors synthesizer, ModatEffect is an **audio effect** that processes incoming audio signals rather than generating sound from MIDI.
+ModalEffect is an audio effect plugin based on modal synthesis that transforms input audio through a physically-modeled resonant body. Unlike the ModalAttractors synthesizer, ModalEffect is an **audio effect** that processes incoming audio signals rather than generating sound from MIDI.
 
 ## Architecture
 
 ### Core DSP Components
 
-ModatEffect implements a complete signal processing chain with the following components:
+ModalEffect implements a complete signal processing chain with the following components:
 
 #### 1. **EnergyExtractor** (`EnergyExtractor.h/cpp`)
 - **Purpose**: Extracts the energy envelope from the input signal
@@ -53,7 +53,7 @@ ModatEffect implements a complete signal processing chain with the following com
 
 ## User Parameters
 
-ModatEffect provides 5 intuitive effect-style parameters:
+ModalEffect provides 5 intuitive effect-style parameters:
 
 ### 1. **Body Size** (0-1)
 - **Description**: Scales the resonator frequencies
@@ -145,8 +145,8 @@ Each resonator uses the existing `modal_node.c` implementation from ModalAttract
 ## File Structure
 
 ```
-ModatEffect/
-├── ModatEffectExtension/
+ModalEffect/
+├── ModalEffectExtension/
 │   ├── DSP/
 │   │   ├── EnergyExtractor.h / .cpp           # RMS energy extraction
 │   │   ├── SpectralAnalyzer.h / .cpp          # 3-band filter bank
@@ -157,14 +157,14 @@ ModatEffect/
 │   │   └── ... (other DSP files)
 │   ├── Parameters/
 │   │   ├── Parameters.swift                   # Parameter definitions
-│   │   └── ModatEffectExtensionParameterAddresses.h
+│   │   └── ModalEffectExtensionParameterAddresses.h
 │   └── ...
 └── README.md (this file)
 ```
 
 ## Differences from ModalAttractors
 
-| Feature | ModalAttractors | ModatEffect |
+| Feature | ModalAttractors | ModalEffect |
 |---------|-----------------|-------------|
 | **Type** | MIDI Synthesizer | Audio Effect |
 | **Input** | MIDI notes | Audio signal |
@@ -186,12 +186,12 @@ Possible improvements:
 
 ## Building
 
-The ModatEffect plugin uses the same build system as ModalAttractors:
-- Xcode project: `ModatEffect.xcodeproj`
+The ModalEffect plugin uses the same build system as ModalAttractors:
+- Xcode project: `ModalEffect.xcodeproj`
 - Targets: macOS app + Audio Unit extension
 - Minimum macOS: 11.0
 
 ## Credits
 
 Based on the ModalAttractors modal synthesis engine by Carsten Bund.
-ModatEffect adaptation implements the resonant body effect concept with new DSP components for audio processing.
+ModalEffect adaptation implements the resonant body effect concept with new DSP components for audio processing.

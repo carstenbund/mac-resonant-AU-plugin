@@ -1,6 +1,6 @@
 //
-//  ModatEffectExtensionParameterAddresses.h
-//  ModatEffectExtension
+//  ModalEffectExtensionParameterAddresses.h
+//  ModalEffectExtension
 //
 //  Resonant Body Effect Parameters
 //
@@ -9,8 +9,8 @@
 
 #include <AudioToolbox/AUParameters.h>
 
-// ModatEffect - Resonant Body Effect Parameters
-typedef NS_ENUM(AUParameterAddress, ModatEffectExtensionParameterAddress) {
+// ModalEffect - Resonant Body Effect Parameters
+typedef NS_ENUM(AUParameterAddress, ModalEffectExtensionParameterAddress) {
     // Effect parameters
     kParam_BodySize = 0,     // Body size [0, 1] - scales resonator frequencies
     kParam_Material = 1,     // Material hardness [0, 1] - controls damping
