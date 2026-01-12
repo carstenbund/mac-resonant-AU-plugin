@@ -212,6 +212,29 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
         _renderBlock
     }
 
+    // MARK: - View Controller (in-process hosting)
+
+    public override func requestViewController(
+      completionHandler: @escaping (AUViewController?) -> Void
+    ) {
+    #if os(macOS)
+      DispatchQueue.main.async { [weak self] in
+          guard let self = self else {
+              completionHandler(nil)
+              return
+          }
+
+          let viewController = ModalAttractorsAUViewController()
+          viewController.audioUnit = self
+          completionHandler(viewController)
+      }
+    #else
+      completionHandler(nil)
+    #endif
+    }
+    
+    
+    
     /// Build a real-time safe render block.
     /// - Important: Does not capture `self` (avoids ARC traffic on audio thread).
     ///
