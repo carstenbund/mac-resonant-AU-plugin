@@ -1,6 +1,6 @@
 //
 //  String+Utils.swift
-//  ModalAttractorsExtension
+//  ModalEffectExtension
 //
 //  Created by Carsten on 1/7/26.
 //

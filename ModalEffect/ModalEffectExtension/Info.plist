@@ -10,11 +10,11 @@
 			<array>
 				<dict>
 					<key>description</key>
-					<string>ModalAttractorsExtension</string>
+					<string>ModalEffectExtension</string>
 					<key>manufacturer</key>
 					<string>Bund</string>
 					<key>name</key>
-					<string>bund.media: ModalAttractors</string>
+					<string>bund.media: ModalEffect</string>
 					<key>sandboxSafe</key>
 					<true/>
 					<key>subtype</key>
@@ -33,7 +33,7 @@
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.AudioUnit</string>
 		<key>NSExtensionPrincipalClass</key>
-		<string>$(PRODUCT_MODULE_NAME).ModalAttractorsAUViewController</string>
+		<string>$(PRODUCT_MODULE_NAME).ModalEffectAUViewController</string>
 	</dict>
 </dict>
 </plist>

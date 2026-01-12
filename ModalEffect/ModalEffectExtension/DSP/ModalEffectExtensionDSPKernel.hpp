@@ -1,6 +1,6 @@
 //
-//  ModalAttractorsExtensionDSPKernel.hpp
-//  ModalAttractorsExtension
+//  ModalEffectExtensionDSPKernel.hpp
+//  ModalEffectExtension
 //
 //  Created by Carsten on 1/7/26.
 //
@@ -13,13 +13,13 @@
 #import <algorithm>
 #import <vector>
 
-#import "ModalAttractorsExtensionParameterAddresses.h"
+#import "ModalEffectExtensionParameterAddresses.h"
 
 /*
- ModalAttractorsExtensionDSPKernel
+ ModalEffectExtensionDSPKernel
  As a non-ObjC class, this is safe to use from render thread.
  */
-class ModalAttractorsExtensionDSPKernel {
+class ModalEffectExtensionDSPKernel {
 public:
     void initialize(double inSampleRate) {
         mSampleRate = inSampleRate;
@@ -38,13 +38,13 @@ public:
     }
     
     // MARK: - Parameter Getter / Setter
-    // Add a case for each parameter in ModalAttractorsExtensionParameterAddresses.h
+    // Add a case for each parameter in ModalEffectExtensionParameterAddresses.h
     void setParameter(AUParameterAddress address, AUValue value) {
         switch (address) {
-            case ModalAttractorsExtensionParameterAddress::kParam_MasterGain:
+            case ModalEffectExtensionParameterAddress::kParam_MasterGain:
                 // TODO: Implement parameter handling
                 break;
-            case ModalAttractorsExtensionParameterAddress::kParam_CouplingStrength:
+            case ModalEffectExtensionParameterAddress::kParam_CouplingStrength:
                 // TODO: Implement parameter handling
                 break;
             default:
@@ -56,10 +56,10 @@ public:
         // Return the goal. It is not thread safe to return the ramping value.
 
         switch (address) {
-            case ModalAttractorsExtensionParameterAddress::kParam_MasterGain:
+            case ModalEffectExtensionParameterAddress::kParam_MasterGain:
                 return 0.7f; // TODO: Return actual value
 
-            case ModalAttractorsExtensionParameterAddress::kParam_CouplingStrength:
+            case ModalEffectExtensionParameterAddress::kParam_CouplingStrength:
                 return 0.3f; // TODO: Return actual value
 
             default: return 0.f;
@@ -136,7 +136,7 @@ public:
         /*
          // Parse UMP messages
          auto visitor = [] (void* context, MIDITimeStamp timeStamp, MIDIUniversalMessage message) {
-         auto thisObject = static_cast<ModalAttractorsExtensionDSPKernel *>(context);
+         auto thisObject = static_cast<ModalEffectExtensionDSPKernel *>(context);
 
          switch (message.type) {
          case kMIDIMessageTypeChannelVoice2: {

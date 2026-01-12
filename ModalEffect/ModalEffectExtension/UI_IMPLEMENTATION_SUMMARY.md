@@ -63,7 +63,7 @@ This document summarizes the implementation of the SwiftUI-based control panel f
   - Section styling and layout
 
 #### 4. Main View
-- **ModalAttractorsExtensionMainView.swift** (`UI/ModalAttractorsExtensionMainView.swift`)
+- **ModalEffectExtensionMainView.swift** (`UI/ModalEffectExtensionMainView.swift`)
   - Root container view
   - Three-section layout (Network, Triggers, Output)
   - ScrollView for flexibility
@@ -71,7 +71,7 @@ This document summarizes the implementation of the SwiftUI-based control panel f
   - Minimum size constraints
 
 #### 5. AudioUnit Integration
-- **ModalAttractorsExtensionAudioUnit.swift** (Updated)
+- **ModalEffectExtensionAudioUnit.swift** (Updated)
   - Added SwiftUI import
   - Implemented `requestViewController` method
   - Creates `ParameterTree` wrapper from AU parameter tree
@@ -81,9 +81,9 @@ This document summarizes the implementation of the SwiftUI-based control panel f
 ## File Structure
 
 ```
-ModalAttractorsExtension/
+ModalEffectExtension/
 ├── UI/
-│   ├── ModalAttractorsExtensionMainView.swift
+│   ├── ModalEffectExtensionMainView.swift
 │   ├── Components/
 │   │   ├── NetworkControlsView.swift
 │   │   ├── TriggersControlsView.swift
@@ -145,7 +145,7 @@ ModalAttractorsExtension/
    - Deferred to Phase 2+
 
 2. **Drive Parameter** - Not included in MVP; would require:
-   - New parameter in `ModalAttractorsExtensionParameterAddresses.h`
+   - New parameter in `ModalEffectExtensionParameterAddresses.h`
    - Addition to `Parameters.swift`
    - DSP implementation
    - Deferred to Phase 3
@@ -200,12 +200,12 @@ To test the implementation:
 
 To add the UI files to the Xcode project:
 
-1. Open `xcode-project/ModalAttractors.xcodeproj`
-2. Right-click the `ModalAttractorsExtension` target
-3. Add Files to "ModalAttractorsExtension"...
+1. Open `xcode-project/ModalEffect.xcodeproj`
+2. Right-click the `ModalEffectExtension` target
+3. Add Files to "ModalEffectExtension"...
 4. Select the entire `UI` directory
 5. Ensure "Copy items if needed" is checked
-6. Ensure target membership includes `ModalAttractorsExtension`
+6. Ensure target membership includes `ModalEffectExtension`
 7. Build and test
 
 ## References
@@ -213,7 +213,7 @@ To add the UI files to the Xcode project:
 - Proposal document: `CONFIG_PANEL_PROPOSAL.md`
 - Implementation guide: `AU_IMPLEMENTATION_GUIDE.md`
 - Parameter definitions: `Parameters/Parameters.swift`
-- AudioUnit wrapper: `Common/Audio Unit/ModalAttractorsExtensionAudioUnit.swift`
+- AudioUnit wrapper: `Common/Audio Unit/ModalEffectExtensionAudioUnit.swift`
 
 ---
 

@@ -1,12 +1,12 @@
 /**
- * @file ModalAttractorsEngine.cpp
+ * @file ModalEffectEngine.cpp
  * @brief C API implementation for Modal Attractors DSP engine
  *
  * Provides a C-compatible interface between the AU wrapper and C++ SynthEngine.
  * All Apple types stay in the AU wrapper; this file is Apple-type-free.
  */
 
-#include "ModalAttractorsAU.h"
+#include "ModalEffectAU.h"
 #include "../../DSP/SynthEngine.h"
 #include <cstring>
 
@@ -14,13 +14,13 @@
 // Initialization and cleanup
 // ============================================================================
 
-void modal_attractors_engine_init(ModalAttractorsEngine* engine,
+void modal_attractors_engine_init(ModalEffectEngine* engine,
                                   double sample_rate,
                                   uint32_t max_frames,
                                   uint32_t max_polyphony) {
     if (!engine) return;
 
-    memset(engine, 0, sizeof(ModalAttractorsEngine));
+    memset(engine, 0, sizeof(ModalEffectEngine));
 
     // Create C++ engine and event queue (only allocation happens here, not in render!)
     engine->synth_engine = new SynthEngine(max_polyphony);
@@ -32,7 +32,7 @@ void modal_attractors_engine_init(ModalAttractorsEngine* engine,
     engine->initialized = true;
 }
 
-void modal_attractors_engine_prepare(ModalAttractorsEngine* engine,
+void modal_attractors_engine_prepare(ModalEffectEngine* engine,
                                      double sample_rate,
                                      uint32_t max_frames) {
     if (!engine || !engine->initialized) return;
@@ -40,13 +40,13 @@ void modal_attractors_engine_prepare(ModalAttractorsEngine* engine,
     engine->synth_engine->prepare(sample_rate, max_frames, 2);
 }
 
-void modal_attractors_engine_reset(ModalAttractorsEngine* engine) {
+void modal_attractors_engine_reset(ModalEffectEngine* engine) {
     if (!engine || !engine->initialized) return;
 
     engine->synth_engine->reset();
 }
 
-void modal_attractors_engine_cleanup(ModalAttractorsEngine* engine) {
+void modal_attractors_engine_cleanup(ModalEffectEngine* engine) {
     if (!engine) return;
 
     if (engine->synth_engine) {
@@ -66,14 +66,14 @@ void modal_attractors_engine_cleanup(ModalAttractorsEngine* engine) {
 // Event handling (real-time safe)
 // ============================================================================
 
-void modal_attractors_engine_begin_events(ModalAttractorsEngine* engine) {
+void modal_attractors_engine_begin_events(ModalEffectEngine* engine) {
     if (!engine || !engine->initialized) return;
 
     // Clear event queue for this render frame
     engine->event_queue->clear();
 }
 
-void modal_attractors_engine_push_note_on(ModalAttractorsEngine* engine,
+void modal_attractors_engine_push_note_on(ModalEffectEngine* engine,
                                           int32_t sample_offset,
                                           uint8_t note,
                                           float velocity,
@@ -90,7 +90,7 @@ void modal_attractors_engine_push_note_on(ModalAttractorsEngine* engine,
     engine->event_queue->push(event);
 }
 
-void modal_attractors_engine_push_note_off(ModalAttractorsEngine* engine,
+void modal_attractors_engine_push_note_off(ModalEffectEngine* engine,
                                            int32_t sample_offset,
                                            uint8_t note) {
     if (!engine || !engine->initialized) return;
@@ -103,7 +103,7 @@ void modal_attractors_engine_push_note_off(ModalAttractorsEngine* engine,
     engine->event_queue->push(event);
 }
 
-void modal_attractors_engine_push_pitch_bend(ModalAttractorsEngine* engine,
+void modal_attractors_engine_push_pitch_bend(ModalEffectEngine* engine,
                                              int32_t sample_offset,
                                              float value) {
     if (!engine || !engine->initialized) return;
@@ -116,7 +116,7 @@ void modal_attractors_engine_push_pitch_bend(ModalAttractorsEngine* engine,
     engine->event_queue->push(event);
 }
 
-void modal_attractors_engine_push_parameter(ModalAttractorsEngine* engine,
+void modal_attractors_engine_push_parameter(ModalEffectEngine* engine,
                                             int32_t sample_offset,
                                             uint32_t param_id,
                                             float value) {
@@ -135,7 +135,7 @@ void modal_attractors_engine_push_parameter(ModalAttractorsEngine* engine,
 // Rendering (real-time safe)
 // ============================================================================
 
-void modal_attractors_engine_render(ModalAttractorsEngine* engine,
+void modal_attractors_engine_render(ModalEffectEngine* engine,
                                     float* outL,
                                     float* outR,
                                     uint32_t num_frames) {
@@ -156,7 +156,7 @@ void modal_attractors_engine_render(ModalAttractorsEngine* engine,
 // Parameter access
 // ============================================================================
 
-void modal_attractors_engine_set_parameter(ModalAttractorsEngine* engine,
+void modal_attractors_engine_set_parameter(ModalEffectEngine* engine,
                                            uint32_t param_id,
                                            float value) {
     if (!engine || !engine->initialized) return;
@@ -164,7 +164,7 @@ void modal_attractors_engine_set_parameter(ModalAttractorsEngine* engine,
     engine->synth_engine->setParameter(param_id, value);
 }
 
-float modal_attractors_engine_get_parameter(ModalAttractorsEngine* engine,
+float modal_attractors_engine_get_parameter(ModalEffectEngine* engine,
                                             uint32_t param_id) {
     if (!engine || !engine->initialized) return 0.0f;
 

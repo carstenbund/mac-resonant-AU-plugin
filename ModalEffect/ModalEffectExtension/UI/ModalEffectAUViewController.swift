@@ -1,6 +1,6 @@
 //
-//  ModalAttractorsAUViewController.swift
-//  ModalAttractorsExtension
+//  ModalEffectAUViewController.swift
+//  ModalEffectExtension
 //
 //  Created by Carsten on 1/8/26.
 //
@@ -14,7 +14,7 @@ import os
 import AppKit
 #endif
 
-private let log = Logger(subsystem: "com.bund.media.ModalAttractorsExtension", category: "AUViewController")
+private let log = Logger(subsystem: "com.bund.media.ModalEffectExtension", category: "AUViewController")
 
 /// Custom AUViewController subclass that hosts the SwiftUI view
 /// This is the principal class for the extension - it conforms to AUAudioUnitFactory
@@ -25,7 +25,7 @@ private let log = Logger(subsystem: "com.bund.media.ModalAttractorsExtension", c
 /// - The audio unit binding happens after view setup
 /// - preferredContentSize must be overridden
 /// - Class must be @objc for runtime discovery via NSExtensionPrincipalClass
-public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFactory {
+public class ModalEffectAUViewController: AUViewController, AUAudioUnitFactory {
 
     // MARK: - Initialization
 
@@ -41,7 +41,7 @@ public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFacto
     // MARK: - Audio Unit Factory
 
     /// The audio unit instance created by this factory
-    var audioUnit: ModalAttractorsExtensionAudioUnit? {
+    var audioUnit: ModalEffectExtensionAudioUnit? {
         didSet {
             // When audio unit becomes available, bind parameters to UI
             if let au = audioUnit {
@@ -59,7 +59,7 @@ public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFacto
     public func createAudioUnit(with componentDescription: AudioComponentDescription) throws -> AUAudioUnit {
         log.info("Creating audio unit...")
 
-        let au = try ModalAttractorsExtensionAudioUnit(
+        let au = try ModalEffectExtensionAudioUnit(
             componentDescription: componentDescription,
             options: []
         )
@@ -133,7 +133,7 @@ public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFacto
 
     /// Bind the audio unit's parameter tree to the UI
     /// Called when audioUnit becomes available
-    private func bindAudioUnit(_ au: ModalAttractorsExtensionAudioUnit) {
+    private func bindAudioUnit(_ au: ModalEffectExtensionAudioUnit) {
         guard let paramTree = au.parameterTree else {
             log.error("Audio unit has no parameter tree")
             return
@@ -161,7 +161,7 @@ public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFacto
 
         // Create the main view - it observes parameterTreeHolder for updates
         let rootView = AnyView(
-            ModalAttractorsExtensionRootView()
+            ModalEffectExtensionRootView()
                 .environmentObject(parameterTreeHolder)
         )
 
@@ -201,14 +201,14 @@ class ParameterTreeHolder: ObservableObject {
 // MARK: - Root View with Loading State
 
 /// Root view that handles the loading state while waiting for parameter tree
-struct ModalAttractorsExtensionRootView: View {
+struct ModalEffectExtensionRootView: View {
     @EnvironmentObject var holder: ParameterTreeHolder
 
     var body: some View {
         Group {
             if let paramTree = holder.parameterTree {
                 // Parameter tree is available - show main view
-                ModalAttractorsExtensionMainView()
+                ModalEffectExtensionMainView()
                     .environmentObject(paramTree)
             } else {
                 // Still loading - show placeholder

@@ -1,6 +1,6 @@
 //
 //  DriveControlsView.swift
-//  ModalAttractorsExtension
+//  ModalEffectExtension
 //
 //  Created by Carsten on 1/8/26.
 //

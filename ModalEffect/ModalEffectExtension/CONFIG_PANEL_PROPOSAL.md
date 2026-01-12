@@ -2,7 +2,7 @@
 
 **Author:** Claude
 **Date:** January 7, 2026
-**Target:** ModalAttractorsExtension UI Layer
+**Target:** ModalEffectExtension UI Layer
 **Status:** Proposal for Review
 
 ---
@@ -25,7 +25,7 @@ This proposal outlines the design and implementation plan for a **SwiftUI-based 
 ### 1.1 What Exists
 
 #### Parameter System ✅
-**Location:** `ModalAttractors/ModalAttractorsExtension/Parameters/`
+**Location:** `ModalEffect/ModalEffectExtension/Parameters/`
 
 The extension has a complete parameter tree specification with **19 parameters** organized into 6 groups:
 
@@ -37,7 +37,7 @@ The extension has a complete parameter tree specification with **19 parameters**
 | **voice** | `polyphony`, `personality` | Voice allocation settings |
 
 **Parameter Addresses:**
-`ModalAttractorsExtensionParameterAddresses.h` (lines 13-46) defines enum values `kParam_MasterGain` through `kParam_Personality` (addresses 0-18).
+`ModalEffectExtensionParameterAddresses.h` (lines 13-46) defines enum values `kParam_MasterGain` through `kParam_Personality` (addresses 0-18).
 
 **Parameter Tree Spec:**
 `Parameters.swift` (lines 12-208) uses declarative `ParameterTreeSpec` DSL with:
@@ -46,7 +46,7 @@ The extension has a complete parameter tree specification with **19 parameters**
 - Read-only flags (e.g., `polyphony`)
 
 #### DSP Integration ⚠️
-**Location:** `ModalAttractors/ModalAttractorsExtension/DSP/ModalAttractorsExtensionDSPKernel.hpp`
+**Location:** `ModalEffect/ModalEffectExtension/DSP/ModalEffectExtensionDSPKernel.hpp`
 
 The DSP kernel has parameter getter/setter stubs (lines 42-67) but **implementation is pending**:
 ```cpp
@@ -58,13 +58,13 @@ case kParam_MasterGain:
 **Implication:** UI can be built independently; DSP integration happens in parallel.
 
 #### UI Layer ❌
-**Expected Location:** `ModalAttractors/ModalAttractorsExtension/UI/ModalAttractorsExtensionMainView.swift`
+**Expected Location:** `ModalEffect/ModalEffectExtension/UI/ModalEffectExtensionMainView.swift`
 
 **Current State:** Directory and file **do not exist**.
 
 **README Expectation (lines 30-31):**
 > `/UI`
-> `ModalAttractorsExtensionMainView.swift` - SwiftUI based main view, add your SwiftUI views and controls here.
+> `ModalEffectExtensionMainView.swift` - SwiftUI based main view, add your SwiftUI views and controls here.
 
 **README Parameter Access Pattern (lines 90-113):**
 ```swift
@@ -89,12 +89,12 @@ ParameterSlider(param: parameterTree.global.masterGain)
 
 ### 2.1 File Structure
 
-Create the following in `ModalAttractors/ModalAttractorsExtension/`:
+Create the following in `ModalEffect/ModalEffectExtension/`:
 
 ```
-ModalAttractorsExtension/
+ModalEffectExtension/
 ├── UI/
-│   ├── ModalAttractorsExtensionMainView.swift    # Root view container
+│   ├── ModalEffectExtensionMainView.swift    # Root view container
 │   ├── Components/
 │   │   ├── NetworkControlsView.swift             # Network section
 │   │   ├── TriggersControlsView.swift            # Triggers section
@@ -110,7 +110,7 @@ ModalAttractorsExtension/
 ### 2.2 View Hierarchy
 
 ```
-ModalAttractorsExtensionMainView
+ModalEffectExtensionMainView
 ├── VStack
 │   ├── NetworkControlsView
 │   │   ├── TopologyPicker (global.topology)
@@ -298,7 +298,7 @@ struct TopologyPicker: View {
 **Implementation Notes:**
 
 **Drive Parameter (if added):**
-1. Add to `ModalAttractorsExtensionParameterAddresses.h`:
+1. Add to `ModalEffectExtensionParameterAddresses.h`:
    ```c
    kParam_Drive = 19,
    ```
@@ -315,7 +315,7 @@ struct TopologyPicker: View {
    )
    ```
 
-3. Implement in `ModalAttractorsExtensionDSPKernel.hpp`:
+3. Implement in `ModalEffectExtensionDSPKernel.hpp`:
    ```cpp
    case kParam_Drive:
        mDrive = value;
@@ -341,13 +341,13 @@ struct TopologyPicker: View {
 
 ### 4.1 Main View Structure
 
-**File:** `UI/ModalAttractorsExtensionMainView.swift`
+**File:** `UI/ModalEffectExtensionMainView.swift`
 
 ```swift
 import SwiftUI
 import AudioToolbox
 
-struct ModalAttractorsExtensionMainView: View {
+struct ModalEffectExtensionMainView: View {
     @EnvironmentObject var parameterTree: ParameterTree
 
     var body: some View {
@@ -371,7 +371,7 @@ struct ModalAttractorsExtensionMainView: View {
 }
 
 #Preview {
-    ModalAttractorsExtensionMainView()
+    ModalEffectExtensionMainView()
         .environmentObject(ParameterTree.preview)
 }
 ```
@@ -658,7 +658,7 @@ class ParameterTree: ObservableObject {
     // For previews
     static var preview: ParameterTree {
         // Create mock AUParameterTree
-        let spec = ModalAttractorsExtensionParameterSpecs
+        let spec = ModalEffectExtensionParameterSpecs
         let tree = spec.createAUParameterTree()
         return ParameterTree(auParameterTree: tree)
     }
@@ -722,12 +722,12 @@ class ParameterWrapper: ObservableObject {
 
 **Integration in AudioUnit:**
 
-The `ModalAttractorsExtensionAudioUnit.swift` would inject `ParameterTree` into the SwiftUI view hierarchy:
+The `ModalEffectExtensionAudioUnit.swift` would inject `ParameterTree` into the SwiftUI view hierarchy:
 
 ```swift
 public var viewController: AUViewController {
     let paramTree = ParameterTree(auParameterTree: self.parameterTree)
-    let view = ModalAttractorsExtensionMainView()
+    let view = ModalEffectExtensionMainView()
         .environmentObject(paramTree)
 
     return AUHostingController(rootView: view)
@@ -744,7 +744,7 @@ public var viewController: AUViewController {
 **Tasks:**
 1. ✅ Create `/UI` directory structure
 2. ✅ Implement `ParameterTree` bridging layer
-3. ✅ Build `ModalAttractorsExtensionMainView` skeleton
+3. ✅ Build `ModalEffectExtensionMainView` skeleton
 4. ✅ Create basic section views (Network, Triggers, Drive)
 5. ✅ Implement `ParameterSlider` widget
 6. ✅ Test parameter reading from SwiftUI (read-only)
@@ -854,7 +854,7 @@ ParameterSlider(...)
 
 **Project Settings:**
 ```
-PRODUCT_NAME = ModalAttractorsExtension
+PRODUCT_NAME = ModalEffectExtension
 SWIFT_VERSION = 5.9
 MACOSX_DEPLOYMENT_TARGET = 12.0
 FRAMEWORKS = AudioToolbox, SwiftUI, CoreMIDI
@@ -964,12 +964,12 @@ FRAMEWORKS = AudioToolbox, SwiftUI, CoreMIDI
 
 2. **Create UI Directory:**
    ```bash
-   mkdir -p ModalAttractors/ModalAttractorsExtension/UI/{Components/Widgets,Utilities}
+   mkdir -p ModalEffect/ModalEffectExtension/UI/{Components/Widgets,Utilities}
    ```
 
 3. **Implement Phase 1 Foundation:**
    - `ParameterTree.swift` (bridging layer)
-   - `ModalAttractorsExtensionMainView.swift` (root view)
+   - `ModalEffectExtensionMainView.swift` (root view)
    - Basic section views (Network, Triggers, Drive)
 
 4. **Add to Xcode Project:**
@@ -1017,15 +1017,15 @@ Complete mapping of existing parameters to UI controls:
 
 ## Appendix B: Code Snippets
 
-### B.1 Complete ModalAttractorsExtensionMainView.swift
+### B.1 Complete ModalEffectExtensionMainView.swift
 
 See Section 4.1 above.
 
 ### B.2 Adding Drive Parameter
 
-**Step 1:** Update `ModalAttractorsExtensionParameterAddresses.h`
+**Step 1:** Update `ModalEffectExtensionParameterAddresses.h`
 ```c
-typedef NS_ENUM(AUParameterAddress, ModalAttractorsExtensionParameterAddress) {
+typedef NS_ENUM(AUParameterAddress, ModalEffectExtensionParameterAddress) {
     // ... existing parameters ...
     kParam_Personality = 18,
     kParam_Drive = 19  // NEW
@@ -1047,7 +1047,7 @@ ParameterGroupSpec(identifier: "global", name: "Global") {
 }
 ```
 
-**Step 3:** Update `ModalAttractorsExtensionDSPKernel.hpp`
+**Step 3:** Update `ModalEffectExtensionDSPKernel.hpp`
 ```cpp
 // In setParameter:
 case kParam_Drive:

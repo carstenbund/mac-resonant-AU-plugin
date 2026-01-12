@@ -1,6 +1,6 @@
 //
 //  TypeAliases.swift
-//  ModalAttractors
+//  ModalEffect
 //
 //  Created by Carsten on 1/7/26.
 //

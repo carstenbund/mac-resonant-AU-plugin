@@ -183,10 +183,10 @@ private:
 
 ### Step 4: Add nodeCount Parameter
 
-**File:** `Parameters/ModalAttractorsExtensionParameterAddresses.h`
+**File:** `Parameters/ModalEffectExtensionParameterAddresses.h`
 
 ```cpp
-typedef NS_ENUM(AUParameterAddress, ModalAttractorsExtensionParameterAddress) {
+typedef NS_ENUM(AUParameterAddress, ModalEffectExtensionParameterAddress) {
     // Global parameters
     kParam_MasterGain = 0,
     kParam_CouplingStrength = 1,

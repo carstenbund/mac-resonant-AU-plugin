@@ -1,6 +1,6 @@
 //
-//  ModalAttractorsExtensionAudioUnit.swift
-//  ModalAttractorsExtension
+//  ModalEffectExtensionAudioUnit.swift
+//  ModalEffectExtension
 //
 //  Created by Carsten on 1/7/26.
 //
@@ -12,12 +12,12 @@ import CoreAudioKit
 ///
 /// This class implements the Audio Unit wrapper around the C++ DSP engine,
 /// providing sample-accurate MIDI and parameter event processing.
-public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable {
+public class ModalEffectExtensionAudioUnit: AUAudioUnit, @unchecked Sendable {
 
     // MARK: - DSP Engine
 
     /// C++ DSP engine handle (managed via C API)
-    private var engine: UnsafeMutablePointer<ModalAttractorsEngine>?
+    private var engine: UnsafeMutablePointer<ModalEffectEngine>?
 
     /// RT-safe render block (built once, does not capture self)
     private var _renderBlock: AUInternalRenderBlock!
@@ -57,7 +57,7 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
                                            busses: [outputBus!])
 
         // Allocate and initialize DSP engine
-        let enginePtr = UnsafeMutablePointer<ModalAttractorsEngine>.allocate(capacity: 1)
+        let enginePtr = UnsafeMutablePointer<ModalEffectEngine>.allocate(capacity: 1)
         self.engine = enginePtr
         modal_attractors_engine_init(
             enginePtr,
@@ -70,7 +70,7 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
         _renderBlock = Self.makeRenderBlock(enginePtr: enginePtr)
 
         // Create parameter tree internally
-        _parameterTree = ModalAttractorsExtensionParameterSpecs.createAUParameterTree()
+        _parameterTree = ModalEffectExtensionParameterSpecs.createAUParameterTree()
 
         // Set default values from parameter tree
         if let paramTree = _parameterTree {
@@ -161,7 +161,7 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
             return paramTree
         }
 
-        let paramTree = ModalAttractorsExtensionParameterSpecs.createAUParameterTree()
+        let paramTree = ModalEffectExtensionParameterSpecs.createAUParameterTree()
         _parameterTree = paramTree
 
         if let engine = engine {
@@ -217,7 +217,7 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
     ///
     
     private static func makeRenderBlock(
-        enginePtr: UnsafeMutablePointer<ModalAttractorsEngine>
+        enginePtr: UnsafeMutablePointer<ModalEffectEngine>
     ) -> AUInternalRenderBlock {
 
         let block: AUInternalRenderBlock = { actionFlags,
@@ -379,7 +379,7 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
         return result
     }
 
-    // NOTE: UI Integration is handled by ModalAttractorsAUViewController
+    // NOTE: UI Integration is handled by ModalEffectAUViewController
     // which is the principal class and conforms to AUAudioUnitFactory.
     // The system automatically uses the principal class for view controller requests.
 }

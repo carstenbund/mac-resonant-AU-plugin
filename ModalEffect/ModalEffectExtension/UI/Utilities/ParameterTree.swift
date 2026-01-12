@@ -1,6 +1,6 @@
 //
 //  ParameterTree.swift
-//  ModalAttractorsExtension
+//  ModalEffectExtension
 //
 //  Created by Carsten on 1/8/26.
 //
@@ -41,7 +41,7 @@ public class ParameterTree: ObservableObject {
     /// Create a mock parameter tree for SwiftUI previews
     @MainActor
     public static var preview: ParameterTree {
-        let tree = ModalAttractorsExtensionParameterSpecs.createAUParameterTree()
+        let tree = ModalEffectExtensionParameterSpecs.createAUParameterTree()
         return ParameterTree(auParameterTree: tree)
     }
 }
@@ -55,10 +55,10 @@ public class GlobalParameters: ObservableObject {
 
     init(auParameterTree: AUParameterTree) {
         // Fetch parameters from tree by address
-        let gain = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_MasterGain.rawValue)!
-        let coupling = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_CouplingStrength.rawValue)!
-        let topo = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_Topology.rawValue)!
-        let nodes = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_NodeCount.rawValue)!
+        let gain = auParameterTree.parameter(withAddress: ModalEffectExtensionParameterAddress.param_MasterGain.rawValue)!
+        let coupling = auParameterTree.parameter(withAddress: ModalEffectExtensionParameterAddress.param_CouplingStrength.rawValue)!
+        let topo = auParameterTree.parameter(withAddress: ModalEffectExtensionParameterAddress.param_Topology.rawValue)!
+        let nodes = auParameterTree.parameter(withAddress: ModalEffectExtensionParameterAddress.param_NodeCount.rawValue)!
 
         self.masterGain = ParameterWrapper(parameter: gain)
         self.couplingStrength = ParameterWrapper(parameter: coupling)
@@ -76,11 +76,11 @@ public class NodeCharacterParameters: ObservableObject {
     @Published public var node4: ParameterWrapper
 
     init(auParameterTree: AUParameterTree) {
-        let n0 = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_Node0_Character.rawValue)!
-        let n1 = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_Node1_Character.rawValue)!
-        let n2 = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_Node2_Character.rawValue)!
-        let n3 = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_Node3_Character.rawValue)!
-        let n4 = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_Node4_Character.rawValue)!
+        let n0 = auParameterTree.parameter(withAddress: ModalEffectExtensionParameterAddress.param_Node0_Character.rawValue)!
+        let n1 = auParameterTree.parameter(withAddress: ModalEffectExtensionParameterAddress.param_Node1_Character.rawValue)!
+        let n2 = auParameterTree.parameter(withAddress: ModalEffectExtensionParameterAddress.param_Node2_Character.rawValue)!
+        let n3 = auParameterTree.parameter(withAddress: ModalEffectExtensionParameterAddress.param_Node3_Character.rawValue)!
+        let n4 = auParameterTree.parameter(withAddress: ModalEffectExtensionParameterAddress.param_Node4_Character.rawValue)!
 
         self.node0 = ParameterWrapper(parameter: n0)
         self.node1 = ParameterWrapper(parameter: n1)
@@ -96,8 +96,8 @@ public class RoutingParameters: ObservableObject {
     @Published public var multiExcite: ParameterWrapper
 
     init(auParameterTree: AUParameterTree) {
-        let routing = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_NoteRouting.rawValue)!
-        let excite = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_MultiExcite.rawValue)!
+        let routing = auParameterTree.parameter(withAddress: ModalEffectExtensionParameterAddress.param_NoteRouting.rawValue)!
+        let excite = auParameterTree.parameter(withAddress: ModalEffectExtensionParameterAddress.param_MultiExcite.rawValue)!
 
         self.noteRouting = ParameterWrapper(parameter: routing)
         self.multiExcite = ParameterWrapper(parameter: excite)
@@ -117,9 +117,9 @@ public class ModeParameters: ObservableObject {
 
         // Get parameter addresses based on mode index
         // Using enum values for type safety
-        let freqAddr: ModalAttractorsExtensionParameterAddress
-        let dampAddr: ModalAttractorsExtensionParameterAddress
-        let wtAddr: ModalAttractorsExtensionParameterAddress
+        let freqAddr: ModalEffectExtensionParameterAddress
+        let dampAddr: ModalEffectExtensionParameterAddress
+        let wtAddr: ModalEffectExtensionParameterAddress
 
         switch modeIndex {
         case 0:
@@ -159,8 +159,8 @@ public class ExcitationParameters: ObservableObject {
 
     init(auParameterTree: AUParameterTree) {
         // Excitation parameters
-        let strength = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_PokeStrength.rawValue)!
-        let duration = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_PokeDuration.rawValue)!
+        let strength = auParameterTree.parameter(withAddress: ModalEffectExtensionParameterAddress.param_PokeStrength.rawValue)!
+        let duration = auParameterTree.parameter(withAddress: ModalEffectExtensionParameterAddress.param_PokeDuration.rawValue)!
 
         self.pokeStrength = ParameterWrapper(parameter: strength)
         self.pokeDuration = ParameterWrapper(parameter: duration)
@@ -174,8 +174,8 @@ public class VoiceParameters: ObservableObject {
 
     init(auParameterTree: AUParameterTree) {
         // Voice parameters
-        let poly = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_Polyphony.rawValue)!
-        let pers = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_Personality.rawValue)!
+        let poly = auParameterTree.parameter(withAddress: ModalEffectExtensionParameterAddress.param_Polyphony.rawValue)!
+        let pers = auParameterTree.parameter(withAddress: ModalEffectExtensionParameterAddress.param_Personality.rawValue)!
 
         self.polyphony = ParameterWrapper(parameter: poly)
         self.personality = ParameterWrapper(parameter: pers)

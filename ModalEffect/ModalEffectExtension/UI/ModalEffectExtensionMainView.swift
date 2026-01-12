@@ -1,6 +1,6 @@
 //
-//  ModalAttractorsExtensionMainView.swift
-//  ModalAttractorsExtension
+//  ModalEffectExtensionMainView.swift
+//  ModalEffectExtension
 //
 //  Created by Carsten on 1/8/26.
 //
@@ -10,7 +10,7 @@ import AudioToolbox
 
 /// Root view for Modal Attractors AUv3 plugin
 /// Single view controller with internal tab/page switching
-public struct ModalAttractorsExtensionMainView: View {
+public struct ModalEffectExtensionMainView: View {
     @EnvironmentObject var parameterTree: ParameterTree
     @State private var selectedTab: Tab = .main
 
@@ -109,7 +109,7 @@ struct MainTabView: View {
 // MARK: - Preview
 
 #Preview {
-    ModalAttractorsExtensionMainView()
+    ModalEffectExtensionMainView()
         .environmentObject(ParameterTree.preview)
         .frame(width: 520, height: 400)
 }
