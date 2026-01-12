@@ -25,6 +25,7 @@ private let log = Logger(subsystem: "com.bund.media.ModalAttractorsExtension", c
 /// - The audio unit binding happens after view setup
 /// - preferredContentSize must be overridden
 /// - Class must be @objc for runtime discovery via NSExtensionPrincipalClass
+@objc(ModalAttractorsAUViewController)
 public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFactory {
 
     // MARK: - Initialization
