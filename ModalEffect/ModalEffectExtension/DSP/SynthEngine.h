@@ -216,7 +216,14 @@ private:
     uint32_t controlRateCounter_;
     static constexpr uint32_t CONTROL_RATE_SAMPLES = 240; // ~200 Hz at 48kHz
 
-    // Parameter cache - Global
+    // ModalEffect parameters
+    float bodySize_;        // Body size [0, 1]
+    float material_;        // Material hardness [0, 1]
+    float excite_;          // Excitation amount [0, 1]
+    float morph_;           // Pitch tracking amount [0, 1]
+    float mix_;             // Dry/wet mix [0, 1]
+
+    // Parameter cache - Global (legacy)
     float masterGain_;
     float couplingStrength_;
     int topologyType_;
