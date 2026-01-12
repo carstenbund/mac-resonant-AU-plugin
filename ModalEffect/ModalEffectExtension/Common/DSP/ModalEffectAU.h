@@ -35,6 +35,20 @@ struct ModalEffectEngine {
     float* wetL;           // Left channel wet signal buffer
     float* wetR;           // Right channel wet signal buffer
     uint32_t buffer_size;  // Allocated buffer size
+
+    // Effect state tracking
+    float last_energy;        // Previous frame energy for onset detection
+    float smoothed_energy;    // Smoothed energy for continuous excitation
+    uint8_t current_note;     // Currently playing note (for note-off)
+    bool note_is_on;          // Whether a note is currently active
+    float energy_threshold;   // Adaptive threshold for onset detection
+
+    // Pitch detection state
+    float* pitch_buffer;      // Circular buffer for pitch detection
+    uint32_t pitch_buf_size;  // Pitch detection buffer size
+    uint32_t pitch_buf_pos;   // Current position in pitch buffer
+    float detected_pitch_hz;  // Last detected pitch in Hz
+    double sample_rate;       // Current sample rate
 };
 
 // ============================================================================
