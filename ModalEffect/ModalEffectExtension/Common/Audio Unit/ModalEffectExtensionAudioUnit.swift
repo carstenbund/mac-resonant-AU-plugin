@@ -319,7 +319,7 @@ public class ModalEffectExtensionAudioUnit: AUAudioUnit, @unchecked Sendable {
                 return kAudioUnitErr_InvalidProperty
             }
 
-            var pullFlags = AudioUnitRenderActionFlags(0)
+            var pullFlags = AudioUnitRenderActionFlags(rawValue: 0)
             let status = pullInputBlock(&pullFlags, timestamp, frameCount, 0, outputData)
             guard status == noErr else { return status }
 
