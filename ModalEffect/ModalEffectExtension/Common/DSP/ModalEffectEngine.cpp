@@ -26,6 +26,13 @@ void modal_attractors_engine_init(ModalEffectEngine* engine,
     engine->synth_engine = new SynthEngine(max_polyphony);
     engine->event_queue = new EventQueue();
 
+    // Allocate wet signal buffers
+    engine->buffer_size = max_frames;
+    engine->wetL = new float[max_frames];
+    engine->wetR = new float[max_frames];
+    memset(engine->wetL, 0, max_frames * sizeof(float));
+    memset(engine->wetR, 0, max_frames * sizeof(float));
+
     // Prepare engine for processing
     engine->synth_engine->prepare(sample_rate, max_frames, 2);
 
@@ -36,6 +43,17 @@ void modal_attractors_engine_prepare(ModalEffectEngine* engine,
                                      double sample_rate,
                                      uint32_t max_frames) {
     if (!engine || !engine->initialized) return;
+
+    // Reallocate buffers if size changed
+    if (max_frames > engine->buffer_size) {
+        delete[] engine->wetL;
+        delete[] engine->wetR;
+        engine->buffer_size = max_frames;
+        engine->wetL = new float[max_frames];
+        engine->wetR = new float[max_frames];
+        memset(engine->wetL, 0, max_frames * sizeof(float));
+        memset(engine->wetR, 0, max_frames * sizeof(float));
+    }
 
     engine->synth_engine->prepare(sample_rate, max_frames, 2);
 }
@@ -59,6 +77,17 @@ void modal_attractors_engine_cleanup(ModalEffectEngine* engine) {
         engine->event_queue = nullptr;
     }
 
+    if (engine->wetL) {
+        delete[] engine->wetL;
+        engine->wetL = nullptr;
+    }
+
+    if (engine->wetR) {
+        delete[] engine->wetR;
+        engine->wetR = nullptr;
+    }
+
+    engine->buffer_size = 0;
     engine->initialized = false;
 }
 
@@ -167,23 +196,46 @@ void modal_attractors_engine_process(ModalEffectEngine* engine,
         return;
     }
 
-    // TODO: Integrate ResonantBodyProcessor and other DSP components here
-    // For now, implement simple passthrough with mix parameter
-
-    // Get mix parameter (0.0 = dry, 1.0 = wet)
-    float mix = engine->synth_engine->getParameter(4); // kParam_Mix = 4
+    // Get effect parameters
+    float excite = engine->synth_engine->getParameter(2);  // kParam_Excite = 2
+    float mix = engine->synth_engine->getParameter(4);     // kParam_Mix = 4
     float dryGain = 1.0f - mix;
     float wetGain = mix;
 
-    // Simple passthrough for now (copy input to output with mix)
+    // Calculate input energy (simple RMS over buffer)
+    float energy = 0.0f;
     for (uint32_t i = 0; i < num_frames; ++i) {
-        outL[i] = inL[i] * dryGain;
-        outR[i] = inR[i] * dryGain;
+        float sample = (inL[i] + inR[i]) * 0.5f;
+        energy += sample * sample;
+    }
+    energy = sqrtf(energy / num_frames);
+
+    // If input energy is above threshold, trigger a note
+    // This is a simple approach - ideally we'd use continuous excitation
+    static float lastEnergy = 0.0f;
+    float energyDelta = energy - lastEnergy;
+    lastEnergy = energy;
+
+    if (energyDelta > 0.01f * excite && energy > 0.001f) {
+        // Trigger note C4 (MIDI 60) with velocity based on energy
+        float velocity = fminf(energy * 10.0f * excite, 1.0f);
+        SynthEvent event;
+        event.type = EventType::NoteOn;
+        event.sampleOffset = 0;
+        event.noteOn.note = 60;
+        event.noteOn.velocity = velocity;
+        event.noteOn.channel = 0;
+        engine->event_queue->push(event);
     }
 
-    // TODO: Add actual effect processing here
-    // The ResonantBodyProcessor should be called here to generate the wet signal
-    // and mix it with the dry signal
+    // Render modal synthesis (wet signal) using pre-allocated buffers
+    engine->synth_engine->render(*engine->event_queue, engine->wetL, engine->wetR, num_frames);
+
+    // Mix dry and wet signals
+    for (uint32_t i = 0; i < num_frames; ++i) {
+        outL[i] = inL[i] * dryGain + engine->wetL[i] * wetGain;
+        outR[i] = inR[i] * dryGain + engine->wetR[i] * wetGain;
+    }
 }
 
 // ============================================================================

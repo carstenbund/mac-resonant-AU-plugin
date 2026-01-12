@@ -11,63 +11,13 @@
 #include "ModalVoice.h"
 #include <algorithm>
 
-// Parameter IDs (should match ModalEffectExtensionParameterAddresses.h)
+// Parameter IDs for ModalEffect (must match ModalEffectExtensionParameterAddresses.h)
 enum ParamID {
-    // Global
-    kParam_MasterGain = 0,
-    kParam_CouplingStrength = 1,
-    kParam_Topology = 2,
-    kParam_NodeCount = 3,  // Deprecated: always 5
-
-    // Mode parameters (for Character Editor)
-    kParam_Mode0_Frequency = 4,
-    kParam_Mode0_Damping = 5,
-    kParam_Mode0_Weight = 6,
-    kParam_Mode1_Frequency = 7,
-    kParam_Mode1_Damping = 8,
-    kParam_Mode1_Weight = 9,
-    kParam_Mode2_Frequency = 10,
-    kParam_Mode2_Damping = 11,
-    kParam_Mode2_Weight = 12,
-    kParam_Mode3_Frequency = 13,
-    kParam_Mode3_Damping = 14,
-    kParam_Mode3_Weight = 15,
-    kParam_PokeStrength = 16,
-    kParam_PokeDuration = 17,
-
-    // Deprecated
-    kParam_Polyphony = 18,
-    kParam_Personality = 19,
-
-    // Node Character System
-    kParam_Node0_Character = 20,
-    kParam_Node1_Character = 21,
-    kParam_Node2_Character = 22,
-    kParam_Node3_Character = 23,
-    kParam_Node4_Character = 24,
-    kParam_NoteRouting = 25,
-    kParam_MultiExcite = 26,
-    // Wave Shape Selection (20 parameters: 5 nodes × 4 modes)
-    kParam_Node0_Mode0_WaveShape = 27,
-    kParam_Node0_Mode1_WaveShape = 28,
-    kParam_Node0_Mode2_WaveShape = 29,
-    kParam_Node0_Mode3_WaveShape = 30,
-    kParam_Node1_Mode0_WaveShape = 31,
-    kParam_Node1_Mode1_WaveShape = 32,
-    kParam_Node1_Mode2_WaveShape = 33,
-    kParam_Node1_Mode3_WaveShape = 34,
-    kParam_Node2_Mode0_WaveShape = 35,
-    kParam_Node2_Mode1_WaveShape = 36,
-    kParam_Node2_Mode2_WaveShape = 37,
-    kParam_Node2_Mode3_WaveShape = 38,
-    kParam_Node3_Mode0_WaveShape = 39,
-    kParam_Node3_Mode1_WaveShape = 40,
-    kParam_Node3_Mode2_WaveShape = 41,
-    kParam_Node3_Mode3_WaveShape = 42,
-    kParam_Node4_Mode0_WaveShape = 43,
-    kParam_Node4_Mode1_WaveShape = 44,
-    kParam_Node4_Mode2_WaveShape = 45,
-    kParam_Node4_Mode3_WaveShape = 46
+    kParam_BodySize = 0,     // Body size [0, 1] - scales resonator frequencies
+    kParam_Material = 1,     // Material hardness [0, 1] - controls damping
+    kParam_Excite = 2,       // Excitation amount [0, 1] - input drive
+    kParam_Morph = 3,        // Pitch tracking amount [0, 1] - morphing
+    kParam_Mix = 4           // Dry/wet mix [0, 1] - effect blend
 };
 
 SynthEngine::SynthEngine(uint32_t maxPolyphony)
@@ -79,21 +29,24 @@ SynthEngine::SynthEngine(uint32_t maxPolyphony)
     , channels_(2)
     , initialized_(false)
     , controlRateCounter_(0)
-    // Global parameters
+    // ModalEffect parameters (5 total)
+    , bodySize_(0.5f)      // Default body size
+    , material_(0.5f)       // Default material
+    , excite_(0.5f)         // Default excitation
+    , morph_(0.0f)          // Default morph (no pitch tracking)
+    , mix_(0.5f)            // Default mix (50% wet)
+    // Legacy parameters kept for compatibility
     , masterGain_(0.7f)
     , couplingStrength_(0.3f)
     , topologyType_(0)
-    , couplingMode_(ModalVoice::CouplingMode::ComplexDiffusion)  // Testing new phase-preserving coupling
-    // Node characters (default: each node gets its own character 0-4)
+    , couplingMode_(ModalVoice::CouplingMode::ComplexDiffusion)
     , node0_character_(0)
     , node1_character_(1)
     , node2_character_(2)
     , node3_character_(3)
     , node4_character_(4)
-    // Routing
-    , noteRouting_(0)      // RoundRobin
-    , multiExcite_(1)      // Accumulate
-    // Mode parameters (for Character Editor)
+    , noteRouting_(0)
+    , multiExcite_(1)
     , mode0_frequency_(1.0f)
     , mode0_damping_(1.0f)
     , mode0_weight_(1.0f)
@@ -273,260 +226,49 @@ void SynthEngine::updateControlRate() {
 
 void SynthEngine::setParameter(uint32_t paramId, float value) {
     switch (paramId) {
-        case kParam_MasterGain: {
-            masterGain_ = value;
-            // Convert volume (0.0-1.0) to global damping (1.0-0.0)
-            // Volume = 1.0 → damping = 0.0 (no damping, full resonance)
-            // Volume = 0.5 → damping = 0.5 (moderate damping)
-            // Volume = 0.0 → damping = 1.0 (maximum damping, fast cooldown)
-            float global_damping = 1.0f - value;
-            if (nodeManager_) {
-                nodeManager_->setGlobalDamping(global_damping);
-            }
-            break;
-        }
-
-        case kParam_CouplingStrength:
-            couplingStrength_ = value;
-            topologyEngine_->setCouplingStrength(value);
+        // ModalEffect parameters
+        case kParam_BodySize:
+            bodySize_ = value;
             break;
 
-        case kParam_Topology: {
-            topologyType_ = static_cast<int>(value);
-
-            // Map parameter value to topology type
-            TopologyType topo = TopologyType::Ring;
-            switch (topologyType_) {
-                case 0: topo = TopologyType::Ring; break;
-                case 1: topo = TopologyType::SmallWorld; break;
-                case 2: topo = TopologyType::Clustered; break;
-                case 3: topo = TopologyType::HubSpoke; break;
-                case 4: topo = TopologyType::Random; break;
-                case 5: topo = TopologyType::Complete; break;
-                case 6: topo = TopologyType::None; break;
-            }
-
-            topologyEngine_->generateTopology(topo, couplingStrength_);
-            break;
-        }
-
-        case kParam_NodeCount:
-            // Set active node count (1-5)
-            if (nodeManager_) {
-                nodeManager_->setNodeCount(static_cast<uint8_t>(value));
-            }
+        case kParam_Material:
+            material_ = value;
             break;
 
-        // Node Character parameters
-        case kParam_Node0_Character:
-            node0_character_ = static_cast<uint8_t>(value);
-            if (nodeManager_) {
-                nodeManager_->setNodeCharacter(0, node0_character_);
-            }
+        case kParam_Excite:
+            excite_ = value;
             break;
 
-        case kParam_Node1_Character:
-            node1_character_ = static_cast<uint8_t>(value);
-            if (nodeManager_) {
-                nodeManager_->setNodeCharacter(1, node1_character_);
-            }
+        case kParam_Morph:
+            morph_ = value;
             break;
 
-        case kParam_Node2_Character:
-            node2_character_ = static_cast<uint8_t>(value);
-            if (nodeManager_) {
-                nodeManager_->setNodeCharacter(2, node2_character_);
-            }
+        case kParam_Mix:
+            mix_ = value;
             break;
 
-        case kParam_Node3_Character:
-            node3_character_ = static_cast<uint8_t>(value);
-            if (nodeManager_) {
-                nodeManager_->setNodeCharacter(3, node3_character_);
-            }
-            break;
-
-        case kParam_Node4_Character:
-            node4_character_ = static_cast<uint8_t>(value);
-            if (nodeManager_) {
-                nodeManager_->setNodeCharacter(4, node4_character_);
-            }
-            break;
-
-        // Routing parameters
-        case kParam_NoteRouting:
-            noteRouting_ = static_cast<uint8_t>(value);
-            if (nodeManager_) {
-                nodeManager_->setRoutingMode(static_cast<NoteRoutingMode>(noteRouting_));
-            }
-            break;
-
-        case kParam_MultiExcite:
-            multiExcite_ = static_cast<uint8_t>(value);
-            if (nodeManager_) {
-                nodeManager_->setMultiExciteMode(static_cast<MultiExciteMode>(multiExcite_));
-            }
-            break;
-
-        // Mode parameters (for Character Editor - not directly used)
-        // These are kept for future Character Editor implementation
-        case kParam_Mode0_Frequency:
-            mode0_frequency_ = value;
-            break;
-        case kParam_Mode0_Damping:
-            mode0_damping_ = value;
-            break;
-        case kParam_Mode0_Weight:
-            mode0_weight_ = value;
-            break;
-
-        case kParam_Mode1_Frequency:
-            mode1_frequency_ = value;
-            break;
-        case kParam_Mode1_Damping:
-            mode1_damping_ = value;
-            break;
-        case kParam_Mode1_Weight:
-            mode1_weight_ = value;
-            break;
-
-        case kParam_Mode2_Frequency:
-            mode2_frequency_ = value;
-            break;
-        case kParam_Mode2_Damping:
-            mode2_damping_ = value;
-            break;
-        case kParam_Mode2_Weight:
-            mode2_weight_ = value;
-            break;
-
-        case kParam_Mode3_Frequency:
-            mode3_frequency_ = value;
-            break;
-        case kParam_Mode3_Damping:
-            mode3_damping_ = value;
-            break;
-        case kParam_Mode3_Weight:
-            mode3_weight_ = value;
-            break;
-
-        // Excitation parameters (for Character Editor)
-        case kParam_PokeStrength:
-            pokeStrength_ = value;
-            break;
-        case kParam_PokeDuration:
-            pokeDuration_ = value;
-            break;
-
-        // Wave Shape parameters (20 parameters: 5 nodes × 4 modes)
-        // Handle all wave shape parameters in a range check
         default:
-            if (paramId >= kParam_Node0_Mode0_WaveShape && paramId <= kParam_Node4_Mode3_WaveShape) {
-                uint32_t paramOffset = paramId - kParam_Node0_Mode0_WaveShape;
-                uint32_t nodeIndex = paramOffset / 4;  // 0-4
-                uint32_t modeIndex = paramOffset % 4;  // 0-3
-                wave_shape_t shape = static_cast<wave_shape_t>(static_cast<int>(value));
-
-                if (nodeManager_) {
-                    nodeManager_->setModeWaveShape(nodeIndex, modeIndex, shape);
-                }
-            }
-            // Note: Also handles deprecated parameters below
+            // Unknown parameter - ignore
             break;
-    }
-
-    // Handle deprecated parameters separately (outside switch for clarity)
-    if (paramId == kParam_Polyphony) {
-        // Always 5 nodes
-    } else if (paramId == kParam_Personality) {
-        personality_ = value;
-        // Per-character now, not global
     }
 }
 
 float SynthEngine::getParameter(uint32_t paramId) const {
     switch (paramId) {
-        // Global parameters
-        case kParam_MasterGain:
-            return masterGain_;
-        case kParam_CouplingStrength:
-            return couplingStrength_;
-        case kParam_Topology:
-            return static_cast<float>(topologyType_);
-        case kParam_NodeCount:
-            return nodeManager_ ? static_cast<float>(nodeManager_->getNodeCount()) : 5.0f;
+        // ModalEffect parameters
+        case kParam_BodySize:
+            return bodySize_;
+        case kParam_Material:
+            return material_;
+        case kParam_Excite:
+            return excite_;
+        case kParam_Morph:
+            return morph_;
+        case kParam_Mix:
+            return mix_;
 
-        // Node Character parameters
-        case kParam_Node0_Character:
-            return static_cast<float>(node0_character_);
-        case kParam_Node1_Character:
-            return static_cast<float>(node1_character_);
-        case kParam_Node2_Character:
-            return static_cast<float>(node2_character_);
-        case kParam_Node3_Character:
-            return static_cast<float>(node3_character_);
-        case kParam_Node4_Character:
-            return static_cast<float>(node4_character_);
-
-        // Routing parameters
-        case kParam_NoteRouting:
-            return static_cast<float>(noteRouting_);
-        case kParam_MultiExcite:
-            return static_cast<float>(multiExcite_);
-
-        // Mode parameters (for Character Editor)
-        case kParam_Mode0_Frequency:
-            return mode0_frequency_;
-        case kParam_Mode0_Damping:
-            return mode0_damping_;
-        case kParam_Mode0_Weight:
-            return mode0_weight_;
-
-        case kParam_Mode1_Frequency:
-            return mode1_frequency_;
-        case kParam_Mode1_Damping:
-            return mode1_damping_;
-        case kParam_Mode1_Weight:
-            return mode1_weight_;
-
-        case kParam_Mode2_Frequency:
-            return mode2_frequency_;
-        case kParam_Mode2_Damping:
-            return mode2_damping_;
-        case kParam_Mode2_Weight:
-            return mode2_weight_;
-
-        case kParam_Mode3_Frequency:
-            return mode3_frequency_;
-        case kParam_Mode3_Damping:
-            return mode3_damping_;
-        case kParam_Mode3_Weight:
-            return mode3_weight_;
-
-        // Excitation parameters (for Character Editor)
-        case kParam_PokeStrength:
-            return pokeStrength_;
-        case kParam_PokeDuration:
-            return pokeDuration_;
-
-        // Deprecated parameters
-        case kParam_Polyphony:
-            return 5.0f;  // Always 5 nodes
-        case kParam_Personality:
-            return personality_;
-
-        // Wave Shape parameters (20 parameters: 5 nodes × 4 modes)
         default:
-            if (paramId >= kParam_Node0_Mode0_WaveShape && paramId <= kParam_Node4_Mode3_WaveShape) {
-                uint32_t paramOffset = paramId - kParam_Node0_Mode0_WaveShape;
-                uint32_t nodeIndex = paramOffset / 4;  // 0-4
-                uint32_t modeIndex = paramOffset % 4;  // 0-3
-
-                if (nodeManager_) {
-                    wave_shape_t shape = nodeManager_->getModeWaveShape(nodeIndex, modeIndex);
-                    return static_cast<float>(static_cast<int>(shape));
-                }
-            }
+            // Unknown parameter
             return 0.0f;
     }
 }

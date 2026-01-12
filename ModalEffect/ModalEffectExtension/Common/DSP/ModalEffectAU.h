@@ -30,6 +30,11 @@ struct ModalEffectEngine {
     SynthEngine* synth_engine;  // C++ engine (opaque to C callers)
     EventQueue* event_queue;    // Render-time event queue
     bool initialized;
+
+    // Pre-allocated buffers for audio processing (real-time safe)
+    float* wetL;           // Left channel wet signal buffer
+    float* wetR;           // Right channel wet signal buffer
+    uint32_t buffer_size;  // Allocated buffer size
 };
 
 // ============================================================================
