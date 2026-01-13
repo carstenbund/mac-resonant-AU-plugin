@@ -18,8 +18,6 @@ import UIKit
 import AppKit
 #endif
 
-private let log = Logger(subsystem: "com.bund.media.ModalAttractors", category: "SimplePlayEngine")
-
 /// Wraps and Audio Unit extension and provides helper functions.
 extension AVAudioUnit {
 
@@ -39,17 +37,17 @@ extension AVAudioUnit {
     }
     
 	fileprivate func loadAudioUnitViewController() async -> ViewController? {
-		log.info("start requesting view (auAudioUnit.requestViewController)")
+		AULogger.audio.info("start requesting view (auAudioUnit.requestViewController)")
 		let viewController = await auAudioUnit.requestViewController()
 		if let viewController {
-			log.info("view requested - received view controller: \(String(describing: type(of: viewController)))")
+			AULogger.audio.info("view requested - received view controller: \(String(describing: type(of: viewController)))")
 		} else {
-			log.info("view requested - no view controller returned")
+			AULogger.audio.info("view requested - no view controller returned")
 		}
 
 		if #available(macOS 13.0, iOS 16.0, *) {
 			if viewController == nil {
-				log.info("using AUGenericViewController fallback")
+				AULogger.audio.info("using AUGenericViewController fallback")
 				let genericViewController = await AUGenericViewController()
 				await MainActor.run {
 					genericViewController.auAudioUnit = self.auAudioUnit
@@ -67,8 +65,6 @@ extension AVAudioUnit {
 @Observable
 public class SimplePlayEngine {
 
-    private static let log = Logger(subsystem: "com.bund.media.ModalAttractors", category: "SimplePlayEngine")
-    
     private var avAudioUnit: AVAudioUnit?
     
     // Synchronizes starting/stopping the engine and scheduling file segments.
@@ -135,7 +131,7 @@ public class SimplePlayEngine {
         }
 
         let description = component.audioComponentDescription
-        SimplePlayEngine.log.info("""
+        AULogger.audio.info("""
             found component:
               name=\(component.name, privacy: .public)
               manufacturer=\(component.manufacturerName, privacy: .public)
@@ -143,13 +139,13 @@ public class SimplePlayEngine {
               subtype=\(fourCharString(description.componentSubType), privacy: .public)
               manufacturerCode=\(fourCharString(description.componentManufacturer), privacy: .public)
             """)
-        
+
         // Instantiate the audio unit.
         do {
             let audioUnit = try await AVAudioUnit.instantiate(
                 with: component.audioComponentDescription, options: AudioComponentInstantiationOptions.loadOutOfProcess)
 
-            SimplePlayEngine.log.info("audio unit instantiated: \(String(describing: type(of: audioUnit.auAudioUnit)), privacy: .public)")
+            AULogger.audio.info("audio unit instantiated: \(String(describing: type(of: audioUnit.auAudioUnit)), privacy: .public)")
 
             self.connect(avAudioUnit: audioUnit)
             

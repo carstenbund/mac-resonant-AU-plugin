@@ -9,8 +9,6 @@ import AVFoundation
 import CoreAudioKit
 import os
 
-private let log = Logger(subsystem: "com.bund.media.ModalAttractorsExtension", category: "AudioUnit")
-
 /// AUv3 Instrument implementation for Modal Attractors synthesis engine
 ///
 /// This class implements the Audio Unit wrapper around the C++ DSP engine,
@@ -221,18 +219,18 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
       completionHandler: @escaping (AUViewController?) -> Void
     ) {
     #if os(macOS)
-      log.info("start requesting view (requestViewController)")
+      AULogger.audioUnit.info("start requesting view (requestViewController)")
       DispatchQueue.main.async { [weak self] in
           guard let self = self else {
-              log.info("view requested - audio unit released before view controller creation")
+              AULogger.audioUnit.info("view requested - audio unit released before view controller creation")
               completionHandler(nil)
               return
           }
 
-          log.info("view requested - creating ModalAttractorsAUViewController")
+          AULogger.audioUnit.info("view requested - creating ModalAttractorsAUViewController")
           let viewController = ModalAttractorsAUViewController()
           viewController.audioUnit = self
-          log.info("view requested - returning view controller")
+          AULogger.audioUnit.info("view requested - returning view controller")
           completionHandler(viewController)
       }
     #else

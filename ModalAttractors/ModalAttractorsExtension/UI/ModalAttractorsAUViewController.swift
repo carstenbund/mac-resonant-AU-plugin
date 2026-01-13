@@ -14,8 +14,6 @@ import os
 import AppKit
 #endif
 
-private let log = Logger(subsystem: "com.bund.media.ModalAttractorsExtension", category: "AUViewController")
-
 /// Custom AUViewController subclass that hosts the SwiftUI view
 /// This is the principal class for the extension - it conforms to AUAudioUnitFactory
 /// to properly support both in-process and out-of-process instantiation.
@@ -58,7 +56,7 @@ public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFacto
     /// This is called by the system when the AU is instantiated
     @objc
     public func createAudioUnit(with componentDescription: AudioComponentDescription) throws -> AUAudioUnit {
-        log.info("Creating audio unit...")
+        AULogger.viewController.info("Creating audio unit...")
 
         let au = try ModalAttractorsExtensionAudioUnit(
             componentDescription: componentDescription,
@@ -74,7 +72,7 @@ public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFacto
             }
         }
 
-        log.info("Audio unit created successfully")
+        AULogger.viewController.info("Audio unit created successfully")
 
         // Set the audio unit - this triggers binding via didSet
         DispatchQueue.main.async { [weak self] in
@@ -113,7 +111,7 @@ public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFacto
     /// Override loadView to create the view programmatically
     /// This is REQUIRED for NSViewController subclasses that don't use a nib
     public override func loadView() {
-        log.info("loadView called - creating view programmatically")
+        AULogger.viewController.info("loadView called - creating view programmatically")
         // Create a plain NSView as the root view
         // The hosting controller will be added as a subview in viewDidLoad
         self.view = NSView(frame: NSRect(x: 0, y: 0,
@@ -124,7 +122,7 @@ public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFacto
 
     public override func viewDidLoad() {
         super.viewDidLoad()
-        log.info("viewDidLoad called - setting up view immediately")
+        AULogger.viewController.info("viewDidLoad called - setting up view immediately")
 
         // CRITICAL: Set up the view hierarchy IMMEDIATELY
         // Do NOT wait for the audio unit - the view must be ready when
@@ -136,23 +134,23 @@ public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFacto
     /// Called when audioUnit becomes available
     private func bindAudioUnit(_ au: ModalAttractorsExtensionAudioUnit) {
         guard let paramTree = au.parameterTree else {
-            log.error("Audio unit has no parameter tree")
+            AULogger.viewController.error("Audio unit has no parameter tree")
             return
         }
 
-        log.info("Binding audio unit parameter tree to UI")
+        AULogger.viewController.info("Binding audio unit parameter tree to UI")
 
         // Create wrapper and update the holder (triggers UI update)
         let wrapper = ParameterTree(auParameterTree: paramTree)
         parameterTreeHolder.parameterTree = wrapper
 
-        log.info("Parameter tree bound successfully")
+        AULogger.viewController.info("Parameter tree bound successfully")
     }
 
     /// Set up the SwiftUI hosting controller
     /// This creates the view hierarchy immediately - parameter binding happens later
     private func setupHostingController() {
-        log.info("Setting up hosting controller with custom tabbed view")
+        AULogger.viewController.info("Setting up hosting controller with custom tabbed view")
 
         // Remove existing hosting controller if present
         if let existing = hostingController {
@@ -186,7 +184,7 @@ public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFacto
         ])
 
         hostingController = hosting
-        log.info("Hosting controller setup complete")
+        AULogger.viewController.info("Hosting controller setup complete")
     }
 }
 
