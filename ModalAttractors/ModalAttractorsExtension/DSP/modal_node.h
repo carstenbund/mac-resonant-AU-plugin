@@ -128,6 +128,7 @@ typedef struct {
 typedef struct {
     uint8_t source_node_id;   ///< Sending node ID
     float strength;           ///< Excitation strength
+    float duration_ms;        ///< Poke duration in milliseconds [1..20]
     float phase_hint;         ///< Phase hint (radians, or -1 for random)
     float mode_weights[MAX_MODES]; ///< Per-mode weighting
 } poke_event_t;

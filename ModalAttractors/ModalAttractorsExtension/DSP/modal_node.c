@@ -197,7 +197,7 @@ void modal_node_apply_poke(modal_node_t* node, const poke_event_t* poke) {
     // Set up excitation envelope
     node->excitation.strength = poke->strength;
     node->excitation.phase_hint = poke->phase_hint;
-    node->excitation.duration_ms = 10.0f; // Default 10ms envelope
+    node->excitation.duration_ms = (poke->duration_ms > 0.0f) ? poke->duration_ms : 10.0f; // Use poke duration or default
     node->excitation.elapsed_ms = 0.0f;
     node->excitation.active = true;
 
