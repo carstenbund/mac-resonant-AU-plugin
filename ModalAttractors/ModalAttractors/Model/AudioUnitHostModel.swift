@@ -59,16 +59,25 @@ class AudioUnitHostModel {
             AULogger.host.info("loading audio unit type=\(self.type, privacy: .public) subType=\(self.subType, privacy: .public) manufacturer=\(self.manufacturer, privacy: .public)")
 			let viewController = await playEngine.initComponent(type: type, subType: subType, manufacturer: manufacturer)
 
-				self.viewModel = AudioUnitViewModel(showAudioControls: self.wantsAudio,
-													showMIDIContols: self.wantsMIDI,
-													title: self.auValString,
-													message: "Successfully loaded (\(self.auValString))",
-													viewController: viewController)
-                AULogger.host.info("audio unit load completed. viewController=\(String(describing: viewController), privacy: .public)")
+            if viewController == nil {
+                AULogger.host.error("Failed to load Audio Unit - component not found or failed to instantiate")
+                self.viewModel = AudioUnitViewModel(showAudioControls: self.wantsAudio,
+                                                    showMIDIContols: self.wantsMIDI,
+                                                    title: self.auValString,
+                                                    message: "Failed to load (\(self.auValString)). The plugin may need to be registered. Please restart the app.",
+                                                    viewController: nil)
+            } else {
+                AULogger.host.info("audio unit loaded successfully. viewController=\(String(describing: viewController), privacy: .public)")
+                self.viewModel = AudioUnitViewModel(showAudioControls: self.wantsAudio,
+                                                    showMIDIContols: self.wantsMIDI,
+                                                    title: self.auValString,
+                                                    message: "Successfully loaded (\(self.auValString))",
+                                                    viewController: viewController)
 
-				if self.isFreeRunning {
-					self.playEngine.startPlaying()
-			}
+                if self.isFreeRunning {
+                    self.playEngine.startPlaying()
+                }
+            }
 		}
     }
 

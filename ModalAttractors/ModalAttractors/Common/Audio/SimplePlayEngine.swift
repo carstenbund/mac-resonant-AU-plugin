@@ -124,9 +124,11 @@ public class SimplePlayEngine {
     func initComponent(type: String, subType: String, manufacturer: String) async -> ViewController? {
         // Reset the engine to remove any configured audio units.
         reset()
-        
+
         guard let component = AVAudioUnit.findComponent(type: type, subType: subType, manufacturer: manufacturer) else {
-            fatalError("Failed to find component with type: \(type), subtype: \(subType), manufacturer: \(manufacturer))" )
+            AULogger.audio.error("Failed to find component with type: \(type, privacy: .public), subtype: \(subType, privacy: .public), manufacturer: \(manufacturer, privacy: .public)")
+            AULogger.audio.notice("The Audio Unit may need to be registered. Please restart the app after initial launch.")
+            return nil
         }
 
         let description = component.audioComponentDescription
