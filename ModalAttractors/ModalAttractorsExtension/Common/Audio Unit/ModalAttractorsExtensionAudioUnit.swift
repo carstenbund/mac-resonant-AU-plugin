@@ -311,6 +311,9 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
                 case .midiEventList:
                     break
 
+                case .MIDISysEx:
+                    break
+
                 @unknown default:
                     break
                 }

@@ -7,9 +7,8 @@
 
 import Foundation
 import os
-public import CoreAudioKit
+import CoreAudioKit
 import AVFoundation
-import os
 @preconcurrency import AVFAudio
 
 #if os(iOS) || os(visionOS)
@@ -135,9 +134,9 @@ public class SimplePlayEngine {
             found component:
               name=\(component.name, privacy: .public)
               manufacturer=\(component.manufacturerName, privacy: .public)
-              type=\(fourCharString(description.componentType), privacy: .public)
-              subtype=\(fourCharString(description.componentSubType), privacy: .public)
-              manufacturerCode=\(fourCharString(description.componentManufacturer), privacy: .public)
+              type=\(self.fourCharString(description.componentType), privacy: .public)
+              subtype=\(self.fourCharString(description.componentSubType), privacy: .public)
+              manufacturerCode=\(self.fourCharString(description.componentManufacturer), privacy: .public)
             """)
 
         // Instantiate the audio unit.
@@ -145,7 +144,8 @@ public class SimplePlayEngine {
             let audioUnit = try await AVAudioUnit.instantiate(
                 with: component.audioComponentDescription, options: AudioComponentInstantiationOptions.loadOutOfProcess)
 
-            AULogger.audio.info("audio unit instantiated: \(String(describing: type(of: audioUnit.auAudioUnit)), privacy: .public)")
+            let auType = String(describing: type(of: audioUnit.auAudioUnit))
+            AULogger.audio.info("audio unit instantiated: \(auType, privacy: .public)")
 
             self.connect(avAudioUnit: audioUnit)
             
