@@ -144,7 +144,7 @@ public class SimplePlayEngine {
             let audioUnit = try await AVAudioUnit.instantiate(
                 with: component.audioComponentDescription, options: AudioComponentInstantiationOptions.loadOutOfProcess)
 
-            let auType = String(describing: type(of: audioUnit.auAudioUnit))
+            let auType = String(describing: Swift.type(of: audioUnit.auAudioUnit))
             AULogger.audio.info("audio unit instantiated: \(auType, privacy: .public)")
 
             self.connect(avAudioUnit: audioUnit)
