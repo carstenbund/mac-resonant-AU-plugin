@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import os
 public import CoreAudioKit
 import AVFoundation
 import os
@@ -65,6 +66,8 @@ extension AVAudioUnit {
 @MainActor
 @Observable
 public class SimplePlayEngine {
+
+    private static let log = Logger(subsystem: "com.bund.media.ModalAttractors", category: "SimplePlayEngine")
     
     private var avAudioUnit: AVAudioUnit?
     
@@ -113,36 +116,48 @@ public class SimplePlayEngine {
         }
     }
     
-	func initComponent(type: String, subType: String, manufacturer: String) async -> ViewController? {
-		// Reset the engine to remove any configured audio units.
-		reset()
+    private func fourCharString(_ code: FourCharCode) -> String {
+        let bytes: [UInt8] = [
+            UInt8((code >> 24) & 0xff),
+            UInt8((code >> 16) & 0xff),
+            UInt8((code >> 8) & 0xff),
+            UInt8(code & 0xff)
+        ]
+        return String(bytes: bytes, encoding: .ascii) ?? String(format: "0x%08X", code)
+    }
+
+    func initComponent(type: String, subType: String, manufacturer: String) async -> ViewController? {
+        // Reset the engine to remove any configured audio units.
+        reset()
         
-		log.info("finding component type=\(type, privacy: .public) subType=\(subType, privacy: .public) manufacturer=\(manufacturer, privacy: .public)")
-		guard let component = AVAudioUnit.findComponent(type: type, subType: subType, manufacturer: manufacturer) else {
-			fatalError("Failed to find component with type: \(type), subtype: \(subType), manufacturer: \(manufacturer))" )
-		}
-		log.info("found component: \(component.name, privacy: .public) bundleID=\(component.bundleIdentifier ?? "nil", privacy: .public)")
+        guard let component = AVAudioUnit.findComponent(type: type, subType: subType, manufacturer: manufacturer) else {
+            fatalError("Failed to find component with type: \(type), subtype: \(subType), manufacturer: \(manufacturer))" )
+        }
+
+        let description = component.audioComponentDescription
+        SimplePlayEngine.log.info("""
+            found component:
+              name=\(component.name, privacy: .public)
+              manufacturer=\(component.manufacturerName, privacy: .public)
+              type=\(fourCharString(description.componentType), privacy: .public)
+              subtype=\(fourCharString(description.componentSubType), privacy: .public)
+              manufacturerCode=\(fourCharString(description.componentManufacturer), privacy: .public)
+            """)
         
-		// Instantiate the audio unit.
-		do {
-			log.info("instantiating audio unit out-of-process")
-			let audioUnit = try await AVAudioUnit.instantiate(
-				with: component.audioComponentDescription, options: AudioComponentInstantiationOptions.loadOutOfProcess)
-			
-			self.avAudioUnit = audioUnit
-			
-			self.connect(avAudioUnit: audioUnit)
-			log.info("audio unit instantiated: \(String(describing: type(of: audioUnit.auAudioUnit)), privacy: .public)")
-			let viewController = await audioUnit.loadAudioUnitViewController()
-			if viewController == nil {
-				log.info("view controller load returned nil")
-			}
-			return viewController
-		} catch {
-			log.error("failed to instantiate audio unit: \(String(describing: error), privacy: .public)")
-			return nil
-		}
-	}
+        // Instantiate the audio unit.
+        do {
+            let audioUnit = try await AVAudioUnit.instantiate(
+                with: component.audioComponentDescription, options: AudioComponentInstantiationOptions.loadOutOfProcess)
+
+            SimplePlayEngine.log.info("audio unit instantiated: \(String(describing: type(of: audioUnit.auAudioUnit)), privacy: .public)")
+
+            self.connect(avAudioUnit: audioUnit)
+            
+            return await audioUnit.loadAudioUnitViewController()
+        } catch {
+            return nil
+        }
+    }
     
     private func setPlayerFile(_ fileURL: URL) {
         do {
@@ -248,76 +263,63 @@ public class SimplePlayEngine {
         }
     }
     
-    private func resetAudioLoop() {
-        guard let avAudioUnit = self.avAudioUnit else {
-            return
-        }
-        
-        if avAudioUnit.wantsAudioInput {
-            // Connect player -> mixer.
-            guard let format = file?.processingFormat else { fatalError("No AVAudioFile defined (processing format unavailable).") }
-            engine.connect(player, to: engine.mainMixerNode, format: format)
-        }
-    }
-    
     public func reset() {
         connect(avAudioUnit: nil)
     }
     
-    public func connect(avAudioUnit: AVAudioUnit?, completion: @escaping (() -> Void) = {}) {
-        guard let avAudioUnit = self.avAudioUnit else {
-            return
-        }
-        
-        // Break the audio unit -> mixer connection
-        engine.disconnectNodeInput(engine.mainMixerNode)
-        
-        resetAudioLoop()
-        
-        // We're done with the unit; release all references.
-        engine.detach(avAudioUnit)
-        
-        // Internal function to resume playing and call the completion handler.
-        func rewiringComplete() {
-            scheduleMIDIEventListBlock = auAudioUnit.scheduleMIDIEventListBlock
-            if isPlaying {
-                player.play()
-            }
-            completion()
-        }
-        
-        let hardwareFormat = engine.outputNode.outputFormat(forBus: 0)
-        
-        // Connect the main mixer -> output node
-        engine.connect(engine.mainMixerNode, to: engine.outputNode, format: hardwareFormat)
-        
-        // Pause the player before re-wiring it. It is not simple to keep it playing across an insertion or deletion.
+    public func connect(avAudioUnit newAudioUnit: AVAudioUnit?, completion: @escaping (() -> Void) = {}) {
+        // Phase 1: teardown current graph.
         if isPlaying {
             player.pause()
         }
-        
+        engine.disconnectNodeInput(engine.mainMixerNode)
+
+        if let existingUnit = self.avAudioUnit {
+            engine.detach(existingUnit)
+        }
+
+        scheduleMIDIEventListBlock = nil
+
+        // Update state before wiring the new unit.
+        self.avAudioUnit = newAudioUnit
+
+        guard let avAudioUnit = newAudioUnit else {
+            completion()
+            return
+        }
+
+        // Phase 2: rewire with the new unit.
+        let hardwareFormat = engine.outputNode.outputFormat(forBus: 0)
+
+        // Connect the main mixer -> output node
+        engine.connect(engine.mainMixerNode, to: engine.outputNode, format: hardwareFormat)
+
         let auAudioUnit = avAudioUnit.auAudioUnit
-        
+
         if !auAudioUnit.midiOutputNames.isEmpty {
             auAudioUnit.midiOutputEventBlock = midiOutBlock
         }
-        
-        // Attach the AVAudioUnit the graph.
+
+        // Attach the AVAudioUnit to the graph.
         engine.attach(avAudioUnit)
-        
+
         if avAudioUnit.wantsAudioInput {
-            // Disconnect the player -> mixer.
-            engine.disconnectNodeInput(engine.mainMixerNode)
-            
-            // Connect the player -> effect -> mixer.
-            if let format = file?.processingFormat {
-                engine.connect(player, to: avAudioUnit, format: format)
-                engine.connect(avAudioUnit, to: engine.mainMixerNode, format: format)
+            guard let format = file?.processingFormat else {
+                fatalError("No AVAudioFile defined (processing format unavailable).")
             }
+            // Connect the player -> effect -> mixer.
+            engine.connect(player, to: avAudioUnit, format: format)
+            engine.connect(avAudioUnit, to: engine.mainMixerNode, format: format)
         } else {
             let stereoFormat = AVAudioFormat(standardFormatWithSampleRate: hardwareFormat.sampleRate, channels: 2)
             engine.connect(avAudioUnit, to: engine.mainMixerNode, format: stereoFormat)
         }
-        rewiringComplete()
+
+        // Phase 3: resume playback and callbacks.
+        scheduleMIDIEventListBlock = auAudioUnit.scheduleMIDIEventListBlock
+        if isPlaying {
+            player.play()
+        }
+        completion()
     }
 }
