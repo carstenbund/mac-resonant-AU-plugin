@@ -9,6 +9,7 @@ import Foundation
 import os
 public import CoreAudioKit
 import AVFoundation
+import os
 @preconcurrency import AVFAudio
 
 #if os(iOS) || os(visionOS)
@@ -16,6 +17,8 @@ import UIKit
 #elseif os(macOS)
 import AppKit
 #endif
+
+private let log = Logger(subsystem: "com.bund.media.ModalAttractors", category: "SimplePlayEngine")
 
 /// Wraps and Audio Unit extension and provides helper functions.
 extension AVAudioUnit {
@@ -36,10 +39,17 @@ extension AVAudioUnit {
     }
     
 	fileprivate func loadAudioUnitViewController() async -> ViewController? {
+		log.info("start requesting view (auAudioUnit.requestViewController)")
 		let viewController = await auAudioUnit.requestViewController()
+		if let viewController {
+			log.info("view requested - received view controller: \(String(describing: type(of: viewController)))")
+		} else {
+			log.info("view requested - no view controller returned")
+		}
 
 		if #available(macOS 13.0, iOS 16.0, *) {
 			if viewController == nil {
+				log.info("using AUGenericViewController fallback")
 				let genericViewController = await AUGenericViewController()
 				await MainActor.run {
 					genericViewController.auAudioUnit = self.auAudioUnit
