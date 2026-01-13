@@ -8,6 +8,9 @@
 import SwiftUI
 import CoreMIDI
 import AudioToolbox
+import os
+
+private let log = Logger(subsystem: "com.bund.media.ModalAttractors", category: "AudioUnitHost")
 
 @MainActor
 @Observable
@@ -31,7 +34,7 @@ class AudioUnitHostModel {
 
     let auValString: String
 
-    init(type: String = "aumi", subType: String = "Test", manufacturer: String = "Bund") {
+    init(type: String = "aumu", subType: String = "Test", manufacturer: String = "Bund") {
         self.type = type
         self.subType = subType
         self.manufacturer = manufacturer
@@ -55,6 +58,7 @@ class AudioUnitHostModel {
 
     private func loadAudioUnit() {
 		Task {
+            log.info("loading audio unit type=\(self.type, privacy: .public) subType=\(self.subType, privacy: .public) manufacturer=\(self.manufacturer, privacy: .public)")
 			let viewController = await playEngine.initComponent(type: type, subType: subType, manufacturer: manufacturer)
 
 				self.viewModel = AudioUnitViewModel(showAudioControls: self.wantsAudio,
@@ -62,6 +66,7 @@ class AudioUnitHostModel {
 													title: self.auValString,
 													message: "Successfully loaded (\(self.auValString))",
 													viewController: viewController)
+                log.info("audio unit load completed. viewController=\(String(describing: viewController), privacy: .public)")
 				
 				if self.isFreeRunning {
 					self.playEngine.startPlaying()

@@ -8,6 +8,7 @@
 import Foundation
 public import CoreAudioKit
 import AVFoundation
+import os
 @preconcurrency import AVFAudio
 
 #if os(iOS) || os(visionOS)
@@ -15,6 +16,8 @@ import UIKit
 #elseif os(macOS)
 import AppKit
 #endif
+
+private let log = Logger(subsystem: "com.bund.media.ModalAttractors", category: "SimplePlayEngine")
 
 /// Wraps and Audio Unit extension and provides helper functions.
 extension AVAudioUnit {
@@ -35,10 +38,17 @@ extension AVAudioUnit {
     }
     
 	fileprivate func loadAudioUnitViewController() async -> ViewController? {
+		log.info("start requesting view (auAudioUnit.requestViewController)")
 		let viewController = await auAudioUnit.requestViewController()
+		if let viewController {
+			log.info("view requested - received view controller: \(String(describing: type(of: viewController)))")
+		} else {
+			log.info("view requested - no view controller returned")
+		}
 
 		if #available(macOS 13.0, iOS 16.0, *) {
 			if viewController == nil {
+				log.info("using AUGenericViewController fallback")
 				let genericViewController = await AUGenericViewController()
 				await MainActor.run {
 					genericViewController.auAudioUnit = self.auAudioUnit
@@ -103,28 +113,36 @@ public class SimplePlayEngine {
         }
     }
     
-    func initComponent(type: String, subType: String, manufacturer: String) async -> ViewController? {
-        // Reset the engine to remove any configured audio units.
-        reset()
+	func initComponent(type: String, subType: String, manufacturer: String) async -> ViewController? {
+		// Reset the engine to remove any configured audio units.
+		reset()
         
-        guard let component = AVAudioUnit.findComponent(type: type, subType: subType, manufacturer: manufacturer) else {
-            fatalError("Failed to find component with type: \(type), subtype: \(subType), manufacturer: \(manufacturer))" )
-        }
+		log.info("finding component type=\(type, privacy: .public) subType=\(subType, privacy: .public) manufacturer=\(manufacturer, privacy: .public)")
+		guard let component = AVAudioUnit.findComponent(type: type, subType: subType, manufacturer: manufacturer) else {
+			fatalError("Failed to find component with type: \(type), subtype: \(subType), manufacturer: \(manufacturer))" )
+		}
+		log.info("found component: \(component.name, privacy: .public) bundleID=\(component.bundleIdentifier ?? "nil", privacy: .public)")
         
-        // Instantiate the audio unit.
-        do {
-            let audioUnit = try await AVAudioUnit.instantiate(
-                with: component.audioComponentDescription, options: AudioComponentInstantiationOptions.loadOutOfProcess)
-            
-            self.avAudioUnit = audioUnit
-            
-            self.connect(avAudioUnit: audioUnit)
-            
-            return await audioUnit.loadAudioUnitViewController()
-        } catch {
-            return nil
-        }
-    }
+		// Instantiate the audio unit.
+		do {
+			log.info("instantiating audio unit out-of-process")
+			let audioUnit = try await AVAudioUnit.instantiate(
+				with: component.audioComponentDescription, options: AudioComponentInstantiationOptions.loadOutOfProcess)
+			
+			self.avAudioUnit = audioUnit
+			
+			self.connect(avAudioUnit: audioUnit)
+			log.info("audio unit instantiated: \(String(describing: type(of: audioUnit.auAudioUnit)), privacy: .public)")
+			let viewController = await audioUnit.loadAudioUnitViewController()
+			if viewController == nil {
+				log.info("view controller load returned nil")
+			}
+			return viewController
+		} catch {
+			log.error("failed to instantiate audio unit: \(String(describing: error), privacy: .public)")
+			return nil
+		}
+	}
     
     private func setPlayerFile(_ fileURL: URL) {
         do {
