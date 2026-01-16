@@ -7,6 +7,9 @@
 
 import SwiftUI
 import AudioToolbox
+import os
+
+private let log = Logger(subsystem: "com.bund.media.ModalAttractorsExtension", category: "MainView")
 
 /// Root view for Modal Attractors AUv3 plugin
 /// Single view controller with internal tab/page switching
@@ -14,7 +17,10 @@ public struct ModalAttractorsExtensionMainView: View {
     @EnvironmentObject var parameterTree: ParameterTree
     @State private var selectedTab: Tab = .main
 
-    public init() {}
+    public init() {
+        log.info("🎨 DEBUG: ModalAttractorsExtensionMainView.init() - Main view created")
+        NSLog("🎨 AUv3 DEBUG: ModalAttractorsExtensionMainView initialized")
+    }
 
     // MARK: - Tab Definition
 
@@ -43,6 +49,10 @@ public struct ModalAttractorsExtensionMainView: View {
                 }
             }
             .pickerStyle(.segmented)
+            .onChange(of: selectedTab) { oldValue, newValue in
+                log.info("🎨 DEBUG: Tab changed from \(oldValue.title) to \(newValue.title)")
+                NSLog("🎨 AUv3 DEBUG: Tab switched to: %@", newValue.title)
+            }
 
             // Tab content
             Group {
@@ -57,6 +67,10 @@ public struct ModalAttractorsExtensionMainView: View {
         }
         .padding(12)
         .frame(minWidth: 520, minHeight: 400)
+        .onAppear {
+            log.info("🎨 DEBUG: MainView.onAppear() - Tabbed view is now visible")
+            NSLog("🎨 AUv3 DEBUG: MainView appeared - Custom tabbed UI is RENDERING")
+        }
     }
 }
 
