@@ -361,11 +361,487 @@ void ProcessCV() {
 }
 ```
 
+#### Step 2.4: Hardware UI Integration (Pots, Switches, LEDs, LCD)
+
+The Daisy Seed has extensive GPIO and peripherals for building a complete hardware interface:
+
+**Available I/O:**
+- 8x ADC inputs (12-bit, 0-3.3V) → Potentiometers, CV inputs
+- 28x GPIO pins → Buttons, encoders, gate inputs
+- 2x SPI buses → OLED/TFT displays, shift registers
+- 2x I2C buses → OLED displays, LED drivers (TLC59711)
+- Multiple UART/I2S/USB for expansion
+
+##### Option A: Potentiometers + LEDs (Simple Panel)
+
+**Hardware:**
+- 8x 10kΩ linear potentiometers
+- 4x RGB LEDs (mode indicators)
+- 2x momentary switches (preset up/down)
+- 1x SPST toggle (personality switch)
+
+**Pinout Example:**
+```cpp
+// ADC (Potentiometers)
+#define POT_MODE0_FREQ    ADC_0  // GPIO 15
+#define POT_MODE0_DAMPING ADC_1  // GPIO 16
+#define POT_MODE1_FREQ    ADC_2  // GPIO 17
+#define POT_MODE1_DAMPING ADC_3  // GPIO 18
+#define POT_COUPLING      ADC_4  // GPIO 19
+#define POT_MASTER_GAIN   ADC_5  // GPIO 20
+#define POT_MODE_MIX      ADC_6  // GPIO 21
+#define POT_BRIGHTNESS    ADC_7  // GPIO 22
+
+// Digital I/O (Buttons)
+#define BTN_PRESET_UP     GPIO_23
+#define BTN_PRESET_DOWN   GPIO_24
+#define SWITCH_PERSONALITY GPIO_25
+
+// PWM (RGB LEDs - mode indicators)
+#define LED_MODE0_R       GPIO_1
+#define LED_MODE0_G       GPIO_2
+#define LED_MODE0_B       GPIO_3
+// ... (repeat for modes 1-3)
+```
+
+**Implementation:**
+```cpp
+// In setup()
+hw.adc.Init(AdcChannelConfig, 8);  // Initialize 8 ADC channels
+hw.adc.Start();
+
+pinMode(BTN_PRESET_UP, INPUT_PULLUP);
+pinMode(BTN_PRESET_DOWN, INPUT_PULLUP);
+pinMode(SWITCH_PERSONALITY, INPUT_PULLUP);
+
+// In loop() - 100Hz UI update rate
+void ProcessHardwareUI() {
+    static uint32_t last_ui_update = 0;
+    if (System::GetNow() - last_ui_update < 10) return;  // 100Hz
+    last_ui_update = System::GetNow();
+
+    // Read potentiometers (0.0 - 1.0)
+    float pot_values[8];
+    for (int i = 0; i < 8; i++) {
+        pot_values[i] = hw.adc.GetFloat(i);
+    }
+
+    // Map to modal parameters
+    // Mode 0 frequency: 50 Hz - 1000 Hz
+    float freq0 = 50.0f + pot_values[0] * 950.0f;
+    modal_node_set_mode(&node, 0,
+                       freq_to_omega(freq0),
+                       pot_values[1] * 3.0f,  // Damping 0-3
+                       node.modes[0].params.weight);
+
+    // Mode 1 frequency: 100 Hz - 2000 Hz
+    float freq1 = 100.0f + pot_values[2] * 1900.0f;
+    modal_node_set_mode(&node, 1,
+                       freq_to_omega(freq1),
+                       pot_values[3] * 3.0f,
+                       node.modes[1].params.weight);
+
+    // Coupling strength
+    node.coupling_strength = pot_values[4];
+
+    // Master gain
+    audio_synth_set_gain(&synth, pot_values[5]);
+
+    // Mode mix (crossfade between modes)
+    float mix = pot_values[6];
+    node.modes[0].params.weight = 1.0f - mix;
+    node.modes[1].params.weight = mix;
+
+    // Brightness (Mode 2 gain)
+    node.modes[2].params.weight = pot_values[7];
+
+    // Read buttons (with debounce)
+    static bool btn_up_last = false;
+    bool btn_up = !digitalRead(BTN_PRESET_UP);
+    if (btn_up && !btn_up_last) {
+        LoadNextPreset();
+    }
+    btn_up_last = btn_up;
+
+    // Read personality switch
+    bool is_oscillator = digitalRead(SWITCH_PERSONALITY);
+    node.personality = is_oscillator ? PERSONALITY_SELF_OSCILLATOR
+                                     : PERSONALITY_RESONATOR;
+
+    // Update mode indicator LEDs (brightness = mode energy)
+    for (int k = 0; k < MAX_MODES; k++) {
+        float energy = cabsf(node.modes[k].a);
+        SetRGBLED(k, energy, 0.2f, 0.5f);  // Hue varies by mode
+    }
+}
+
+void SetRGBLED(int led_idx, float brightness, float hue, float saturation) {
+    // Convert HSV to RGB
+    // ... (standard HSV->RGB conversion)
+
+    // PWM output
+    analogWrite(LED_MODE0_R + led_idx * 3, r * 255);
+    analogWrite(LED_MODE0_G + led_idx * 3, g * 255);
+    analogWrite(LED_MODE0_B + led_idx * 3, b * 255);
+}
+```
+
+##### Option B: OLED Display (128x64, I2C)
+
+**Hardware:** Adafruit SSD1306 OLED or similar
+
+**Wiring:**
+```
+OLED SDA → GPIO 12 (I2C1 SDA)
+OLED SCL → GPIO 11 (I2C1 SCL)
+OLED VCC → 3.3V
+OLED GND → GND
+```
+
+**Library:** Use Adafruit_SSD1306 or U8g2
+
+**Implementation:**
+```cpp
+#include <Adafruit_SSD1306.h>
+
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define OLED_RESET -1
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+void setup() {
+    // ... existing setup ...
+
+    Wire.begin();
+    display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setTextColor(SSD1306_WHITE);
+}
+
+void UpdateDisplay() {
+    static uint32_t last_display_update = 0;
+    if (System::GetNow() - last_display_update < 50) return;  // 20Hz
+    last_display_update = System::GetNow();
+
+    display.clearDisplay();
+
+    // Title
+    display.setCursor(0, 0);
+    display.println("Modal Resonator");
+
+    // Mode parameters (compact display)
+    for (int k = 0; k < MAX_MODES; k++) {
+        float freq = node.modes[k].params.omega / (2.0f * M_PI);
+        float gamma = node.modes[k].params.gamma;
+        float amp = cabsf(node.modes[k].a);
+
+        display.setCursor(0, 16 + k * 12);
+        display.print("M");
+        display.print(k);
+        display.print(": ");
+        display.print((int)freq);
+        display.print("Hz ");
+
+        // Energy bar
+        int bar_width = (int)(amp * 40.0f);
+        if (bar_width > 40) bar_width = 40;
+        for (int i = 0; i < bar_width; i++) {
+            display.drawPixel(80 + i, 16 + k * 12, SSD1306_WHITE);
+        }
+    }
+
+    display.display();
+}
+```
+
+##### Option C: LED Bar Graph (Parameter Feedback)
+
+**Hardware:** 4x 10-segment LED bar graphs (LM3914 drivers or shift registers)
+
+**Purpose:** Real-time visualization of mode amplitudes
+
+**Implementation with 74HC595 Shift Register:**
+```cpp
+#define LED_DATA  GPIO_26
+#define LED_CLOCK GPIO_27
+#define LED_LATCH GPIO_28
+
+void UpdateLEDBars() {
+    static uint32_t last_led_update = 0;
+    if (System::GetNow() - last_led_update < 20) return;  // 50Hz
+    last_led_update = System::GetNow();
+
+    uint8_t led_data[4] = {0};  // 4 modes, 8 LEDs each
+
+    for (int k = 0; k < MAX_MODES; k++) {
+        float energy = cabsf(node.modes[k].a);
+
+        // Convert to 8-LED bar (0-8 LEDs lit)
+        int leds_lit = (int)(energy * 8.0f);
+        if (leds_lit > 8) leds_lit = 8;
+
+        // Create bit pattern (e.g., 0b00111111 for 6 LEDs)
+        led_data[k] = (1 << leds_lit) - 1;
+    }
+
+    // Shift out data
+    digitalWrite(LED_LATCH, LOW);
+    for (int k = 0; k < 4; k++) {
+        shiftOut(LED_DATA, LED_CLOCK, MSBFIRST, led_data[k]);
+    }
+    digitalWrite(LED_LATCH, HIGH);
+}
+```
+
+##### Option D: TFT LCD Display (Color, 240x320, SPI)
+
+**Hardware:** ILI9341 TFT display (Adafruit 2.8" or similar)
+
+**Features:**
+- Full-color spectral display
+- Waveform visualization
+- Menu system
+- Parameter editing
+
+**Wiring (SPI):**
+```
+TFT CS   → GPIO 7
+TFT DC   → GPIO 8
+TFT MOSI → GPIO 10 (SPI MOSI)
+TFT SCK  → GPIO 9  (SPI SCK)
+TFT RST  → GPIO 6
+```
+
+**Implementation:**
+```cpp
+#include <Adafruit_ILI9341.h>
+
+#define TFT_CS   7
+#define TFT_DC   8
+#define TFT_RST  6
+Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
+
+void setup() {
+    // ... existing setup ...
+    tft.begin();
+    tft.setRotation(1);  // Landscape
+    tft.fillScreen(ILI9341_BLACK);
+}
+
+void UpdateTFTDisplay() {
+    static uint32_t last_update = 0;
+    if (System::GetNow() - last_update < 100) return;  // 10Hz
+    last_update = System::GetNow();
+
+    // Draw mode waveforms
+    for (int k = 0; k < MAX_MODES; k++) {
+        int y_base = 40 + k * 60;
+
+        // Mode info
+        tft.setCursor(10, y_base - 15);
+        tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
+        tft.setTextSize(1);
+
+        float freq = node.modes[k].params.omega / (2.0f * M_PI);
+        tft.print("Mode ");
+        tft.print(k);
+        tft.print(": ");
+        tft.print((int)freq);
+        tft.print(" Hz");
+
+        // Waveform (real-time phase)
+        float amp = cabsf(node.modes[k].a);
+        float phase = cargf(node.modes[k].a);
+
+        for (int x = 0; x < 280; x++) {
+            float t = (x / 280.0f) * 2.0f * M_PI;
+            float y = amp * sinf(t + phase) * 20.0f;
+            int pixel_y = y_base + (int)y;
+
+            uint16_t color = GetModeColor(k);
+            tft.drawPixel(20 + x, pixel_y, color);
+        }
+    }
+
+    // Draw spectral display (frequency bars)
+    // ... (FFT or mode frequency display)
+}
+
+uint16_t GetModeColor(int mode_idx) {
+    switch (mode_idx) {
+        case 0: return ILI9341_RED;
+        case 1: return ILI9341_GREEN;
+        case 2: return ILI9341_BLUE;
+        case 3: return ILI9341_YELLOW;
+        default: return ILI9341_WHITE;
+    }
+}
+```
+
+##### Option E: Rotary Encoders (Precise Parameter Control)
+
+**Hardware:**
+- 4x rotary encoders with push buttons (e.g., EC11)
+- Each encoder controls one mode
+
+**Implementation:**
+```cpp
+#include <Encoder.h>
+
+Encoder enc_mode0(GPIO_1, GPIO_2);
+Encoder enc_mode1(GPIO_3, GPIO_4);
+Encoder enc_mode2(GPIO_5, GPIO_6);
+Encoder enc_mode3(GPIO_7, GPIO_8);
+
+#define ENC_BTN0 GPIO_23
+#define ENC_BTN1 GPIO_24
+#define ENC_BTN2 GPIO_25
+#define ENC_BTN3 GPIO_26
+
+typedef enum {
+    EDIT_FREQUENCY,
+    EDIT_DAMPING,
+    EDIT_WEIGHT,
+    EDIT_COUNT
+} edit_mode_t;
+
+edit_mode_t edit_modes[MAX_MODES] = {EDIT_FREQUENCY, EDIT_FREQUENCY,
+                                      EDIT_FREQUENCY, EDIT_FREQUENCY};
+
+void ProcessEncoders() {
+    // Mode 0 encoder
+    long pos0 = enc_mode0.read();
+    if (pos0 != 0) {
+        switch (edit_modes[0]) {
+            case EDIT_FREQUENCY: {
+                float freq = node.modes[0].params.omega / (2.0f * M_PI);
+                freq += pos0 * 1.0f;  // 1 Hz per click
+                if (freq < 20.0f) freq = 20.0f;
+                if (freq > 2000.0f) freq = 2000.0f;
+                modal_node_set_mode(&node, 0, freq_to_omega(freq),
+                                   node.modes[0].params.gamma,
+                                   node.modes[0].params.weight);
+                break;
+            }
+            case EDIT_DAMPING:
+                node.modes[0].params.gamma += pos0 * 0.01f;
+                break;
+            case EDIT_WEIGHT:
+                node.modes[0].params.weight += pos0 * 0.01f;
+                break;
+        }
+        enc_mode0.write(0);
+    }
+
+    // Button press cycles edit mode
+    if (digitalRead(ENC_BTN0) == LOW) {
+        delay(20);  // Debounce
+        edit_modes[0] = (edit_mode_t)((edit_modes[0] + 1) % EDIT_COUNT);
+        while (digitalRead(ENC_BTN0) == LOW);  // Wait for release
+    }
+
+    // Repeat for modes 1-3...
+}
+```
+
+##### Option F: Complete Eurorack Panel Design
+
+**Features:**
+- 8x potentiometers (mode parameters)
+- 4x rotary encoders (fine tuning)
+- 4x CV inputs (external modulation)
+- 4x gate inputs (trigger pokes)
+- 1x OLED display (128x64)
+- 4x RGB LEDs (mode indicators)
+- 2x audio outputs (L/R)
+
+**Panel Layout (16HP Eurorack):**
+```
+┌─────────────────────────────────┐
+│  MODAL RESONATOR    [OLED]      │
+│                                  │
+│  [POT]  [POT]  [POT]  [POT]     │
+│  Freq0  Damp0  Freq1  Damp1     │
+│                                  │
+│  [POT]  [POT]  [POT]  [POT]     │
+│  Freq2  Damp2  Freq3  Damp3     │
+│                                  │
+│  [ENC0] [ENC1] [ENC2] [ENC3]    │
+│   🔴    🟢    🔵    🟡         │
+│                                  │
+│  CV0  CV1  CV2  CV3             │
+│  GATE0 GATE1 GATE2 GATE3        │
+│                                  │
+│  OUT_L  OUT_R                    │
+└─────────────────────────────────┘
+```
+
+**CV Input Processing:**
+```cpp
+void ProcessCVGateInputs() {
+    // CV inputs (0-5V → 0-1.0, use voltage divider to 3.3V)
+    float cv[4];
+    for (int i = 0; i < 4; i++) {
+        cv[i] = hw.adc.GetFloat(i + 4);  // ADC channels 4-7
+    }
+
+    // CV0 → Mode 0 frequency (V/Oct)
+    float volts = cv[0] * 5.0f;
+    float freq = 440.0f * powf(2.0f, volts - 3.0f);  // A4 at 3V
+    node.modes[0].params.omega = freq_to_omega(freq);
+
+    // CV1 → Mode 0 damping
+    node.modes[0].params.gamma = cv[1] * 3.0f;
+
+    // Gate inputs (trigger pokes)
+    static bool gate_last[4] = {false};
+    for (int i = 0; i < 4; i++) {
+        bool gate = digitalRead(GPIO_23 + i);
+        if (gate && !gate_last[i]) {
+            // Gate rising edge → trigger poke
+            poke_event_t poke;
+            poke.source_node_id = 0;
+            poke.strength = 0.8f;
+            poke.phase_hint = -1.0f;  // Random
+            poke.mode_weights[i] = 1.0f;  // Target mode
+            modal_node_apply_poke(&node, &poke);
+        }
+        gate_last[i] = gate;
+    }
+}
+```
+
+##### Hardware Recommendations
+
+| Component | Recommended Part | Price | Notes |
+|-----------|------------------|-------|-------|
+| **Pots** | Alpha 9mm linear | $0.50 ea | Smooth, reliable |
+| **Encoders** | EC11 rotary encoder | $1.50 ea | Detents, push button |
+| **OLED** | SSD1306 128x64 I2C | $5 | Low power, crisp |
+| **TFT LCD** | ILI9341 2.8" SPI | $15 | Color, fast refresh |
+| **RGB LEDs** | WS2812B (NeoPixel) | $0.30 ea | Individually addressable |
+| **LED Bars** | 10-segment bar graph | $2 ea | Visual feedback |
+| **Switches** | Tactile 6mm button | $0.10 ea | Panel mount |
+| **Jacks** | Thonkiconn 3.5mm | $1 ea | Eurorack standard |
+
 **Deliverables:**
 - [ ] Optimized DSP (target <50% CPU @ 48kHz)
-- [ ] CV input mapping
-- [ ] LED status indicators
+- [ ] CV input mapping (8 channels)
+- [ ] Potentiometer support (8 pots)
+- [ ] Button/encoder input
+- [ ] RGB LED mode indicators (4 LEDs)
+- [ ] OLED display integration (128x64)
+- [ ] Optional: TFT display (240x320)
 - [ ] Preset system (save/load from flash)
+- [ ] Hardware UI update rate: 100Hz
+
+**Performance Impact:**
+- ADC reading: <1% CPU
+- OLED update (20Hz): ~2% CPU
+- TFT update (10Hz): ~5% CPU
+- LED PWM: negligible (hardware)
+- **Total with full UI: ~20% CPU** (still 65% headroom!)
 
 ---
 
