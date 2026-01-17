@@ -49,6 +49,53 @@ pio device monitor
 3. Select "Daisy Seed" as board
 4. Upload via DFU
 
+## Automated Test Suite
+
+**NEW**: Built-in automated testing with simulated MIDI input!
+
+The test suite runs 12 different sonic scenarios automatically - no external MIDI controller needed. Each test demonstrates different behaviors and validates DSP correctness.
+
+### Run Test Suite
+
+```bash
+# Build and upload test firmware
+pio run -e daisy_seed_test --target upload
+
+# Monitor test results
+pio device monitor -e daisy_seed_test
+```
+
+### What It Does
+
+- **Cycles through 12 scenarios** automatically (10 seconds each)
+- **Simulates MIDI events** (notes, CCs, pitch bend)
+- **Logs audio statistics** to serial output
+- **LED indicators** show test progress
+- **Perfect for**:
+  - Verifying DSP works correctly
+  - Demonstrating different sounds
+  - Recording sonic examples
+  - Regression testing after code changes
+
+### Test Scenarios Include
+
+1. **Single Poke Decay** - Measure exponential decay
+2. **Note Sequence** - C major scale melody
+3. **Damping Sweep** - Long → short decay
+4. **Velocity Ramp** - Quiet → loud crescendo
+5. **Rapid Fire** - 200 pokes in 10 seconds (stress test)
+6. **Mode Isolation** - Hear each of 4 modes individually
+7. **Harmonic Series** - Natural harmonics of C2
+8. **Resonance Sweep** - Varying decay times
+9. **Brightness Sweep** - Dark → bright timbre
+10. **Pitch Bend Sweep** - Gliding frequency
+11. **Chaos Mode** - Random notes and parameters
+12. ...and more!
+
+**Total runtime**: ~2.5 minutes for full suite
+
+See [test/TEST_SCENARIOS_GUIDE.md](test/TEST_SCENARIOS_GUIDE.md) for detailed descriptions and [test/TEST_QUICK_REFERENCE.md](test/TEST_QUICK_REFERENCE.md) for quick lookup.
+
 ## Usage
 
 ### MIDI Control
