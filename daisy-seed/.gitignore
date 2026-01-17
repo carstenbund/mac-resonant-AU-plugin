@@ -1,0 +1,25 @@
+# PlatformIO
+.pio/
+.vscode/
+.pioenvs/
+.piolibdeps/
+
+# Build artifacts
+*.o
+*.elf
+*.bin
+*.hex
+*.map
+
+# IDE
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Compiled libraries
+lib/
+
+# Dependencies
+.pio/
+.venv/
