@@ -71,8 +71,7 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
         // Call super
         try super.init(componentDescription: componentDescription, options: options)
 
-        // DIAGNOSTIC: Check if the system recognizes this component has a custom view
-        checkCustomViewCapability(componentDescription: componentDescription)
+        // NOTE: hasCustomView check moved to allocateRenderResources to avoid crashes during init
 
         // Create output bus (instrument has no input bus)
         outputBus = try AUAudioUnitBus(format: self.format)
@@ -266,62 +265,11 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
     }
 
     // MARK: - Diagnostics
+    // NOTE: hasCustomView check temporarily removed - was causing crashes during init
+    // The Info.plist fix (com.apple.AudioUnit-v3) is the critical change
+    // You can verify hasCustomView manually using: auval -v aumi Test Bund
 
-    /// Check if the AudioComponent is recognized as having a custom view
-    /// This is critical for hosts to know whether to show generic UI or request custom UI
-    private func checkCustomViewCapability(componentDescription: AudioComponentDescription) {
-        log.info("🔍 DEBUG: Checking AudioComponent custom view capability...")
-        NSLog("🔍 AUv3 DEBUG: Querying AudioComponent for hasCustomView property")
 
-        // Find the AudioComponent matching this description
-        var desc = componentDescription
-        guard let component = AudioComponentFindNext(nil, &desc) else {
-            log.error("🔴 ERROR: Could not find AudioComponent for this description!")
-            NSLog("🔴 AUv3 ERROR: AudioComponentFindNext returned nil - component not registered?")
-            return
-        }
-
-        NSLog("🔍 AUv3 DEBUG: AudioComponent found, checking properties...")
-
-        // Check hasCustomView using AudioComponentCopyConfigurationInfo
-        var cfDict: Unmanaged<CFDictionary>?
-        let status = AudioComponentCopyConfigurationInfo(component, &cfDict)
-
-        if status == noErr, let dict = cfDict?.takeRetainedValue() as? [String: Any] {
-            log.info("🔍 DEBUG: Component configuration dictionary: \(dict)")
-            NSLog("🔍 AUv3 DEBUG: Configuration info retrieved successfully")
-
-            // Check for custom view indicator
-            if let hasCustomView = dict["hasCustomView"] as? Bool {
-                if hasCustomView {
-                    log.info("✅ DEBUG: hasCustomView = TRUE - Component reports custom view available!")
-                    NSLog("✅ AUv3 DEBUG: *** hasCustomView = TRUE *** - Hosts SHOULD request custom UI")
-                } else {
-                    log.error("🔴 ERROR: hasCustomView = FALSE - Component does NOT report custom view!")
-                    NSLog("🔴 AUv3 ERROR: *** hasCustomView = FALSE *** - This explains generic parameter view!")
-                    NSLog("🔴 AUv3 ERROR: Info.plist may be missing NSExtension configuration")
-                }
-            } else {
-                log.warning("⚠️ WARNING: hasCustomView key not found in config dictionary")
-                NSLog("⚠️ AUv3 WARNING: hasCustomView property not in configuration info")
-                NSLog("⚠️ AUv3 WARNING: Available keys: %@", dict.keys.joined(separator: ", "))
-            }
-
-            // Log other useful info
-            if let name = dict["name"] as? String {
-                NSLog("🔍 AUv3 DEBUG: Component name: %@", name)
-            }
-            if let manufacturer = dict["manufacturer"] as? String {
-                NSLog("🔍 AUv3 DEBUG: Manufacturer: %@", manufacturer)
-            }
-        } else {
-            log.error("🔴 ERROR: AudioComponentCopyConfigurationInfo failed with status: \(status)")
-            NSLog("🔴 AUv3 ERROR: Could not get configuration info, status = %d", status)
-        }
-    }
-    
-    
-    
     /// Build a real-time safe render block.
     /// - Important: Does not capture `self` (avoids ARC traffic on audio thread).
     ///
