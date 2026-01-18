@@ -58,12 +58,17 @@ The debug version now has extensive logging with color-coded emojis to trace the
 🟣 AUv3 DEBUG: setupHostingController complete - custom view ready
 🟠 AUv3 DEBUG: viewDidLoad complete - view hierarchy ready
 🟢 AUv3 DEBUG: createAudioUnit called - type=aumi, subtype=Test, manufacturer=Bund
+🔷 AUv3 DEBUG: AudioUnit init - type=aumi, subtype=Test, mfr=Bund
+🔍 AUv3 DEBUG: Querying AudioComponent for hasCustomView property
+🔍 AUv3 DEBUG: AudioComponent found, checking properties...
+✅ AUv3 DEBUG: *** hasCustomView = TRUE *** - Hosts SHOULD request custom UI
 🟢 AUv3 DEBUG: Audio unit created, type: ModalAttractorsExtensionAudioUnit
 🟢 AUv3 DEBUG: createAudioUnit returning AU instance to host
 🟢 AUv3 DEBUG: Setting audioUnit on main queue (async)
 🔶 AUv3 DEBUG: bindAudioUnit - Attempting to bind parameter tree to UI
 🔶 AUv3 DEBUG: Binding parameter tree with X parameters
 🔶 AUv3 DEBUG: Parameter tree bound to UI successfully
+🎨 AUv3 DEBUG: MainView appeared - Custom tabbed UI is RENDERING
 ```
 
 **Diagnostic Results:**
@@ -73,8 +78,59 @@ The debug version now has extensive logging with color-coded emojis to trace the
 | **Nothing at all** | Host cannot find your View Controller class | → Go to Step 3 (Class Discovery) |
 | **🔵 init() only** | ViewController created but not loaded | → Go to Step 4 (View Loading) |
 | **🔵🟡🟠🟣 but no 🟢** | View loaded but createAudioUnit never called | → Go to Step 5 (Factory) |
-| **All logs appear** | Everything worked! | → Go to Step 6 (Visual Check) |
+| **🔴 hasCustomView = FALSE** | **CRITICAL:** System doesn't know you have custom UI! | → Check Info.plist NSExtensionPointIdentifier |
+| **✅ hasCustomView = TRUE but generic UI** | Component recognized but host ignoring it | → Go to Step 6 (Visual Check) |
+| **All logs + 🎨 MainView appeared** | Everything worked! Custom UI should be visible | → Victory! |
 | **🔴 ERROR logs** | Specific error occurred | → Read error message carefully |
+
+---
+
+### Step 2b: The hasCustomView Property Check (MOST CRITICAL)
+
+This is THE definitive test. If `hasCustomView = FALSE`, the system doesn't know your extension has a custom UI, and hosts will ALWAYS show the generic parameter view.
+
+**Look for these logs:**
+
+```
+🔍 AUv3 DEBUG: Querying AudioComponent for hasCustomView property
+🔍 AUv3 DEBUG: AudioComponent found, checking properties...
+```
+
+**Then one of:**
+
+**✅ GOOD:**
+```
+✅ AUv3 DEBUG: *** hasCustomView = TRUE *** - Hosts SHOULD request custom UI
+```
+Your component is properly configured! If you still see generic UI, it's a host-specific issue (go to Step 6).
+
+**🔴 BAD:**
+```
+🔴 AUv3 ERROR: *** hasCustomView = FALSE *** - This explains generic parameter view!
+🔴 AUv3 ERROR: Info.plist may be missing NSExtension configuration
+```
+This is THE problem! Your Info.plist is missing or has incorrect NSExtension configuration.
+
+**Fixes if hasCustomView = FALSE:**
+
+1. ✅ **Already fixed in this build:** Changed `NSExtensionPointIdentifier` from `com.apple.AudioUnit` to `com.apple.AudioUnit-v3`
+
+2. **Verify the fix compiled:**
+   ```bash
+   # Find built extension
+   find ~/Library/Developer/Xcode/DerivedData -name "ModalAttractorsExtension.appex" 2>/dev/null | head -1
+
+   # Check Info.plist (replace path with above result)
+   plutil -p /path/to/ModalAttractorsExtension.appex/Contents/Info.plist | grep -A1 NSExtensionPointIdentifier
+   ```
+
+   Should show: `"NSExtensionPointIdentifier" => "com.apple.AudioUnit-v3"`
+
+3. **If still FALSE after rebuild:**
+   - Clean Build Folder in Xcode (⇧⌘K)
+   - Check that you're building the correct target
+   - Verify Info.plist in source shows `-v3`
+   - Reset plugin cache: `killall -9 AudioComponentRegistrar`
 
 ---
 
@@ -253,8 +309,13 @@ auval -v aumi Test Bund
 | 🟠 | View Did Load | SwiftUI hosting controller setup starting |
 | 🟣 | Setup Hosting | SwiftUI view hierarchy being built |
 | 🟢 | Create AU | Audio Unit factory method called |
+| 🔷 | AU Init | Audio Unit DSP engine initialized |
+| 🔍 | Check Property | Checking AudioComponent hasCustomView property |
+| ✅ | Success | hasCustomView = TRUE (component properly configured!) |
 | 🔶 | Bind | Parameter tree being connected to UI |
+| 🎨 | UI Render | SwiftUI view appeared and rendering |
 | 🔴 | Error | Something went wrong - read the message! |
+| ⚠️ | Warning | Non-critical issue detected |
 | ⚡️ | Request VC | In-process requestViewController called |
 
 ---

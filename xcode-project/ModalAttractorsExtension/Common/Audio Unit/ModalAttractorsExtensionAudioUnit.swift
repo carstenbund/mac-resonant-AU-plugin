@@ -7,8 +7,25 @@
 
 import AVFoundation
 import CoreAudioKit
-import SwiftUI
-import AppKit
+import AudioToolbox
+import os
+
+private let log = Logger(subsystem: "com.bund.media.ModalAttractorsExtension", category: "AudioUnit")
+
+// MARK: - FourCharCode Extension for Debugging
+
+extension UInt32 {
+    /// Convert FourCharCode to readable string (e.g., 'aumi' from 1635085673)
+    var fourCharString: String {
+        let bytes: [UInt8] = [
+            UInt8((self >> 24) & 0xFF),
+            UInt8((self >> 16) & 0xFF),
+            UInt8((self >> 8) & 0xFF),
+            UInt8(self & 0xFF)
+        ]
+        return String(bytes: bytes, encoding: .utf8) ?? "????"
+    }
+}
 
 /// AUv3 Instrument implementation for Modal Attractors synthesis engine
 ///
@@ -33,8 +50,7 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
 
     // MARK: - Parameter Tree
 
-    /// SwiftUI parameter tree wrapper - created once and reused for all UI instances
-    private var paramTreeWrapper: ParameterTree?
+    private var _parameterTree: AUParameterTree?
 
     // MARK: - Constants
 
@@ -46,11 +62,17 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
     @objc override init(componentDescription: AudioComponentDescription,
                        options: AudioComponentInstantiationOptions) throws {
 
+        log.info("🔷 DEBUG: AudioUnit.init() - Initializing with component description")
+        NSLog("🔷 AUv3 DEBUG: AudioUnit init - type=\(componentDescription.componentType.fourCharString), subtype=\(componentDescription.componentSubType.fourCharString), mfr=\(componentDescription.componentManufacturer.fourCharString)")
+
         // Create default stereo format
         self.format = AVAudioFormat(standardFormatWithSampleRate: defaultSampleRate, channels: 2)!
 
         // Call super
         try super.init(componentDescription: componentDescription, options: options)
+
+        // DIAGNOSTIC: Check if the system recognizes this component has a custom view
+        checkCustomViewCapability(componentDescription: componentDescription)
 
         // Create output bus (instrument has no input bus)
         outputBus = try AUAudioUnitBus(format: self.format)
@@ -71,6 +93,17 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
 
         // Build RT-safe render block once (no ARC in render thread)
         _renderBlock = Self.makeRenderBlock(enginePtr: enginePtr)
+
+        // Create parameter tree internally
+        _parameterTree = ModalAttractorsExtensionParameterSpecs.createAUParameterTree()
+
+        // Set default values from parameter tree
+        if let paramTree = _parameterTree {
+            for param in paramTree.allParameters {
+                modal_attractors_engine_set_parameter(engine, UInt32(param.address), param.value)
+            }
+            setupParameterCallbacks(paramTree)
+        }
     }
 
     deinit {
@@ -85,6 +118,11 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
 
     public override var outputBusses: AUAudioUnitBusArray {
         return _outputBusses
+    }
+
+    public override var parameterTree: AUParameterTree? {
+        get { return _parameterTree }
+        set { _parameterTree = newValue }
     }
 
     public override var maximumFramesToRender: AUAudioFrameCount {
@@ -105,26 +143,9 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
         }
     }
 
-    // MARK: - Parameter Tree
+    // MARK: - Parameter Tree Callbacks
 
-    public func setupParameterTree(_ parameterTree: AUParameterTree) {
-        self.parameterTree = parameterTree
-
-        // Create SwiftUI wrapper once for all UI instances
-        paramTreeWrapper = ParameterTree(auParameterTree: parameterTree)
-
-        // Set default values from parameter tree
-        guard let engine = engine else { return }
-
-        for param in parameterTree.allParameters {
-            modal_attractors_engine_set_parameter(engine, UInt32(param.address), param.value)
-        }
-
-        setupParameterCallbacks()
-    }
-
-    private func setupParameterCallbacks() {
-        guard let paramTree = parameterTree else { return }
+    private func setupParameterCallbacks(_ paramTree: AUParameterTree) {
 
         // Called when a parameter changes (from UI or host automation)
         // NOTE: this is not sample-accurate; sample-accurate automation comes via render events.
@@ -161,16 +182,20 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
     }
 
     private func ensureParameterTree() -> AUParameterTree {
-        if let paramTree = parameterTree {
-            // Create wrapper if it doesn't exist yet
-            if paramTreeWrapper == nil {
-                paramTreeWrapper = ParameterTree(auParameterTree: paramTree)
-            }
+        if let paramTree = _parameterTree {
             return paramTree
         }
 
         let paramTree = ModalAttractorsExtensionParameterSpecs.createAUParameterTree()
-        setupParameterTree(paramTree)
+        _parameterTree = paramTree
+
+        if let engine = engine {
+            for param in paramTree.allParameters {
+                modal_attractors_engine_set_parameter(engine, UInt32(param.address), param.value)
+            }
+        }
+
+        setupParameterCallbacks(paramTree)
         return paramTree
     }
 
@@ -212,6 +237,91 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
         _renderBlock
     }
 
+    // MARK: - View Controller (in-process hosting)
+
+    public override func requestViewController(
+      completionHandler: @escaping (AUViewController?) -> Void
+    ) {
+    #if os(macOS)
+      log.info("⚡️ DEBUG: requestViewController called - Host using IN-PROCESS mode")
+      NSLog("⚡️ AUv3 DEBUG: requestViewController called on AudioUnit (in-process mode)")
+
+      DispatchQueue.main.async { [weak self] in
+          guard let self = self else {
+              NSLog("⚡️ AUv3 DEBUG: requestViewController - self was nil, returning nil VC")
+              completionHandler(nil)
+              return
+          }
+
+          NSLog("⚡️ AUv3 DEBUG: requestViewController - Creating ModalAttractorsAUViewController")
+          let viewController = ModalAttractorsAUViewController()
+          viewController.audioUnit = self
+          NSLog("⚡️ AUv3 DEBUG: requestViewController - Returning view controller to host")
+          completionHandler(viewController)
+      }
+    #else
+      NSLog("⚡️ AUv3 DEBUG: requestViewController called on non-macOS platform - returning nil")
+      completionHandler(nil)
+    #endif
+    }
+
+    // MARK: - Diagnostics
+
+    /// Check if the AudioComponent is recognized as having a custom view
+    /// This is critical for hosts to know whether to show generic UI or request custom UI
+    private func checkCustomViewCapability(componentDescription: AudioComponentDescription) {
+        log.info("🔍 DEBUG: Checking AudioComponent custom view capability...")
+        NSLog("🔍 AUv3 DEBUG: Querying AudioComponent for hasCustomView property")
+
+        // Find the AudioComponent matching this description
+        var desc = componentDescription
+        guard let component = AudioComponentFindNext(nil, &desc) else {
+            log.error("🔴 ERROR: Could not find AudioComponent for this description!")
+            NSLog("🔴 AUv3 ERROR: AudioComponentFindNext returned nil - component not registered?")
+            return
+        }
+
+        NSLog("🔍 AUv3 DEBUG: AudioComponent found, checking properties...")
+
+        // Check hasCustomView using AudioComponentCopyConfigurationInfo
+        var cfDict: Unmanaged<CFDictionary>?
+        let status = AudioComponentCopyConfigurationInfo(component, &cfDict)
+
+        if status == noErr, let dict = cfDict?.takeRetainedValue() as? [String: Any] {
+            log.info("🔍 DEBUG: Component configuration dictionary: \(dict)")
+            NSLog("🔍 AUv3 DEBUG: Configuration info retrieved successfully")
+
+            // Check for custom view indicator
+            if let hasCustomView = dict["hasCustomView"] as? Bool {
+                if hasCustomView {
+                    log.info("✅ DEBUG: hasCustomView = TRUE - Component reports custom view available!")
+                    NSLog("✅ AUv3 DEBUG: *** hasCustomView = TRUE *** - Hosts SHOULD request custom UI")
+                } else {
+                    log.error("🔴 ERROR: hasCustomView = FALSE - Component does NOT report custom view!")
+                    NSLog("🔴 AUv3 ERROR: *** hasCustomView = FALSE *** - This explains generic parameter view!")
+                    NSLog("🔴 AUv3 ERROR: Info.plist may be missing NSExtension configuration")
+                }
+            } else {
+                log.warning("⚠️ WARNING: hasCustomView key not found in config dictionary")
+                NSLog("⚠️ AUv3 WARNING: hasCustomView property not in configuration info")
+                NSLog("⚠️ AUv3 WARNING: Available keys: %@", dict.keys.joined(separator: ", "))
+            }
+
+            // Log other useful info
+            if let name = dict["name"] as? String {
+                NSLog("🔍 AUv3 DEBUG: Component name: %@", name)
+            }
+            if let manufacturer = dict["manufacturer"] as? String {
+                NSLog("🔍 AUv3 DEBUG: Manufacturer: %@", manufacturer)
+            }
+        } else {
+            log.error("🔴 ERROR: AudioComponentCopyConfigurationInfo failed with status: \(status)")
+            NSLog("🔴 AUv3 ERROR: Could not get configuration info, status = %d", status)
+        }
+    }
+    
+    
+    
     /// Build a real-time safe render block.
     /// - Important: Does not capture `self` (avoids ARC traffic on audio thread).
     ///
@@ -245,12 +355,13 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
                     let status = d.0
                     let data1  = d.1
                     let data2  = d.2
+                    let channel = status & 0x0F  // Extract MIDI channel (0-15)
 
                     switch status & 0xF0 {
                     case 0x90:
                         if data2 > 0 {
                             modal_attractors_engine_push_note_on(
-                                enginePtr, offset, data1, Float(data2) * (1.0 / 127.0)
+                                enginePtr, offset, data1, Float(data2) * (1.0 / 127.0), channel
                             )
                         } else {
                             modal_attractors_engine_push_note_off(enginePtr, offset, data1)
@@ -378,29 +489,7 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
         return result
     }
 
-    // MARK: - UI Integration
-
-    public override func requestViewController(completionHandler: @escaping (AUViewController?) -> Void) {
-        NSLog("ModalAttractorsAudioUnit requestViewController called")
-
-        // Ensure parameter tree exists
-        let _ = ensureParameterTree()
-
-        // Ensure we have the wrapper (should be created in ensureParameterTree)
-        guard let wrapper = paramTreeWrapper else {
-            NSLog("ModalAttractorsAudioUnit: No paramTreeWrapper available")
-            completionHandler(nil)
-            return
-        }
-
-        // Ensure UI creation happens on main thread
-        DispatchQueue.main.async {
-            // Create and configure our custom AUViewController subclass
-            // Use the persistent wrapper so SwiftUI bindings work correctly
-            let vc = ModalAttractorsAUViewController()
-            vc.configure(paramTreeWrapper: wrapper)
-
-            completionHandler(vc)
-        }
-    }
+    // NOTE: UI Integration is handled by ModalAttractorsAUViewController
+    // which is the principal class and conforms to AUAudioUnitFactory.
+    // The system automatically uses the principal class for view controller requests.
 }
