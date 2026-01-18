@@ -219,7 +219,7 @@ public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFacto
         let hosting = NSHostingController(rootView: rootView)
         hosting.preferredContentSize = preferredContentSize
 
-        log.info("🟣 DEBUG: Hosting controller created, preferredContentSize=\(preferredContentSize)")
+        log.info("🟣 DEBUG: Hosting controller created, preferredContentSize=\(NSStringFromSize(preferredContentSize))")
         NSLog("🟣 AUv3 DEBUG: Hosting controller preferredContentSize: %fx%f", preferredContentSize.width, preferredContentSize.height)
 
         // Add hosting controller as child view controller
@@ -231,7 +231,7 @@ public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFacto
         // Set initial frame before adding constraints (helps with initial layout)
         hosting.view.frame = view.bounds
 
-        log.info("🟣 DEBUG: Initial frame set to view.bounds: \(view.bounds)")
+        log.info("🟣 DEBUG: Initial frame set to view.bounds: \(NSStringFromRect(view.bounds))")
 
         // Set up auto-layout constraints to fill the parent view
         hosting.view.translatesAutoresizingMaskIntoConstraints = false
