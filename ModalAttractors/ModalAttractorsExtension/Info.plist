@@ -6,6 +6,8 @@
 	<dict>
 		<key>NSExtensionAttributes</key>
 		<dict>
+			<key>AudioComponentBundle</key>
+			<string>bund.media.ModalAttractorsFramework</string>
 			<key>AudioComponents</key>
 			<array>
 				<dict>
@@ -27,15 +29,13 @@
 					<string>aumu</string>
 					<key>version</key>
 					<integer>67072</integer>
-					<key>hasCustomView</key>
-					<true/>
 				</dict>
 			</array>
 		</dict>
 		<key>NSExtensionPointIdentifier</key>
-		<string>com.apple.AudioUnit</string>
+		<string>com.apple.AudioUnit-UI</string>
 		<key>NSExtensionPrincipalClass</key>
-		<string>$(PRODUCT_MODULE_NAME).ModalAttractorsAUViewController</string>
+		<string>ModalAttractorsFramework.ModalAttractorsAUViewController</string>
 	</dict>
 </dict>
 </plist>
