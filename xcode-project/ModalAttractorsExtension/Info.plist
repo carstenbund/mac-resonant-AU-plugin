@@ -27,6 +27,8 @@
 					<string>aumi</string>
 					<key>version</key>
 					<integer>67072</integer>
+					<key>hasCustomView</key>
+					<true/>
 				</dict>
 			</array>
 		</dict>
