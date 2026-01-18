@@ -390,7 +390,12 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
                         enginePtr, offset, UInt32(r.parameterAddress), r.value
                     )
 
+                case .MIDISysEx:
+                    // SysEx not currently handled
+                    break
+
                 case .midiEventList:
+                    // MIDI 2.0 event list not currently handled
                     break
 
                 @unknown default:

@@ -16,21 +16,6 @@ import AppKit
 
 private let log = Logger(subsystem: "com.bund.media.ModalAttractorsExtension", category: "AUViewController")
 
-// MARK: - FourCharCode Extension for Debugging
-
-extension UInt32 {
-    /// Convert FourCharCode to readable string (e.g., 'aumi' from 1635085673)
-    var fourCharString: String {
-        let bytes: [UInt8] = [
-            UInt8((self >> 24) & 0xFF),
-            UInt8((self >> 16) & 0xFF),
-            UInt8((self >> 8) & 0xFF),
-            UInt8(self & 0xFF)
-        ]
-        return String(bytes: bytes, encoding: .utf8) ?? "????"
-    }
-}
-
 /// Custom AUViewController subclass that hosts the SwiftUI view
 /// This is the principal class for the extension - it conforms to AUAudioUnitFactory
 /// to properly support both in-process and out-of-process instantiation.
@@ -219,7 +204,7 @@ public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFacto
         let hosting = NSHostingController(rootView: rootView)
         hosting.preferredContentSize = preferredContentSize
 
-        log.info("🟣 DEBUG: Hosting controller created, preferredContentSize=\(NSStringFromSize(preferredContentSize))")
+        log.info("🟣 DEBUG: Hosting controller created, preferredContentSize=\(NSStringFromSize(self.preferredContentSize))")
         NSLog("🟣 AUv3 DEBUG: Hosting controller preferredContentSize: %fx%f", preferredContentSize.width, preferredContentSize.height)
 
         // Add hosting controller as child view controller
@@ -231,7 +216,7 @@ public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFacto
         // Set initial frame before adding constraints (helps with initial layout)
         hosting.view.frame = view.bounds
 
-        log.info("🟣 DEBUG: Initial frame set to view.bounds: \(NSStringFromRect(view.bounds))")
+        log.info("🟣 DEBUG: Initial frame set to view.bounds: \(NSStringFromRect(self.view.bounds))")
 
         // Set up auto-layout constraints to fill the parent view
         hosting.view.translatesAutoresizingMaskIntoConstraints = false
