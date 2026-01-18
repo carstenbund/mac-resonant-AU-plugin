@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 /// Represents a complete character preset with all parameters
 struct CharacterPreset: Codable, Identifiable {

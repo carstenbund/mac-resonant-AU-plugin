@@ -7,7 +7,7 @@
  */
 
 #include "ModalAttractorsAU.h"
-#include "../../DSP/SynthEngine.h"
+#include "../../../ModalAttractorsExtension/DSP/SynthEngine.h"
 #include <cstring>
 
 // ============================================================================
