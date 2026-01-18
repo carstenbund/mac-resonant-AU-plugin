@@ -35,7 +35,7 @@
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.AudioUnit</string>
 		<key>NSExtensionPrincipalClass</key>
-		<string>$(PRODUCT_MODULE_NAME).AudioUnitFactory</string>
+		<string>$(PRODUCT_MODULE_NAME).ModalAttractorsAUViewController</string>
 	</dict>
 </dict>
 </plist>
