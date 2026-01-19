@@ -25,7 +25,8 @@ public:
         Inactive,   ///< Voice not playing
         Attack,     ///< Note on, attack phase
         Sustain,    ///< Sustaining (self-oscillator only)
-        Release     ///< Note off, release phase
+        Release,    ///< Note off, release phase
+        FadeOut     ///< Final fade-out to prevent clicks
     };
 
     /**
@@ -164,6 +165,10 @@ private:
     uint32_t samples_per_update_;   ///< Samples between control updates
 
     float sample_rate_;             ///< Current sample rate
+
+    // Fade-out envelope to prevent clicks on voice deactivation
+    float fade_out_gain_;           ///< Current fade-out envelope gain (1.0 -> 0.0)
+    uint32_t fade_out_samples_;     ///< Remaining samples in fade-out
 
     /**
      * @brief Update mode frequencies based on MIDI note and pitch bend
