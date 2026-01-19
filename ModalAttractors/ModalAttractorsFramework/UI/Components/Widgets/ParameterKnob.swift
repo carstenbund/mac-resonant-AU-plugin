@@ -48,9 +48,9 @@ struct ParameterKnob: View {
                     .fill(UIConstants.Colors.sectionBackground)
                     .frame(width: size, height: size)
 
-                // Value arc (starts at 7 o'clock, sweeps 270°)
+                // Value arc (starts at 7 o'clock, sweeps 270° to match pointer)
                 Circle()
-                    .trim(from: 0, to: normalizedValue)
+                    .trim(from: 0, to: normalizedValue * 0.75)  // 0.75 = 270°/360°
                     .stroke(UIConstants.Colors.primary, lineWidth: 4)
                     .frame(width: size, height: size)
                     .rotationEffect(.degrees(-135))
