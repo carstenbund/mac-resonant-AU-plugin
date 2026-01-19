@@ -10,6 +10,7 @@
 #include "TopologyEngine.h"
 #include "ModalVoice.h"
 #include "NodeCharacter.h"
+#include "CharacterManager.h"
 #include <algorithm>
 
 // Parameter IDs (should match ModalAttractorsExtensionParameterAddresses.h)
@@ -40,7 +41,7 @@ enum ParamID {
     kParam_Polyphony = 18,
     kParam_Personality = 19,
 
-    // Node Character System
+    // Node Character System (valid range: 0-20, see CharacterManager)
     kParam_Node0_Character = 20,
     kParam_Node1_Character = 21,
     kParam_Node2_Character = 22,

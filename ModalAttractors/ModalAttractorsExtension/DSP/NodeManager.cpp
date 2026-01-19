@@ -4,6 +4,7 @@
  */
 
 #include "NodeManager.h"
+#include "CharacterManager.h"
 #include <cstring>
 #include <algorithm>
 
@@ -74,22 +75,22 @@ void NodeManager::initialize(float sample_rate) {
 
 void NodeManager::setNodeCharacter(uint8_t node_idx, uint8_t character_id) {
     if (node_idx >= NUM_NETWORK_NODES) return;
-    if (character_id >= NUM_BUILTIN_CHARACTERS) return;
 
-    const NodeCharacter* character = CHARACTER_LIBRARY[character_id];
-    if (!character || !validateCharacter(character)) return;
+    // Get character from CharacterManager (handles bounds checking)
+    const NodeCharacter& character = CharacterManager::getCharacter(character_id);
+    if (!CharacterManager::validateCharacter(character)) return;
 
     // Store character ID and data
     node_character_ids_[node_idx] = character_id;
-    current_characters_[node_idx] = *character;
+    current_characters_[node_idx] = character;
 
     // Apply to node
-    applyCharacterToNode(node_idx, character);
+    applyCharacterToNode(node_idx, &character);
 }
 
 void NodeManager::setNodeCharacterCustom(uint8_t node_idx, const NodeCharacter* character) {
     if (node_idx >= NUM_NETWORK_NODES) return;
-    if (!character || !validateCharacter(character)) return;
+    if (!character || !CharacterManager::validateCharacter(*character)) return;
 
     // Store custom character (ID = 0xFF for custom)
     node_character_ids_[node_idx] = 0xFF;
