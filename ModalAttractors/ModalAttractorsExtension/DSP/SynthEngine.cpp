@@ -9,6 +9,7 @@
 #include "NodeManager.h"
 #include "TopologyEngine.h"
 #include "ModalVoice.h"
+#include "NodeCharacter.h"
 #include <algorithm>
 
 // Parameter IDs (should match ModalAttractorsExtensionParameterAddresses.h)
@@ -429,6 +430,10 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
 
                 if (nodeManager_) {
                     nodeManager_->setModeWaveShape(nodeIndex, modeIndex, shape);
+
+                    // Apply custom character to this node when wave shapes change
+                    // This ensures mode parameters from Character Editor are applied to voices
+                    applyCustomCharacterToNode(nodeIndex);
                 }
             }
             // Note: Also handles deprecated parameters below
@@ -529,4 +534,50 @@ float SynthEngine::getParameter(uint32_t paramId) const {
             }
             return 0.0f;
     }
+}
+
+void SynthEngine::applyCustomCharacterToNode(uint8_t nodeIndex) {
+    if (nodeIndex >= 5 || !nodeManager_) return;
+
+    // Build a custom NodeCharacter from the Character Editor parameters
+    NodeCharacter customChar;
+
+    // Mode parameters (frequency multipliers, damping, weights)
+    customChar.mode_freq_mult[0] = mode0_frequency_;
+    customChar.mode_damping[0] = mode0_damping_;
+    customChar.mode_weight[0] = mode0_weight_;
+
+    customChar.mode_freq_mult[1] = mode1_frequency_;
+    customChar.mode_damping[1] = mode1_damping_;
+    customChar.mode_weight[1] = mode1_weight_;
+
+    customChar.mode_freq_mult[2] = mode2_frequency_;
+    customChar.mode_damping[2] = mode2_damping_;
+    customChar.mode_weight[2] = mode2_weight_;
+
+    customChar.mode_freq_mult[3] = mode3_frequency_;
+    customChar.mode_damping[3] = mode3_damping_;
+    customChar.mode_weight[3] = mode3_weight_;
+
+    // Wave shapes - get current wave shapes for this node
+    for (uint32_t mode = 0; mode < 4; mode++) {
+        customChar.mode_shape[mode] = nodeManager_->getModeWaveShape(nodeIndex, mode);
+    }
+
+    // Voice behavior
+    customChar.personality = static_cast<node_personality_t>(static_cast<int>(personality_));
+
+    // Excitation parameters
+    customChar.poke_strength = pokeStrength_;
+    customChar.poke_duration_ms = pokeDuration_;
+
+    // Network behavior (default neutral response)
+    customChar.coupling_response_gain = 1.0f;
+
+    // Metadata
+    customChar.name = "Custom Character";
+    customChar.description = "Character Editor custom parameters";
+
+    // Apply the custom character to the node
+    nodeManager_->setNodeCharacterCustom(nodeIndex, &customChar);
 }

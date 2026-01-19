@@ -170,3 +170,10 @@ float modal_attractors_engine_get_parameter(ModalAttractorsEngine* engine,
 
     return engine->synth_engine->getParameter(param_id);
 }
+
+void modal_attractors_engine_apply_custom_character(ModalAttractorsEngine* engine,
+                                                     uint8_t node_index) {
+    if (!engine || !engine->initialized) return;
+
+    engine->synth_engine->applyCustomCharacterToNode(node_index);
+}

@@ -164,6 +164,17 @@ void modal_attractors_engine_set_parameter(ModalAttractorsEngine* engine,
 float modal_attractors_engine_get_parameter(ModalAttractorsEngine* engine,
                                             uint32_t param_id);
 
+/**
+ * @brief Apply custom character from Character Editor parameters to a node
+ * @param engine Engine handle
+ * @param node_index Target node index (0-4)
+ *
+ * Builds a custom NodeCharacter from the current mode, excitation, and
+ * personality parameters and applies it to the specified node.
+ */
+void modal_attractors_engine_apply_custom_character(ModalAttractorsEngine* engine,
+                                                     uint8_t node_index);
+
 #ifdef __cplusplus
 }
 #endif

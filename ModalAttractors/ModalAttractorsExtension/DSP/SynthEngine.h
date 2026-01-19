@@ -189,6 +189,16 @@ public:
     }
 
     /**
+     * @brief Apply custom character from Character Editor parameters to a node
+     * @param nodeIndex Target node index (0-4)
+     *
+     * Builds a custom NodeCharacter from the current mode, excitation, and personality
+     * parameters and applies it to the specified node. This is called when the user
+     * clicks "Apply to Node" in the Character Editor or loads a preset/template.
+     */
+    void applyCustomCharacterToNode(uint8_t nodeIndex);
+
+    /**
      * @brief Get maximum polyphony (always 5 nodes)
      */
     uint32_t getMaxPolyphony() const { return 5; }
