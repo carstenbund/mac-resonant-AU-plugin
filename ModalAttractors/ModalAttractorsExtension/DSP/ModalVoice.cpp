@@ -241,7 +241,7 @@ void ModalVoice::updateState() {
             // Continue sustaining
             break;
 
-        case State::Release:
+        case State::Release: {
             // Check if voice is quiet enough to start fade-out
             float amp = getAmplitude();
             if (amp < 0.001f) {
@@ -251,6 +251,7 @@ void ModalVoice::updateState() {
                 fadeout_gain_ = 1.0f;
             }
             break;
+        }
 
         case State::FadeOut:
             // Nothing to do here - fade is applied in renderAudio()
