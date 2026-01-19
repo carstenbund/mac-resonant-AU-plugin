@@ -38,6 +38,23 @@ public class ParameterTree: ObservableObject {
         self.voice = VoiceParameters(auParameterTree: auParameterTree)
     }
 
+    /// Get wave shape parameter for a specific node and mode
+    /// - Parameters:
+    ///   - nodeIndex: Node index (0-4)
+    ///   - modeIndex: Mode index (0-3)
+    /// - Returns: ParameterWrapper for the wave shape parameter
+    public func waveShapeParameter(nodeIndex: Int, modeIndex: Int) -> ParameterWrapper {
+        // Calculate parameter address: base address (27) + (nodeIndex * 4) + modeIndex
+        let baseAddress = ModalAttractorsExtensionParameterAddress.param_Node0_Mode0_WaveShape.rawValue
+        let address = baseAddress + UInt64(nodeIndex * 4 + modeIndex)
+
+        guard let param = auParameterTree.parameter(withAddress: address) else {
+            fatalError("Invalid wave shape parameter for node \(nodeIndex), mode \(modeIndex)")
+        }
+
+        return ParameterWrapper(parameter: param)
+    }
+
     /// Create a mock parameter tree for SwiftUI previews
     @MainActor
     public static var preview: ParameterTree {

@@ -18,18 +18,22 @@ struct CharacterPreset: Codable, Identifiable {
     var mode0Frequency: Float
     var mode0Damping: Float
     var mode0Weight: Float
+    var mode0WaveShape: Int
 
     var mode1Frequency: Float
     var mode1Damping: Float
     var mode1Weight: Float
+    var mode1WaveShape: Int
 
     var mode2Frequency: Float
     var mode2Damping: Float
     var mode2Weight: Float
+    var mode2WaveShape: Int
 
     var mode3Frequency: Float
     var mode3Damping: Float
     var mode3Weight: Float
+    var mode3WaveShape: Int
 
     // Excitation parameters
     var pokeStrength: Float
@@ -39,28 +43,36 @@ struct CharacterPreset: Codable, Identifiable {
     var personality: Int
 
     /// Create a preset from current parameter tree values
-    init(name: String, from parameterTree: ParameterTree) {
+    /// - Parameters:
+    ///   - name: Name of the preset
+    ///   - parameterTree: Parameter tree to read values from
+    ///   - nodeIndex: Node index to read wave shapes from (0-4)
+    init(name: String, from parameterTree: ParameterTree, nodeIndex: Int) {
         self.name = name
 
         // Mode 0
         self.mode0Frequency = parameterTree.mode0.frequency.value
         self.mode0Damping = parameterTree.mode0.damping.value
         self.mode0Weight = parameterTree.mode0.weight.value
+        self.mode0WaveShape = Int(parameterTree.waveShapeParameter(nodeIndex: nodeIndex, modeIndex: 0).value)
 
         // Mode 1
         self.mode1Frequency = parameterTree.mode1.frequency.value
         self.mode1Damping = parameterTree.mode1.damping.value
         self.mode1Weight = parameterTree.mode1.weight.value
+        self.mode1WaveShape = Int(parameterTree.waveShapeParameter(nodeIndex: nodeIndex, modeIndex: 1).value)
 
         // Mode 2
         self.mode2Frequency = parameterTree.mode2.frequency.value
         self.mode2Damping = parameterTree.mode2.damping.value
         self.mode2Weight = parameterTree.mode2.weight.value
+        self.mode2WaveShape = Int(parameterTree.waveShapeParameter(nodeIndex: nodeIndex, modeIndex: 2).value)
 
         // Mode 3
         self.mode3Frequency = parameterTree.mode3.frequency.value
         self.mode3Damping = parameterTree.mode3.damping.value
         self.mode3Weight = parameterTree.mode3.weight.value
+        self.mode3WaveShape = Int(parameterTree.waveShapeParameter(nodeIndex: nodeIndex, modeIndex: 3).value)
 
         // Excitation
         self.pokeStrength = parameterTree.excitation.pokeStrength.value
@@ -71,26 +83,33 @@ struct CharacterPreset: Codable, Identifiable {
     }
 
     /// Apply this preset to a parameter tree
-    func apply(to parameterTree: ParameterTree) {
+    /// - Parameters:
+    ///   - parameterTree: Parameter tree to apply values to
+    ///   - nodeIndex: Node index to apply wave shapes to (0-4)
+    func apply(to parameterTree: ParameterTree, nodeIndex: Int) {
         // Mode 0
         parameterTree.mode0.frequency.value = mode0Frequency
         parameterTree.mode0.damping.value = mode0Damping
         parameterTree.mode0.weight.value = mode0Weight
+        parameterTree.waveShapeParameter(nodeIndex: nodeIndex, modeIndex: 0).value = Float(mode0WaveShape)
 
         // Mode 1
         parameterTree.mode1.frequency.value = mode1Frequency
         parameterTree.mode1.damping.value = mode1Damping
         parameterTree.mode1.weight.value = mode1Weight
+        parameterTree.waveShapeParameter(nodeIndex: nodeIndex, modeIndex: 1).value = Float(mode1WaveShape)
 
         // Mode 2
         parameterTree.mode2.frequency.value = mode2Frequency
         parameterTree.mode2.damping.value = mode2Damping
         parameterTree.mode2.weight.value = mode2Weight
+        parameterTree.waveShapeParameter(nodeIndex: nodeIndex, modeIndex: 2).value = Float(mode2WaveShape)
 
         // Mode 3
         parameterTree.mode3.frequency.value = mode3Frequency
         parameterTree.mode3.damping.value = mode3Damping
         parameterTree.mode3.weight.value = mode3Weight
+        parameterTree.waveShapeParameter(nodeIndex: nodeIndex, modeIndex: 3).value = Float(mode3WaveShape)
 
         // Excitation
         parameterTree.excitation.pokeStrength.value = pokeStrength
