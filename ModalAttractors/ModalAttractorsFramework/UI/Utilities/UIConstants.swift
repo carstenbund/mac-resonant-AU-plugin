@@ -40,8 +40,8 @@ enum UIConstants {
         static let sliderHeight: CGFloat = 20
         static let minimumTouchTarget: CGFloat = 44
 
-        static let windowMinWidth: CGFloat = 400
-        static let windowMinHeight: CGFloat = 500
+        static let windowMinWidth: CGFloat = 900
+        static let windowMinHeight: CGFloat = 650
     }
 
     // MARK: - Corner Radius
