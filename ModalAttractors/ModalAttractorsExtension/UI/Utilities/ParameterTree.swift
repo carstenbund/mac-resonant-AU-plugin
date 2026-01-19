@@ -20,6 +20,8 @@ public class ParameterTree: ObservableObject {
     public let mode1: ModeParameters
     public let mode2: ModeParameters
     public let mode3: ModeParameters
+    public let mode4: ModeParameters
+    public let mode5: ModeParameters
     public let excitation: ExcitationParameters
     public let voice: VoiceParameters
     public let characterEditorState: CharacterEditorStateParameters
@@ -35,6 +37,8 @@ public class ParameterTree: ObservableObject {
         self.mode1 = ModeParameters(auParameterTree: auParameterTree, modeIndex: 1)
         self.mode2 = ModeParameters(auParameterTree: auParameterTree, modeIndex: 2)
         self.mode3 = ModeParameters(auParameterTree: auParameterTree, modeIndex: 3)
+        self.mode4 = ModeParameters(auParameterTree: auParameterTree, modeIndex: 4)
+        self.mode5 = ModeParameters(auParameterTree: auParameterTree, modeIndex: 5)
         self.excitation = ExcitationParameters(auParameterTree: auParameterTree)
         self.voice = VoiceParameters(auParameterTree: auParameterTree)
         self.characterEditorState = CharacterEditorStateParameters(auParameterTree: auParameterTree)
@@ -43,12 +47,12 @@ public class ParameterTree: ObservableObject {
     /// Get wave shape parameter for a specific node and mode
     /// - Parameters:
     ///   - nodeIndex: Node index (0-4)
-    ///   - modeIndex: Mode index (0-3)
+    ///   - modeIndex: Mode index (0-5)
     /// - Returns: ParameterWrapper for the wave shape parameter
     public func waveShapeParameter(nodeIndex: Int, modeIndex: Int) -> ParameterWrapper {
-        // Calculate parameter address: base address (27) + (nodeIndex * 4) + modeIndex
+        // Calculate parameter address: base address (33) + (nodeIndex * 6) + modeIndex
         let baseAddress = ModalAttractorsExtensionParameterAddress.param_Node0_Mode0_WaveShape.rawValue
-        let address = baseAddress + UInt64(nodeIndex * 4 + modeIndex)
+        let address = baseAddress + UInt64(nodeIndex * 6 + modeIndex)
 
         guard let param = auParameterTree.parameter(withAddress: address) else {
             fatalError("Invalid wave shape parameter for node \(nodeIndex), mode \(modeIndex)")
@@ -123,7 +127,7 @@ public class RoutingParameters: ObservableObject {
     }
 }
 
-/// Mode parameter group (generic for mode0-3)
+/// Mode parameter group (generic for mode0-5)
 public class ModeParameters: ObservableObject {
     @Published public var frequency: ParameterWrapper
     @Published public var damping: ParameterWrapper
@@ -157,6 +161,14 @@ public class ModeParameters: ObservableObject {
             freqAddr = .param_Mode3_Frequency
             dampAddr = .param_Mode3_Damping
             wtAddr = .param_Mode3_Weight
+        case 4:
+            freqAddr = .param_Mode4_Frequency
+            dampAddr = .param_Mode4_Damping
+            wtAddr = .param_Mode4_Weight
+        case 5:
+            freqAddr = .param_Mode5_Frequency
+            dampAddr = .param_Mode5_Damping
+            wtAddr = .param_Mode5_Weight
         default:
             fatalError("Invalid mode index: \(modeIndex)")
         }

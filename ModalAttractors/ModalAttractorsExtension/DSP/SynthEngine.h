@@ -256,6 +256,12 @@ private:
     float mode3_frequency_;
     float mode3_damping_;
     float mode3_weight_;
+    float mode4_frequency_;
+    float mode4_damping_;
+    float mode4_weight_;
+    float mode5_frequency_;
+    float mode5_damping_;
+    float mode5_weight_;
 
     // Parameter cache - Excitation (for Character Editor)
     float pokeStrength_;

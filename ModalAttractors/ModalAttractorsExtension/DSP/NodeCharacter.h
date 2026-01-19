@@ -16,20 +16,20 @@
  * @brief Complete character definition for a single node
  *
  * Encapsulates all parameters that define a node's sonic behavior:
- * - Modal frequency ratios (4 modes)
- * - Modal damping coefficients (4 modes)
- * - Modal audio weights (4 modes)
- * - Modal wave shapes (4 modes)
+ * - Modal frequency ratios (6 modes)
+ * - Modal damping coefficients (6 modes)
+ * - Modal audio weights (6 modes)
+ * - Modal wave shapes (6 modes)
  * - Personality (resonator vs self-oscillator)
  * - Excitation behavior (poke strength/duration)
  * - Network coupling response
  */
 struct NodeCharacter {
-    // Mode parameters (4 modes per node)
-    float mode_freq_mult[4];    ///< Frequency multipliers relative to base note
-    float mode_damping[4];      ///< Damping coefficients (higher = faster decay)
-    float mode_weight[4];       ///< Audio contribution weights (0.0-1.0)
-    wave_shape_t mode_shape[4]; ///< Wave shapes for each mode
+    // Mode parameters (6 modes per node)
+    float mode_freq_mult[6];    ///< Frequency multipliers relative to base note
+    float mode_damping[6];      ///< Damping coefficients (higher = faster decay)
+    float mode_weight[6];       ///< Audio contribution weights (0.0-1.0)
+    wave_shape_t mode_shape[6]; ///< Wave shapes for each mode
 
     // Voice behavior
     node_personality_t personality;  ///< Resonator or Self-Oscillator

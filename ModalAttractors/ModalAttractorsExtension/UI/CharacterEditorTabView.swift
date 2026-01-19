@@ -182,7 +182,7 @@ struct CharacterEditorTabView: View {
                 .font(UIConstants.Fonts.sectionTitle)
                 .foregroundColor(UIConstants.Colors.textSecondary)
 
-            Text("4 internal modal oscillators per node")
+            Text("6 internal modal oscillators per node")
                 .font(.caption)
                 .foregroundColor(.secondary)
 
@@ -221,6 +221,23 @@ struct CharacterEditorTabView: View {
                     mode: parameterTree.mode3,
                     waveShape: parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 3),
                     modeLabel: "MODE 3"
+                )
+                .frame(maxWidth: .infinity)
+            }
+
+            // Row 3: Mode 4 and Mode 5 (side-by-side)
+            HStack(alignment: .top, spacing: UIConstants.Spacing.large) {
+                ModeControlsView(
+                    mode: parameterTree.mode4,
+                    waveShape: parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 4),
+                    modeLabel: "MODE 4"
+                )
+                .frame(maxWidth: .infinity)
+
+                ModeControlsView(
+                    mode: parameterTree.mode5,
+                    waveShape: parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 5),
+                    modeLabel: "MODE 5"
                 )
                 .frame(maxWidth: .infinity)
             }

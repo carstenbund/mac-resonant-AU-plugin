@@ -1,8 +1,8 @@
 /**
  * @file modal_node.h
- * @brief Core 4-mode modal resonator node implementation (macOS port)
+ * @brief Core 6-mode modal resonator node implementation (macOS port)
  *
- * This module implements the autonomous modal resonator with up to 4 complex modes.
+ * This module implements the autonomous modal resonator with up to 6 complex modes.
  * Each mode evolves according to: ȧ_k = (-γ_k + iω_k)a_k + u_k(t)
  *
  * Ported from ESP32 firmware for macOS Audio Unit plugin:
@@ -39,7 +39,7 @@ typedef struct {
 // Constants
 // ============================================================================
 
-#define MAX_MODES 4
+#define MAX_MODES 6
 #define MAX_NEIGHBORS 8
 #define CONTROL_RATE_HZ 500  // 500 Hz control rate (2ms timestep)
 #define CONTROL_DT (1.0f / CONTROL_RATE_HZ)
@@ -101,13 +101,13 @@ typedef struct {
 } excitation_envelope_t;
 
 /**
- * @brief Node state (4 modes + metadata)
+ * @brief Node state (6 modes + metadata)
  */
 typedef struct {
     uint8_t node_id;                    ///< Unique node identifier
     node_personality_t personality;      ///< Resonator or self-oscillator
 
-    mode_state_t modes[MAX_MODES];      ///< 4 complex modes
+    mode_state_t modes[MAX_MODES];      ///< 6 complex modes
     excitation_envelope_t excitation;   ///< Current excitation envelope
 
     float coupling_strength;            ///< Global coupling coefficient
@@ -266,7 +266,7 @@ const char* modal_node_get_preset_description(uint8_t preset_idx);
 /**
  * @brief Apply physical preset to node
  *
- * Sets all 4 modes according to preset frequency ratios, damping ratios, and weights.
+ * Sets all 6 modes according to preset frequency ratios, damping ratios, and weights.
  * Frequency ratios are relative to fundamental_freq_hz.
  * Damping ratios are relative to base_damping.
  *
