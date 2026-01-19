@@ -205,33 +205,39 @@ struct CharacterEditorTabView: View {
                 .foregroundColor(.secondary)
                 .italic()
 
-            // Mode 0
-            ModeControlsView(
-                mode: parameterTree.mode0,
-                waveShape: parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 0),
-                modeLabel: "MODE 0"
-            )
+            // Row 1: Mode 0 and Mode 1 (side-by-side)
+            HStack(alignment: .top, spacing: UIConstants.Spacing.large) {
+                ModeControlsView(
+                    mode: parameterTree.mode0,
+                    waveShape: parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 0),
+                    modeLabel: "MODE 0"
+                )
+                .frame(maxWidth: .infinity)
 
-            // Mode 1
-            ModeControlsView(
-                mode: parameterTree.mode1,
-                waveShape: parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 1),
-                modeLabel: "MODE 1"
-            )
+                ModeControlsView(
+                    mode: parameterTree.mode1,
+                    waveShape: parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 1),
+                    modeLabel: "MODE 1"
+                )
+                .frame(maxWidth: .infinity)
+            }
 
-            // Mode 2
-            ModeControlsView(
-                mode: parameterTree.mode2,
-                waveShape: parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 2),
-                modeLabel: "MODE 2"
-            )
+            // Row 2: Mode 2 and Mode 3 (side-by-side)
+            HStack(alignment: .top, spacing: UIConstants.Spacing.large) {
+                ModeControlsView(
+                    mode: parameterTree.mode2,
+                    waveShape: parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 2),
+                    modeLabel: "MODE 2"
+                )
+                .frame(maxWidth: .infinity)
 
-            // Mode 3
-            ModeControlsView(
-                mode: parameterTree.mode3,
-                waveShape: parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 3),
-                modeLabel: "MODE 3"
-            )
+                ModeControlsView(
+                    mode: parameterTree.mode3,
+                    waveShape: parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 3),
+                    modeLabel: "MODE 3"
+                )
+                .frame(maxWidth: .infinity)
+            }
         }
     }
 
