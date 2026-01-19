@@ -22,6 +22,7 @@ public class ParameterTree: ObservableObject {
     public let mode3: ModeParameters
     public let excitation: ExcitationParameters
     public let voice: VoiceParameters
+    public let characterEditorState: CharacterEditorStateParameters
 
     private let auParameterTree: AUParameterTree
 
@@ -36,6 +37,24 @@ public class ParameterTree: ObservableObject {
         self.mode3 = ModeParameters(auParameterTree: auParameterTree, modeIndex: 3)
         self.excitation = ExcitationParameters(auParameterTree: auParameterTree)
         self.voice = VoiceParameters(auParameterTree: auParameterTree)
+        self.characterEditorState = CharacterEditorStateParameters(auParameterTree: auParameterTree)
+    }
+
+    /// Get wave shape parameter for a specific node and mode
+    /// - Parameters:
+    ///   - nodeIndex: Node index (0-4)
+    ///   - modeIndex: Mode index (0-3)
+    /// - Returns: ParameterWrapper for the wave shape parameter
+    public func waveShapeParameter(nodeIndex: Int, modeIndex: Int) -> ParameterWrapper {
+        // Calculate parameter address: base address (27) + (nodeIndex * 4) + modeIndex
+        let baseAddress = ModalAttractorsExtensionParameterAddress.param_Node0_Mode0_WaveShape.rawValue
+        let address = baseAddress + UInt64(nodeIndex * 4 + modeIndex)
+
+        guard let param = auParameterTree.parameter(withAddress: address) else {
+            fatalError("Invalid wave shape parameter for node \(nodeIndex), mode \(modeIndex)")
+        }
+
+        return ParameterWrapper(parameter: param)
     }
 
     /// Create a mock parameter tree for SwiftUI previews
@@ -272,5 +291,15 @@ public class ParameterWrapper: ObservableObject {
         default:
             return String(format: "%.2f", value)
         }
+    }
+}
+
+/// Character Editor State parameter group (hidden parameter)
+public class CharacterEditorStateParameters: ObservableObject {
+    @Published public var editingNodeIndex: ParameterWrapper
+
+    init(auParameterTree: AUParameterTree) {
+        let param = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_EditingNodeIndex.rawValue)!
+        self.editingNodeIndex = ParameterWrapper(parameter: param)
     }
 }

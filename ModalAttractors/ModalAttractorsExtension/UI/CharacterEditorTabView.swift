@@ -99,6 +99,10 @@ struct CharacterEditorTabView: View {
                     }
                 }
                 .pickerStyle(.menu)
+                .onChange(of: selectedNodeIndex) { newValue in
+                    // Update the DSP engine's editing node index for real-time parameter application
+                    parameterTree.characterEditorState.editingNodeIndex.value = Float(newValue)
+                }
             }
 
             Text("Note: Wave shapes are per-node, other parameters are shared")
