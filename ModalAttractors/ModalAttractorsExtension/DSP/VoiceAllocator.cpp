@@ -30,10 +30,15 @@ VoiceAllocator::VoiceAllocator(uint32_t max_polyphony)
     memset(note_to_voice_, -1, sizeof(note_to_voice_));
 
     // Initialize mode parameters with defaults (from Parameters.swift)
+    // Only first 4 modes have defaults; modes 4-7 can be set via characters
     mode_params_[0] = {1.0f, 1.0f, 1.0f};   // Mode 0
     mode_params_[1] = {2.0f, 1.2f, 0.8f};   // Mode 1
     mode_params_[2] = {3.0f, 1.5f, 0.6f};   // Mode 2
     mode_params_[3] = {4.5f, 2.0f, 0.4f};   // Mode 3
+    // Initialize remaining modes (4-7) with zero weight (inactive)
+    for (uint8_t i = 4; i < MAX_MODES; i++) {
+        mode_params_[i] = {static_cast<float>(i + 1), 2.0f, 0.0f};
+    }
 }
 
 VoiceAllocator::~VoiceAllocator() {
@@ -87,7 +92,7 @@ ModalVoice* VoiceAllocator::noteOn(uint8_t midi_note, float velocity) {
 
         // Apply mode parameters after noteOn (which calls updateFrequencies with hardcoded values)
         float base_freq = voice->getBaseFrequency();
-        for (uint8_t mode_idx = 0; mode_idx < 4; mode_idx++) {
+        for (uint8_t mode_idx = 0; mode_idx < MAX_MODES; mode_idx++) {
             float mode_freq = base_freq * mode_params_[mode_idx].freq_multiplier;
             voice->setMode(mode_idx, mode_freq, mode_params_[mode_idx].damping, mode_params_[mode_idx].weight);
         }
@@ -110,7 +115,7 @@ ModalVoice* VoiceAllocator::noteOn(uint8_t midi_note, float velocity) {
 
         // Apply mode parameters after noteOn (which calls updateFrequencies with hardcoded values)
         float base_freq = voice->getBaseFrequency();
-        for (uint8_t mode_idx = 0; mode_idx < 4; mode_idx++) {
+        for (uint8_t mode_idx = 0; mode_idx < MAX_MODES; mode_idx++) {
             float mode_freq = base_freq * mode_params_[mode_idx].freq_multiplier;
             voice->setMode(mode_idx, mode_freq, mode_params_[mode_idx].damping, mode_params_[mode_idx].weight);
         }
@@ -170,7 +175,7 @@ void VoiceAllocator::setPersonality(node_personality_t personality) {
 }
 
 void VoiceAllocator::setMode(uint8_t mode_idx, float freq_multiplier, float damping, float weight) {
-    if (mode_idx >= 4) return;  // Only 4 modes (0-3)
+    if (mode_idx >= MAX_MODES) return;  // Validate mode index
 
     // Store parameters
     mode_params_[mode_idx].freq_multiplier = freq_multiplier;

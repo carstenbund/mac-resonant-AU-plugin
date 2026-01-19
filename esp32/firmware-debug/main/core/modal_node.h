@@ -32,7 +32,7 @@ typedef struct {
 // Constants
 // ============================================================================
 
-#define MAX_MODES 4
+#define MAX_MODES 8  // Increased from 4 to support richer harmonic content
 #define MAX_NEIGHBORS 8
 #define CONTROL_RATE_HZ 500  // 500 Hz control rate (2ms timestep)
 #define CONTROL_DT (1.0f / CONTROL_RATE_HZ)

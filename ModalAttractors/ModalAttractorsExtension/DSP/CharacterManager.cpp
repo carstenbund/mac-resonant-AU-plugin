@@ -36,8 +36,13 @@ const NodeCharacter& CharacterManager::getCharacterByNameOrDefault(
 }
 
 bool CharacterManager::validateCharacter(const NodeCharacter& character) {
-    // Validate mode parameters
-    for (int i = 0; i < 4; i++) {
+    // Validate num_active_modes is within range
+    if (character.num_active_modes < 1 || character.num_active_modes > MAX_MODES) {
+        return false;
+    }
+
+    // Validate mode parameters (only check active modes)
+    for (int i = 0; i < character.num_active_modes; i++) {
         // Frequency multipliers should be positive and reasonable
         if (character.mode_freq_mult[i] < 0.1f || character.mode_freq_mult[i] > 20.0f) {
             return false;
