@@ -24,7 +24,9 @@
 					<key>tags</key>
 					<array>
 						<string>Synthesizer</string>
-						<string>Synth</string>
+						<string>Physical Modeling</string>
+						<string>Bass</string>
+						<string>Pad</string>
 					</array>
 					<key>type</key>
 					<string>aumu</string>

@@ -86,5 +86,9 @@ typedef NS_ENUM(AUParameterAddress, ModalAttractorsExtensionParameterAddress) {
     kParam_Node4_Mode0_WaveShape = 43,
     kParam_Node4_Mode1_WaveShape = 44,
     kParam_Node4_Mode2_WaveShape = 45,
-    kParam_Node4_Mode3_WaveShape = 46
+    kParam_Node4_Mode3_WaveShape = 46,
+
+    // Character Editor state - tracks which node is being edited (0-4)
+    // Hidden parameter set by UI when user selects a node in Character Editor
+    kParam_EditingNodeIndex = 47
 };

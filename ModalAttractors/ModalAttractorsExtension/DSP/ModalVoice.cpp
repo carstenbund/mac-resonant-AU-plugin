@@ -17,6 +17,9 @@ ModalVoice::ModalVoice(uint8_t voice_id)
     , samples_since_update_(0)
     , samples_per_update_(0)
     , sample_rate_(48000.0f)
+    , fadeout_samples_remaining_(0)
+    , fadeout_total_samples_(0)
+    , fadeout_gain_(1.0f)
 {
     // Initialize node with resonator personality by default
     modal_node_init(&node_, voice_id, PERSONALITY_RESONATOR);
@@ -32,6 +35,9 @@ void ModalVoice::initialize(float sample_rate) {
     // Calculate samples per control update
     // Control rate is 500 Hz (CONTROL_RATE_HZ)
     samples_per_update_ = static_cast<uint32_t>(sample_rate / CONTROL_RATE_HZ);
+
+    // Calculate fade-out duration (5ms to prevent clicks)
+    fadeout_total_samples_ = static_cast<uint32_t>(sample_rate * 0.005f);
 
     // Initialize audio synth
     audio_synth_init(&synth_, &node_, sample_rate);
@@ -114,6 +120,29 @@ void ModalVoice::renderAudio(float* outL, float* outR, uint32_t num_frames) {
 
     // Render audio from modal state
     audio_synth_render(&synth_, outL, outR, num_frames);
+
+    // Apply fade-out envelope if in FadeOut state
+    if (state_ == State::FadeOut) {
+        for (uint32_t i = 0; i < num_frames; i++) {
+            if (fadeout_samples_remaining_ > 0) {
+                // Linear fade from 1.0 to 0.0
+                fadeout_gain_ = static_cast<float>(fadeout_samples_remaining_) /
+                                static_cast<float>(fadeout_total_samples_);
+
+                outL[i] *= fadeout_gain_;
+                outR[i] *= fadeout_gain_;
+
+                fadeout_samples_remaining_--;
+            } else {
+                // Fade complete - zero out remaining samples and deactivate
+                memset(&outL[i], 0, (num_frames - i) * sizeof(float));
+                memset(&outR[i], 0, (num_frames - i) * sizeof(float));
+                state_ = State::Inactive;
+                reset();
+                break;
+            }
+        }
+    }
 }
 
 void ModalVoice::applyCoupling(const float coupling_inputs[MAX_MODES]) {
@@ -212,13 +241,21 @@ void ModalVoice::updateState() {
             // Continue sustaining
             break;
 
-        case State::Release:
-            // Check if voice is quiet enough to deactivate
+        case State::Release: {
+            // Check if voice is quiet enough to start fade-out
             float amp = getAmplitude();
             if (amp < 0.001f) {
-                state_ = State::Inactive;
-                reset();
+                // Transition to fade-out instead of immediately deactivating
+                state_ = State::FadeOut;
+                fadeout_samples_remaining_ = fadeout_total_samples_;
+                fadeout_gain_ = 1.0f;
             }
+            break;
+        }
+
+        case State::FadeOut:
+            // Nothing to do here - fade is applied in renderAudio()
+            // State transition happens when fadeout_samples_remaining_ reaches 0
             break;
     }
 }
