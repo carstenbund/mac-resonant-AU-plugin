@@ -60,19 +60,28 @@ public class ModalAttractorsAUViewController: AUViewController {
     /// Observable wrapper for parameter tree that can be updated when AU becomes available
     let parameterTreeHolder = ParameterTreeHolder()
 
+    /// Stored content size for persistence between tab switches
+    private var storedContentSize: NSSize?
+
     // MARK: - Content Size (Critical for out-of-process)
 
     /// Override preferredContentSize to ensure the host knows our size
     /// This is REQUIRED for out-of-process AUv3 to properly size the view
+    /// Returns the stored size if available, otherwise the minimum size
     public override var preferredContentSize: NSSize {
         get {
+            // Return stored size if we have one, otherwise use minimum
+            if let stored = storedContentSize {
+                return stored
+            }
             return NSSize(
                 width: UIConstants.Sizes.windowMinWidth,
                 height: UIConstants.Sizes.windowMinHeight
             )
         }
         set {
-            // Allow host to set size if needed
+            // Store the new size for persistence
+            storedContentSize = newValue
             super.preferredContentSize = newValue
         }
     }
@@ -99,6 +108,35 @@ public class ModalAttractorsAUViewController: AUViewController {
         // Do NOT wait for the audio unit - the view must be ready when
         // requestViewController() is called by the host
         setupHostingController()
+
+        // Observe view frame changes to persist size
+        observeViewSize()
+    }
+
+    public override func viewDidAppear() {
+        super.viewDidAppear()
+        log.info("viewDidAppear - current size: \(view.frame.size)")
+
+        // Update stored size when view appears
+        if view.frame.size.width > 0 && view.frame.size.height > 0 {
+            storedContentSize = view.frame.size
+        }
+    }
+
+    /// Observe view size changes to maintain size between tab switches
+    private func observeViewSize() {
+        // Use KVO to observe frame changes
+        observation = view.observe(\.frame, options: [.new]) { [weak self] _, change in
+            guard let self = self,
+                  let newFrame = change.newValue else { return }
+
+            // Only store if size is reasonable
+            if newFrame.size.width >= UIConstants.Sizes.windowMinWidth &&
+               newFrame.size.height >= UIConstants.Sizes.windowMinHeight {
+                self.storedContentSize = newFrame.size
+                log.debug("Stored new content size: \(newFrame.size)")
+            }
+        }
     }
 
     /// Bind the audio unit's parameter tree to the UI
