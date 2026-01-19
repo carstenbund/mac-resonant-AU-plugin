@@ -348,7 +348,10 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
     /// Cached factory preset objects
     private lazy var _factoryPresets: [AUAudioUnitPreset] = {
         return ModalAttractorsFactoryPresets.enumerated().map { index, data in
-            AUAudioUnitPreset(number: index, name: data.name)
+            let preset = AUAudioUnitPreset()
+            preset.number = index
+            preset.name = data.name
+            return preset
         }
     }()
 
@@ -395,7 +398,8 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
 
         // Apply each parameter from the preset
         for (identifier, value) in state {
-            if let param = paramTree.parameter(withIdentifier: identifier),
+            // Find parameter by identifier
+            if let param = paramTree.allParameters.first(where: { $0.identifier == identifier }),
                let floatValue = value as? Float {
                 param.value = floatValue
                 modal_attractors_engine_set_parameter(engine, UInt32(param.address), floatValue)
@@ -450,7 +454,10 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
             // Restore preset reference if present
             if let presetNumber = newState["presetNumber"] as? Int,
                let presetName = newState["presetName"] as? String {
-                _currentPreset = AUAudioUnitPreset(number: presetNumber, name: presetName)
+                let preset = AUAudioUnitPreset()
+                preset.number = presetNumber
+                preset.name = presetName
+                _currentPreset = preset
             } else {
                 _currentPreset = nil
             }
