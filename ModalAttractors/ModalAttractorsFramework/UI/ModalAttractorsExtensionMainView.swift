@@ -83,23 +83,24 @@ struct MainTabView: View {
 
                 Divider()
 
-                // Network section
-                NetworkControlsView()
-
-                Divider()
-
-                // Node Character System
-                NodeCharactersView()
-
-                Divider()
-
-                // Routing & Behavior
-                RoutingControlsView()
-
-                Divider()
-
-                // Drive/Output section
+                // Output section (top)
                 DriveControlsView()
+
+                Divider()
+
+                // Network and Node Characters (side-by-side)
+                HStack(alignment: .top, spacing: UIConstants.Spacing.large) {
+                    NetworkControlsView()
+                        .frame(maxWidth: .infinity)
+
+                    NodeCharactersView()
+                        .frame(maxWidth: .infinity)
+                }
+
+                Divider()
+
+                // Routing & Behavior (bottom)
+                RoutingControlsView()
             }
             .padding()
         }

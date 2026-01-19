@@ -51,12 +51,28 @@ struct CharacterEditorTabView: View {
         ScrollView {
             VStack(spacing: UIConstants.Spacing.large) {
                 // Header
-                headerSection
+                VStack(spacing: UIConstants.Spacing.small) {
+                    Text("Character Editor")
+                        .font(.title2)
+                        .fontWeight(.bold)
+
+                    Text("Edit character parameters for advanced control")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
 
                 Divider()
 
-                // Template loader
-                templateSection
+                // Node selector and Template loader (side-by-side)
+                HStack(alignment: .top, spacing: UIConstants.Spacing.large) {
+                    // Node selector
+                    nodeSelectorSection
+                        .frame(maxWidth: .infinity)
+
+                    // Template loader
+                    templateSection
+                        .frame(maxWidth: .infinity)
+                }
 
                 Divider()
 
@@ -82,23 +98,18 @@ struct CharacterEditorTabView: View {
         }
     }
 
-    // MARK: - Header Section
+    // MARK: - Node Selector Section
 
-    private var headerSection: some View {
-        VStack(spacing: UIConstants.Spacing.small) {
-            Text("Character Editor")
-                .font(.title2)
-                .fontWeight(.bold)
+    private var nodeSelectorSection: some View {
+        VStack(alignment: .leading, spacing: UIConstants.Spacing.medium) {
+            Text("SELECT NODE")
+                .font(UIConstants.Fonts.sectionTitle)
+                .foregroundColor(UIConstants.Colors.textSecondary)
 
-            Text("Edit character parameters for advanced control")
-                .font(.caption)
-                .foregroundColor(.secondary)
-
-            // Node selector
-            HStack {
-                Text("Editing Node:")
-                    .font(UIConstants.Fonts.sectionTitle)
-                    .foregroundColor(UIConstants.Colors.textSecondary)
+            VStack(alignment: .leading, spacing: UIConstants.Spacing.small) {
+                Text("Editing wave shapes for:")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
 
                 Picker("Node", selection: $selectedNodeIndex) {
                     ForEach(0..<5) { index in
@@ -106,9 +117,16 @@ struct CharacterEditorTabView: View {
                     }
                 }
                 .pickerStyle(.menu)
-                .labelsHidden()
             }
+
+            Text("Note: Wave shapes are per-node, other parameters are shared")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+                .italic()
         }
+        .padding()
+        .background(UIConstants.Colors.sectionBackground)
+        .cornerRadius(UIConstants.CornerRadius.medium)
     }
 
     // MARK: - Template Section
