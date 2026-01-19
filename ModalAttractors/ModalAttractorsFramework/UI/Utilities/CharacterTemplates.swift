@@ -83,6 +83,7 @@ public struct CharacterTemplates {
 
     /// All available built-in templates
     public static let all: [CharacterTemplate] = [
+        // Original presets
         vibrantBass,
         darkNode,
         brightBell,
@@ -97,7 +98,17 @@ public struct CharacterTemplates {
         detunedChorus,
         malletTone,
         windChime,
-        gongWash
+        gongWash,
+
+        // Physically-derived presets (based on acoustics literature)
+        churchBell,
+        circularPlate,
+        wineGlass,
+        freeBar,
+        tunedBar,
+        drumMembrane,
+        smallBell,
+        harmonicString
     ]
 
     /// Get template names
@@ -291,5 +302,104 @@ public struct CharacterTemplates {
         waveShapes: (1, 3, 1, 4), // Sawtooth, Square, Sawtooth, Pulse25%
         pokeStrength: 0.7,
         pokeDuration: 35.0
+    )
+
+    // MARK: - Physically-Derived Presets
+    // Based on acoustics literature (Fletcher & Rossing, Rayleigh)
+
+    public static let churchBell = CharacterTemplate(
+        name: "Church Bell",
+        description: "Western church bell with tierce (minor third) character",
+        mode0: (1.000, 0.5, 1.00),   // Fundamental
+        mode1: (1.190, 0.6, 0.75),   // Tierce (minor third - classic bell sound)
+        mode2: (1.500, 0.7, 0.60),   // Quint (perfect fifth)
+        mode3: (2.000, 0.9, 0.45),   // Nominal (octave)
+        waveShapes: (0, 0, 0, 0),    // All sine for pure bell tone
+        pokeStrength: 0.8,
+        pokeDuration: 10.0
+    )
+
+    public static let circularPlate = CharacterTemplate(
+        name: "Circular Plate",
+        description: "Cymbal/gong with Rayleigh modes (inharmonic)",
+        mode0: (1.000, 0.5, 1.00),   // (0,1) mode
+        mode1: (2.081, 0.55, 0.70),  // (1,1) mode - Rayleigh
+        mode2: (3.413, 0.65, 0.50),  // (2,1) mode - Rayleigh
+        mode3: (3.891, 0.70, 0.35),  // (0,2) mode - Rayleigh
+        waveShapes: (0, 0, 0, 0),    // Pure sine for metallic clarity
+        pokeStrength: 0.7,
+        pokeDuration: 25.0
+    )
+
+    public static let wineGlass = CharacterTemplate(
+        name: "Wine Glass",
+        description: "Crystalline cylindrical shell resonance",
+        mode0: (1.000, 0.5, 1.00),   // Fundamental
+        mode1: (2.280, 0.65, 0.65),  // First overtone
+        mode2: (3.650, 0.80, 0.45),  // Second overtone
+        mode3: (5.130, 1.00, 0.30),  // Third overtone
+        waveShapes: (0, 0, 0, 0),    // Pure sine for glass clarity
+        pokeStrength: 0.6,
+        pokeDuration: 20.0
+    )
+
+    public static let freeBar = CharacterTemplate(
+        name: "Free Bar",
+        description: "Vibraphone/tubular chimes (widely-spaced modes)",
+        mode0: (1.000, 0.5, 1.00),   // Fundamental
+        mode1: (2.756, 0.60, 0.60),  // Second bending mode
+        mode2: (5.404, 0.75, 0.35),  // Third bending mode
+        mode3: (8.933, 0.90, 0.20),  // Fourth bending mode
+        waveShapes: (0, 0, 0, 0),    // Pure sine for mallet clarity
+        pokeStrength: 0.75,
+        pokeDuration: 12.0
+    )
+
+    public static let tunedBar = CharacterTemplate(
+        name: "Tuned Bar",
+        description: "Marimba/xylophone with harmonic overtones",
+        mode0: (1.000, 0.5, 1.00),   // Fundamental
+        mode1: (4.000, 0.70, 0.50),  // 2 octaves (arch-tuned)
+        mode2: (10.00, 1.00, 0.25),  // ~3 octaves + fifth
+        mode3: (18.00, 1.25, 0.15),  // ~4 octaves
+        waveShapes: (0, 0, 0, 0),    // Pure sine for wooden warmth
+        pokeStrength: 0.85,
+        pokeDuration: 8.0
+    )
+
+    public static let drumMembrane = CharacterTemplate(
+        name: "Drum Membrane",
+        description: "Timpani/kettledrum (closely-spaced modes)",
+        mode0: (1.000, 0.40, 1.00),  // (0,1) fundamental
+        mode1: (1.593, 0.50, 0.70),  // (1,1) mode
+        mode2: (2.136, 0.60, 0.50),  // (2,1) mode
+        mode3: (2.296, 0.65, 0.40),  // (0,2) mode
+        waveShapes: (0, 0, 0, 0),    // Pure sine for drum tone
+        pokeStrength: 0.9,
+        pokeDuration: 15.0
+    )
+
+    public static let smallBell = CharacterTemplate(
+        name: "Small Bell",
+        description: "Handbell with stretched inharmonicity",
+        mode0: (1.000, 0.30, 1.00),  // Fundamental (quick decay)
+        mode1: (1.350, 0.40, 0.80),  // Stretched minor third
+        mode2: (1.700, 0.50, 0.60),  // Stretched fifth
+        mode3: (2.200, 0.60, 0.40),  // Upper partial
+        waveShapes: (0, 0, 0, 0),    // Pure sine for bright bell
+        pokeStrength: 0.85,
+        pokeDuration: 6.0
+    )
+
+    public static let harmonicString = CharacterTemplate(
+        name: "Harmonic String",
+        description: "Perfect harmonic series (reference)",
+        mode0: (1.000, 0.5, 1.00),   // Fundamental
+        mode1: (2.000, 0.55, 0.60),  // Octave
+        mode2: (3.000, 0.60, 0.40),  // Fifth above octave
+        mode3: (4.000, 0.65, 0.30),  // Two octaves
+        waveShapes: (0, 0, 0, 0),    // Pure sine for harmonic purity
+        pokeStrength: 0.65,
+        pokeDuration: 18.0
     )
 }
