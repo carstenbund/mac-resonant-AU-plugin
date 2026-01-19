@@ -115,7 +115,7 @@ public class ModalAttractorsAUViewController: AUViewController {
 
     public override func viewDidAppear() {
         super.viewDidAppear()
-        log.info("viewDidAppear - current size: \(view.frame.size.width, privacy: .public)x\(view.frame.size.height, privacy: .public)")
+        log.info("viewDidAppear - current size: \(self.view.frame.size.width, privacy: .public)x\(self.view.frame.size.height, privacy: .public)")
 
         // Update stored size when view appears
         if view.frame.size.width > 0 && view.frame.size.height > 0 {
