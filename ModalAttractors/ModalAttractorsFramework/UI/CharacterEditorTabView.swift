@@ -225,19 +225,22 @@ struct CharacterEditorTabView: View {
                 .font(UIConstants.Fonts.sectionTitle)
                 .foregroundColor(UIConstants.Colors.textSecondary)
 
-            ParameterSlider(
-                param: parameterTree.excitation.pokeStrength,
-                label: "Poke Strength",
-                showUnit: false,
-                formatString: "%.2f"
-            )
+            // Rotary knobs for excitation parameters
+            HStack(spacing: UIConstants.Spacing.large) {
+                ParameterKnob(
+                    param: parameterTree.excitation.pokeStrength,
+                    label: "Strength",
+                    size: 80,
+                    formatString: "%.2f"
+                )
 
-            ParameterSlider(
-                param: parameterTree.excitation.pokeDuration,
-                label: "Poke Duration",
-                showUnit: true,
-                formatString: "%.1f"
-            )
+                ParameterKnob(
+                    param: parameterTree.excitation.pokeDuration,
+                    label: "Duration",
+                    size: 80,
+                    formatString: "%.1f ms"
+                )
+            }
         }
         .padding()
         .background(UIConstants.Colors.sectionBackground)

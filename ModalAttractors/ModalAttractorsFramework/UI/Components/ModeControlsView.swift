@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-/// Simple mode controls with sliders and wave shape picker
+/// Mode controls with rotary knobs and wave shape picker
 struct ModeControlsView: View {
     @ObservedObject var mode: ModeParameters
     @ObservedObject var waveShape: ParameterWrapper
@@ -39,26 +39,29 @@ struct ModeControlsView: View {
                 .labelsHidden()
             }
 
-            ParameterSlider(
-                param: mode.frequency,
-                label: "Frequency",
-                showUnit: false,
-                formatString: "%.2f"
-            )
+            // Rotary knobs for mode parameters
+            HStack(spacing: UIConstants.Spacing.large) {
+                ParameterKnob(
+                    param: mode.frequency,
+                    label: "Frequency",
+                    size: 60,
+                    formatString: "%.2f×"
+                )
 
-            ParameterSlider(
-                param: mode.damping,
-                label: "Damping",
-                showUnit: false,
-                formatString: "%.2f"
-            )
+                ParameterKnob(
+                    param: mode.damping,
+                    label: "Damping",
+                    size: 60,
+                    formatString: "%.2f"
+                )
 
-            ParameterSlider(
-                param: mode.weight,
-                label: "Weight",
-                showUnit: false,
-                formatString: "%.2f"
-            )
+                ParameterKnob(
+                    param: mode.weight,
+                    label: "Weight",
+                    size: 60,
+                    formatString: "%.2f"
+                )
+            }
         }
         .padding()
         .background(UIConstants.Colors.sectionBackground)
