@@ -56,7 +56,7 @@ public struct ModalAttractorsExtensionMainView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .padding(12)
-        .frame(minWidth: 520, minHeight: 400)
+        .frame(minWidth: 900, minHeight: 650)
     }
 }
 
@@ -112,5 +112,5 @@ struct MainTabView: View {
 #Preview {
     ModalAttractorsExtensionMainView()
         .environmentObject(ParameterTree.preview)
-        .frame(width: 520, height: 400)
+        .frame(width: 900, height: 650)
 }
