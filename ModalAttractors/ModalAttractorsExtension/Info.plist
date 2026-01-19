@@ -23,7 +23,10 @@
 					<string>Test</string>
 					<key>tags</key>
 					<array>
-						<string>MIDI Processor</string>
+						<string>Synthesizer</string>
+						<string>Physical Modeling</string>
+						<string>Bass</string>
+						<string>Pad</string>
 					</array>
 					<key>type</key>
 					<string>aumu</string>
