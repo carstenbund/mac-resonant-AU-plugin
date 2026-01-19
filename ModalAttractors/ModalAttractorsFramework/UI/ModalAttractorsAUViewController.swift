@@ -108,36 +108,26 @@ public class ModalAttractorsAUViewController: AUViewController {
         // Do NOT wait for the audio unit - the view must be ready when
         // requestViewController() is called by the host
         setupHostingController()
-
-        // Observe view frame changes to persist size
-        observeViewSize()
     }
 
     public override func viewDidAppear() {
         super.viewDidAppear()
         log.info("viewDidAppear - current size: \(view.frame.size)")
 
-        // Update stored size when view appears
-        if view.frame.size.width > 0 && view.frame.size.height > 0 {
+        // Capture initial size only once when view first appears
+        // Do NOT continuously observe frame changes as this causes cumulative zoom scaling
+        if storedContentSize == nil && view.frame.size.width > 0 && view.frame.size.height > 0 {
             storedContentSize = view.frame.size
+            log.info("Captured initial content size: \(view.frame.size)")
         }
     }
 
-    /// Observe view size changes to maintain size between tab switches
-    private func observeViewSize() {
-        // Use KVO to observe frame changes
-        observation = view.observe(\.frame, options: [.new]) { [weak self] _, change in
-            guard let self = self,
-                  let newFrame = change.newValue else { return }
-
-            // Only store if size is reasonable
-            if newFrame.size.width >= UIConstants.Sizes.windowMinWidth &&
-               newFrame.size.height >= UIConstants.Sizes.windowMinHeight {
-                self.storedContentSize = newFrame.size
-                log.debug("Stored new content size: \(newFrame.size)")
-            }
-        }
-    }
+    // REMOVED: observeViewSize() method
+    // The frame observation was causing cumulative zoom scaling issues:
+    // - When host applies zoom (e.g., 89%), the frame changes and gets stored
+    // - Next open uses the zoomed size as base, zoom applies again (89% of 89% = 79%)
+    // - This creates progressively smaller (or larger) windows each time
+    // Solution: Only capture size once in viewDidAppear, don't continuously observe
 
     /// Bind the audio unit's parameter tree to the UI
     /// Called when audioUnit becomes available
