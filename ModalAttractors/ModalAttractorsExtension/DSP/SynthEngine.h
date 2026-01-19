@@ -264,6 +264,9 @@ private:
     // Parameter cache - Deprecated
     float personality_;
 
+    // Character Editor - currently editing node (0-4)
+    uint8_t editingNodeIndex_;
+
     /**
      * @brief Process single event (real-time safe)
      */

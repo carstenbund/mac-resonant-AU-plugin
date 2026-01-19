@@ -68,7 +68,12 @@ enum ParamID {
     kParam_Node4_Mode0_WaveShape = 43,
     kParam_Node4_Mode1_WaveShape = 44,
     kParam_Node4_Mode2_WaveShape = 45,
-    kParam_Node4_Mode3_WaveShape = 46
+    kParam_Node4_Mode3_WaveShape = 46,
+
+    // Character Editor - currently editing node index (0-4)
+    // This hidden parameter tracks which node is selected in the Character Editor
+    // When mode/excitation/personality parameters change, they're applied to this node
+    kParam_EditingNodeIndex = 47
 };
 
 SynthEngine::SynthEngine(uint32_t maxPolyphony)
@@ -112,6 +117,8 @@ SynthEngine::SynthEngine(uint32_t maxPolyphony)
     , pokeDuration_(10.0f)
     // Deprecated
     , personality_(0.0f)
+    // Character Editor state
+    , editingNodeIndex_(0)
 {
     // Allocate DSP components (always 5 nodes)
     nodeManager_ = new NodeManager();
@@ -369,54 +376,69 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
             }
             break;
 
-        // Mode parameters (for Character Editor - not directly used)
-        // These are kept for future Character Editor implementation
+        // Mode parameters (for Character Editor)
+        // Apply immediately to the currently edited node
         case kParam_Mode0_Frequency:
             mode0_frequency_ = value;
+            applyCustomCharacterToNode(editingNodeIndex_);
             break;
         case kParam_Mode0_Damping:
             mode0_damping_ = value;
+            applyCustomCharacterToNode(editingNodeIndex_);
             break;
         case kParam_Mode0_Weight:
             mode0_weight_ = value;
+            applyCustomCharacterToNode(editingNodeIndex_);
             break;
 
         case kParam_Mode1_Frequency:
             mode1_frequency_ = value;
+            applyCustomCharacterToNode(editingNodeIndex_);
             break;
         case kParam_Mode1_Damping:
             mode1_damping_ = value;
+            applyCustomCharacterToNode(editingNodeIndex_);
             break;
         case kParam_Mode1_Weight:
             mode1_weight_ = value;
+            applyCustomCharacterToNode(editingNodeIndex_);
             break;
 
         case kParam_Mode2_Frequency:
             mode2_frequency_ = value;
+            applyCustomCharacterToNode(editingNodeIndex_);
             break;
         case kParam_Mode2_Damping:
             mode2_damping_ = value;
+            applyCustomCharacterToNode(editingNodeIndex_);
             break;
         case kParam_Mode2_Weight:
             mode2_weight_ = value;
+            applyCustomCharacterToNode(editingNodeIndex_);
             break;
 
         case kParam_Mode3_Frequency:
             mode3_frequency_ = value;
+            applyCustomCharacterToNode(editingNodeIndex_);
             break;
         case kParam_Mode3_Damping:
             mode3_damping_ = value;
+            applyCustomCharacterToNode(editingNodeIndex_);
             break;
         case kParam_Mode3_Weight:
             mode3_weight_ = value;
+            applyCustomCharacterToNode(editingNodeIndex_);
             break;
 
         // Excitation parameters (for Character Editor)
+        // Apply immediately to the currently edited node
         case kParam_PokeStrength:
             pokeStrength_ = value;
+            applyCustomCharacterToNode(editingNodeIndex_);
             break;
         case kParam_PokeDuration:
             pokeDuration_ = value;
+            applyCustomCharacterToNode(editingNodeIndex_);
             break;
 
         // Wave Shape parameters (20 parameters: 5 nodes × 4 modes)
@@ -440,12 +462,17 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
             break;
     }
 
-    // Handle deprecated parameters separately (outside switch for clarity)
+    // Handle deprecated and special parameters separately (outside switch for clarity)
     if (paramId == kParam_Polyphony) {
         // Always 5 nodes
     } else if (paramId == kParam_Personality) {
         personality_ = value;
-        // Per-character now, not global
+        // Apply immediately to the currently edited node
+        applyCustomCharacterToNode(editingNodeIndex_);
+    } else if (paramId == kParam_EditingNodeIndex) {
+        // Update which node is being edited in the Character Editor
+        editingNodeIndex_ = static_cast<uint8_t>(value);
+        if (editingNodeIndex_ > 4) editingNodeIndex_ = 0;  // Safety clamp
     }
 }
 
@@ -519,6 +546,10 @@ float SynthEngine::getParameter(uint32_t paramId) const {
             return 5.0f;  // Always 5 nodes
         case kParam_Personality:
             return personality_;
+
+        // Character Editor state
+        case kParam_EditingNodeIndex:
+            return static_cast<float>(editingNodeIndex_);
 
         // Wave Shape parameters (20 parameters: 5 nodes × 4 modes)
         default:

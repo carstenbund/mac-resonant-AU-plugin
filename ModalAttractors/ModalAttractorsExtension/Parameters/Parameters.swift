@@ -330,6 +330,19 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
         )
     }
 
+    // MARK: - Character Editor State (Hidden Parameter)
+    ParameterGroupSpec(identifier: "characterEditorState", name: "Character Editor State") {
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_EditingNodeIndex,
+            identifier: "editingNodeIndex",
+            name: "Editing Node Index",
+            units: .indexed,
+            valueRange: 0...4,
+            defaultValue: 0,
+            flags: [.flag_IsWritable, .flag_IsReadable]  // Hidden parameter (no UI flag)
+        )
+    }
+
     // MARK: - Mode 0 Parameters
     ParameterGroupSpec(identifier: "mode0", name: "Mode 0") {
         ParameterSpec(
