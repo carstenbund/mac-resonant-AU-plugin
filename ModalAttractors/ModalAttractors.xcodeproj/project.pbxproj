@@ -108,6 +108,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				DSP/audio_synth.c,
+				DSP/CharacterManager.cpp,
 				DSP/modal_node.c,
 				DSP/ModalVoice.cpp,
 				DSP/NodeCharacter.cpp,
