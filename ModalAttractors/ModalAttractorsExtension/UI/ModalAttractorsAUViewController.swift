@@ -17,8 +17,7 @@ import AppKit
 private let log = Logger(subsystem: "com.bund.media.ModalAttractorsExtension", category: "AUViewController")
 
 /// Custom AUViewController subclass that hosts the SwiftUI view
-/// This is the principal class for the extension - it conforms to AUAudioUnitFactory
-/// to properly support both in-process and out-of-process instantiation.
+/// Factory implementation is provided via extension in ModalAttractorsAUViewControllerExtension.swift
 ///
 /// CRITICAL for out-of-process AUv3:
 /// - The view MUST be set up immediately in viewDidLoad (not lazily)
@@ -26,7 +25,7 @@ private let log = Logger(subsystem: "com.bund.media.ModalAttractorsExtension", c
 /// - preferredContentSize must be overridden
 /// - Class must be @objc for runtime discovery via NSExtensionPrincipalClass
 @objc(ModalAttractorsAUViewController)
-public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFactory {
+public class ModalAttractorsAUViewController: AUViewController {
 
     // MARK: - Initialization
 
@@ -39,9 +38,9 @@ public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFacto
         super.init(coder: coder)
     }
 
-    // MARK: - Audio Unit Factory
+    // MARK: - Audio Unit Reference
 
-    /// The audio unit instance created by this factory
+    /// The audio unit instance (set by factory extension)
     var audioUnit: ModalAttractorsExtensionAudioUnit? {
         didSet {
             // When audio unit becomes available, bind parameters to UI
@@ -52,58 +51,37 @@ public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFacto
     }
 
     /// Observation token for parameter value changes
-    private var observation: NSKeyValueObservation?
-
-    /// Creates the audio unit when requested by the host
-    /// This is called by the system when the AU is instantiated
-    @objc
-    public func createAudioUnit(with componentDescription: AudioComponentDescription) throws -> AUAudioUnit {
-        log.info("Creating audio unit...")
-
-        let au = try ModalAttractorsExtensionAudioUnit(
-            componentDescription: componentDescription,
-            options: []
-        )
-
-        // Observe allParameterValues to ensure host can set initial values
-        observation = au.observe(\.allParameterValues, options: [.new]) { [weak au] _, _ in
-            guard let audioUnit = au, let tree = audioUnit.parameterTree else { return }
-            // This ensures the Audio Unit gets initial values from the host
-            for param in tree.allParameters {
-                param.value = param.value
-            }
-        }
-
-        log.info("Audio unit created successfully")
-
-        // Set the audio unit - this triggers binding via didSet
-        DispatchQueue.main.async { [weak self] in
-            self?.audioUnit = au
-        }
-
-        return au
-    }
+    var observation: NSKeyValueObservation?
 
     // MARK: - View Controller
 
     private var hostingController: NSHostingController<AnyView>?
 
     /// Observable wrapper for parameter tree that can be updated when AU becomes available
-    private let parameterTreeHolder = ParameterTreeHolder()
+    let parameterTreeHolder = ParameterTreeHolder()
+
+    /// Stored content size for persistence between tab switches
+    private var storedContentSize: NSSize?
 
     // MARK: - Content Size (Critical for out-of-process)
 
     /// Override preferredContentSize to ensure the host knows our size
     /// This is REQUIRED for out-of-process AUv3 to properly size the view
+    /// Returns the stored size if available, otherwise the minimum size
     public override var preferredContentSize: NSSize {
         get {
+            // Return stored size if we have one, otherwise use minimum
+            if let stored = storedContentSize {
+                return stored
+            }
             return NSSize(
                 width: UIConstants.Sizes.windowMinWidth,
                 height: UIConstants.Sizes.windowMinHeight
             )
         }
         set {
-            // Allow host to set size if needed
+            // Store the new size for persistence
+            storedContentSize = newValue
             super.preferredContentSize = newValue
         }
     }
@@ -130,6 +108,35 @@ public class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFacto
         // Do NOT wait for the audio unit - the view must be ready when
         // requestViewController() is called by the host
         setupHostingController()
+
+        // Observe view frame changes to persist size
+        observeViewSize()
+    }
+
+    public override func viewDidAppear() {
+        super.viewDidAppear()
+        log.info("viewDidAppear - current size: \(view.frame.size.width, privacy: .public)x\(view.frame.size.height, privacy: .public)")
+
+        // Update stored size when view appears
+        if view.frame.size.width > 0 && view.frame.size.height > 0 {
+            storedContentSize = view.frame.size
+        }
+    }
+
+    /// Observe view size changes to maintain size between tab switches
+    private func observeViewSize() {
+        // Use KVO to observe frame changes
+        observation = view.observe(\.frame, options: [.new]) { [weak self] _, change in
+            guard let self = self,
+                  let newFrame = change.newValue else { return }
+
+            // Only store if size is reasonable
+            if newFrame.size.width >= UIConstants.Sizes.windowMinWidth &&
+               newFrame.size.height >= UIConstants.Sizes.windowMinHeight {
+                self.storedContentSize = newFrame.size
+                log.debug("Stored new content size: \(newFrame.size.width, privacy: .public)x\(newFrame.size.height, privacy: .public)")
+            }
+        }
     }
 
     /// Bind the audio unit's parameter tree to the UI

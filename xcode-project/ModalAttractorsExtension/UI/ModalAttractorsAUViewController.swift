@@ -7,114 +7,235 @@
 
 import CoreAudioKit
 import SwiftUI
+import Combine
+import os
+
+#if os(macOS)
 import AppKit
+#endif
 
-/// Custom AUViewController subclass that hosts the SwiftUI view and serves as the AUv3 factory
+private let log = Logger(subsystem: "com.bund.media.ModalAttractorsExtension", category: "AUViewController")
+
+/// Custom AUViewController subclass that hosts the SwiftUI view
+/// Factory implementation is provided via extension in ModalAttractorsAUViewControllerExtension.swift
 ///
-/// This implementation uses a safe pattern that prevents crashes during first render:
-/// - Shows a placeholder view initially (safe to render without environment objects)
-/// - Only switches to the real UI once paramTreeWrapper is configured
-/// - Handles host timing issues where viewDidLoad may be called before configure
-/// - Conforms to AUAudioUnitFactory to serve as the extension's principal class
-public final class ModalAttractorsAUViewController: AUViewController, AUAudioUnitFactory {
+/// CRITICAL for out-of-process AUv3:
+/// - The view MUST be set up immediately in viewDidLoad (not lazily)
+/// - The audio unit binding happens after view setup
+/// - preferredContentSize must be overridden
+/// - Class must be @objc for runtime discovery via NSExtensionPrincipalClass
+@objc(ModalAttractorsAUViewController)
+public class ModalAttractorsAUViewController: AUViewController {
+
+    // MARK: - Initialization
+
+    /// Initialize without a nib - view is created programmatically in loadView()
+    public override init(nibName nibNameOrNil: NSNib.Name?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+
+    // MARK: - Audio Unit Reference
+
+    /// The audio unit instance (set by factory extension)
+    var audioUnit: ModalAttractorsExtensionAudioUnit? {
+        didSet {
+            // When audio unit becomes available, bind parameters to UI
+            if let au = audioUnit {
+                bindAudioUnit(au)
+            }
+        }
+    }
+
+    /// Observation token for parameter value changes
+    var observation: NSKeyValueObservation?
+
+    // MARK: - View Controller
+
     private var hostingController: NSHostingController<AnyView>?
-    private var paramTreeWrapper: ParameterTree?
-    private var audioUnit: ModalAttractorsExtensionAudioUnit?
-    private var observation: NSKeyValueObservation?
 
-    /// Configure the view controller with the parameter tree wrapper
-    /// Call this before presenting to inject environment objects
-    func configure(paramTreeWrapper: ParameterTree) {
-        self.paramTreeWrapper = paramTreeWrapper
-        if isViewLoaded { updateRootView() }
+    /// Observable wrapper for parameter tree that can be updated when AU becomes available
+    let parameterTreeHolder = ParameterTreeHolder()
+
+    /// Stored content size for persistence between tab switches
+    private var storedContentSize: NSSize?
+
+    // MARK: - Content Size (Critical for out-of-process)
+
+    /// Override preferredContentSize to ensure the host knows our size
+    /// This is REQUIRED for out-of-process AUv3 to properly size the view
+    /// Returns the stored size if available, otherwise the minimum size
+    public override var preferredContentSize: NSSize {
+        get {
+            // Return stored size if we have one, otherwise use minimum
+            if let stored = storedContentSize {
+                return stored
+            }
+            return NSSize(
+                width: UIConstants.Sizes.windowMinWidth,
+                height: UIConstants.Sizes.windowMinHeight
+            )
+        }
+        set {
+            // Store the new size for persistence
+            storedContentSize = newValue
+            super.preferredContentSize = newValue
+        }
     }
 
-    override func viewDidLoad() {
+    // MARK: - View Lifecycle
+
+    /// Override loadView to create the view programmatically
+    /// This is REQUIRED for NSViewController subclasses that don't use a nib
+    public override func loadView() {
+        log.info("loadView called - creating view programmatically")
+        // Create a plain NSView as the root view
+        // The hosting controller will be added as a subview in viewDidLoad
+        self.view = NSView(frame: NSRect(x: 0, y: 0,
+                                         width: UIConstants.Sizes.windowMinWidth,
+                                         height: UIConstants.Sizes.windowMinHeight))
+        self.view.wantsLayer = true
+    }
+
+    public override func viewDidLoad() {
         super.viewDidLoad()
-        setupHostingControllerIfNeeded()
-        updateRootView()
-        NSLog("ModalAttractorsAUViewController viewDidLoad")
+        log.info("viewDidLoad called - setting up view immediately")
+
+        // CRITICAL: Set up the view hierarchy IMMEDIATELY
+        // Do NOT wait for the audio unit - the view must be ready when
+        // requestViewController() is called by the host
+        setupHostingController()
+
+        // Observe view frame changes to persist size
+        observeViewSize()
     }
 
-    private func setupHostingControllerIfNeeded() {
-        guard hostingController == nil else { return }
+    public override func viewDidAppear() {
+        super.viewDidAppear()
+        log.info("viewDidAppear - current size: \(view.frame.size.width, privacy: .public)x\(view.frame.size.height, privacy: .public)")
 
-        // Create safe placeholder view (no environment object required)
-        let placeholder = AnyView(
-            VStack(spacing: 8) {
-                Text("ModalAttractors")
-                    .font(.title2).fontWeight(.bold)
-                Text("Loading UI…")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+        // Update stored size when view appears
+        if view.frame.size.width > 0 && view.frame.size.height > 0 {
+            storedContentSize = view.frame.size
+        }
+    }
+
+    /// Observe view size changes to maintain size between tab switches
+    private func observeViewSize() {
+        // Use KVO to observe frame changes
+        observation = view.observe(\.frame, options: [.new]) { [weak self] _, change in
+            guard let self = self,
+                  let newFrame = change.newValue else { return }
+
+            // Only store if size is reasonable
+            if newFrame.size.width >= UIConstants.Sizes.windowMinWidth &&
+               newFrame.size.height >= UIConstants.Sizes.windowMinHeight {
+                self.storedContentSize = newFrame.size
+                log.debug("Stored new content size: \(newFrame.size.width, privacy: .public)x\(newFrame.size.height, privacy: .public)")
             }
-            .padding(12)
+        }
+    }
+
+    /// Bind the audio unit's parameter tree to the UI
+    /// Called when audioUnit becomes available
+    private func bindAudioUnit(_ au: ModalAttractorsExtensionAudioUnit) {
+        guard let paramTree = au.parameterTree else {
+            log.error("Audio unit has no parameter tree")
+            return
+        }
+
+        log.info("Binding audio unit parameter tree to UI")
+
+        // Create wrapper and update the holder (triggers UI update)
+        let wrapper = ParameterTree(auParameterTree: paramTree)
+        parameterTreeHolder.parameterTree = wrapper
+
+        log.info("Parameter tree bound successfully")
+    }
+
+    /// Set up the SwiftUI hosting controller
+    /// This creates the view hierarchy immediately - parameter binding happens later
+    private func setupHostingController() {
+        log.info("Setting up hosting controller with custom tabbed view")
+
+        // Remove existing hosting controller if present
+        if let existing = hostingController {
+            existing.view.removeFromSuperview()
+            existing.removeFromParent()
+        }
+
+        // Create the main view - it observes parameterTreeHolder for updates
+        let rootView = AnyView(
+            ModalAttractorsExtensionRootView()
+                .environmentObject(parameterTreeHolder)
         )
 
-        let hc = NSHostingController(rootView: placeholder)
-        hc.preferredContentSize = NSSize(
-            width: UIConstants.Sizes.windowMinWidth,
-            height: UIConstants.Sizes.windowMinHeight
-        )
+        let hosting = NSHostingController(rootView: rootView)
+        hosting.preferredContentSize = preferredContentSize
 
-        hostingController = hc
-        addChild(hc)
-        view.addSubview(hc.view)
+        // Add hosting controller as child view controller
+        addChild(hosting)
+        view.addSubview(hosting.view)
 
-        hc.view.translatesAutoresizingMaskIntoConstraints = false
+        // Set initial frame before adding constraints (helps with initial layout)
+        hosting.view.frame = view.bounds
+
+        // Set up auto-layout constraints to fill the parent view
+        hosting.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            hc.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            hc.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            hc.view.topAnchor.constraint(equalTo: view.topAnchor),
-            hc.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            hosting.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            hosting.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            hosting.view.topAnchor.constraint(equalTo: view.topAnchor),
+            hosting.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+
+        hostingController = hosting
+        log.info("Hosting controller setup complete")
     }
+}
 
-    private func updateRootView() {
-        guard let hc = hostingController else { return }
-        guard let pt = paramTreeWrapper else { return }
+// MARK: - Parameter Tree Holder
 
-        // Switch to the real UI now that we have the parameter tree
-        hc.rootView = AnyView(
-            ModalAttractorsExtensionMainView()
-                .environmentObject(pt)
-                .id("RootUI_v2") // bump to force refresh during dev
-        )
-    }
+/// Observable class that holds the parameter tree
+/// This allows the view to be created before the audio unit is available,
+/// and update when the parameter tree becomes available
+class ParameterTreeHolder: ObservableObject {
+    @Published var parameterTree: ParameterTree?
+}
 
-    // MARK: - AUAudioUnitFactory
+// MARK: - Root View with Loading State
 
-    public func beginRequest(with context: NSExtensionContext) {
-        // Extension lifecycle - no action needed
-    }
+/// Root view that handles the loading state while waiting for parameter tree
+struct ModalAttractorsExtensionRootView: View {
+    @EnvironmentObject var holder: ParameterTreeHolder
 
-    @objc
-    public func createAudioUnit(with componentDescription: AudioComponentDescription) throws -> AUAudioUnit {
-        audioUnit = try ModalAttractorsExtensionAudioUnit(componentDescription: componentDescription, options: [])
-
-        guard let audioUnit = audioUnit as? ModalAttractorsExtensionAudioUnit else {
-            throw NSError(domain: NSOSStatusErrorDomain, code: Int(kAudioUnitErr_FailedInitialization))
-        }
-
-        // Setup parameter tree
-        audioUnit.setupParameterTree(ModalAttractorsExtensionParameterSpecs.createAUParameterTree())
-
-        // Get the parameter tree wrapper for UI
-        if let paramTree = audioUnit.parameterTree {
-            let wrapper = ParameterTree(auParameterTree: paramTree)
-            self.paramTreeWrapper = wrapper
-
-            // Configure the view with the wrapper
-            configure(paramTreeWrapper: wrapper)
-
-            // Observe parameter changes to ensure host can set initial values
-            self.observation = audioUnit.observe(\.allParameterValues, options: [.new]) { object, change in
-                guard let tree = audioUnit.parameterTree else { return }
-                // This ensures the Audio Unit gets initial values from the host
-                for param in tree.allParameters { param.value = param.value }
+    var body: some View {
+        Group {
+            if let paramTree = holder.parameterTree {
+                // Parameter tree is available - show main view
+                ModalAttractorsExtensionMainView()
+                    .environmentObject(paramTree)
+            } else {
+                // Still loading - show placeholder
+                VStack(spacing: 16) {
+                    ProgressView()
+                        .scaleEffect(1.5)
+                    Text("Initializing...")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                    Text("Modal Attractors")
+                        .font(.caption)
+                        .foregroundColor(.secondary.opacity(0.7))
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-
-        return audioUnit
+        .frame(
+            minWidth: UIConstants.Sizes.windowMinWidth,
+            minHeight: UIConstants.Sizes.windowMinHeight
+        )
     }
 }
