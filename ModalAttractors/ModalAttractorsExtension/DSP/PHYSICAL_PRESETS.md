@@ -4,6 +4,12 @@
 
 The modal synthesis engine now includes 8 physically-derived modal presets based on real acoustic objects. These presets provide authentic timbres for bells, plates, glasses, bars, drums, and strings.
 
+**Location**: The presets are available in two places:
+- **UI Layer** (primary): `ModalAttractorsFramework/UI/Utilities/CharacterTemplates.swift` - accessible from the AU plugin UI
+- **DSP Layer** (optional): `modal_node.c/h` - available for standalone C usage
+
+Users will access these presets through the character selector in the AU plugin interface.
+
 ## Available Presets
 
 ### 0. Church Bell
@@ -128,7 +134,47 @@ Perfect harmonic series for comparison. Use when you want traditional string-lik
 
 ## Usage Example
 
-### C API
+### Swift UI (Primary Method)
+
+The presets are available through the UI character selector:
+
+```swift
+import ModalAttractorsFramework
+
+// Get all available presets
+let presets = CharacterTemplates.all
+print("Available presets: \(CharacterTemplates.names)")
+
+// Apply a preset to the parameter store
+let churchBell = CharacterTemplates.churchBell
+churchBell.apply(to: parameterStore, nodeIndex: 0)
+
+// Or apply by index
+if let preset = CharacterTemplates.template(at: 15) {  // Church Bell (index 15)
+    preset.apply(to: parameterStore, nodeIndex: 0)
+}
+
+// Access preset properties
+print("Name: \(churchBell.name)")
+print("Description: \(churchBell.description)")
+print("Mode 1 ratio: \(churchBell.mode1.frequency)")  // 1.190 (tierce)
+```
+
+**In the AU Plugin UI:**
+1. Open the Character Editor tab
+2. Select a node (0-4)
+3. Choose from the preset dropdown
+4. The new physical presets appear at the bottom of the list:
+   - Church Bell
+   - Circular Plate
+   - Wine Glass
+   - Free Bar
+   - Tuned Bar
+   - Drum Membrane
+   - Small Bell
+   - Harmonic String
+
+### C API (Optional - for standalone usage)
 
 ```c
 #include "modal_node.h"
@@ -145,32 +191,6 @@ for (uint8_t i = 0; i < num_presets; i++) {
     const char* name = modal_node_get_preset_name(i);
     const char* desc = modal_node_get_preset_description(i);
     printf("%d. %s\n   %s\n\n", i, name, desc);
-}
-```
-
-### C++ Integration (ModalVoice)
-
-```cpp
-// In ModalVoice.cpp or similar
-void ModalVoice::setPreset(uint8_t preset_idx, float fundamental_hz) {
-    float base_damping = 0.5f;  // Adjust based on UI parameter
-    modal_node_apply_preset(&node_, preset_idx, fundamental_hz, base_damping);
-}
-
-void ModalVoice::noteOn(uint8_t note, float velocity) {
-    float freq = midi_to_freq(note);
-
-    // Apply preset with MIDI note frequency
-    modal_node_apply_preset(&node_, current_preset_, freq, damping_param_);
-
-    // Apply poke excitation
-    poke_event_t poke = {
-        .source_node_id = 0,
-        .strength = velocity,
-        .phase_hint = -1.0f,  // Random
-        .mode_weights = {1.0f, 1.0f, 1.0f, 1.0f}
-    };
-    modal_node_apply_poke(&node_, &poke);
 }
 ```
 
