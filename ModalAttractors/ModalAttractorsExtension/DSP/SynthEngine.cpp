@@ -369,54 +369,110 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
             }
             break;
 
-        // Mode parameters (for Character Editor - not directly used)
-        // These are kept for future Character Editor implementation
+        // Mode parameters (for Character Editor)
+        // Apply immediately to all nodes for instant feedback
         case kParam_Mode0_Frequency:
             mode0_frequency_ = value;
+            // Apply to all nodes immediately
+            for (uint8_t i = 0; i < 5; i++) {
+                applyCustomCharacterToNode(i);
+            }
             break;
         case kParam_Mode0_Damping:
             mode0_damping_ = value;
+            // Apply to all nodes immediately
+            for (uint8_t i = 0; i < 5; i++) {
+                applyCustomCharacterToNode(i);
+            }
             break;
         case kParam_Mode0_Weight:
             mode0_weight_ = value;
+            // Apply to all nodes immediately
+            for (uint8_t i = 0; i < 5; i++) {
+                applyCustomCharacterToNode(i);
+            }
             break;
 
         case kParam_Mode1_Frequency:
             mode1_frequency_ = value;
+            // Apply to all nodes immediately
+            for (uint8_t i = 0; i < 5; i++) {
+                applyCustomCharacterToNode(i);
+            }
             break;
         case kParam_Mode1_Damping:
             mode1_damping_ = value;
+            // Apply to all nodes immediately
+            for (uint8_t i = 0; i < 5; i++) {
+                applyCustomCharacterToNode(i);
+            }
             break;
         case kParam_Mode1_Weight:
             mode1_weight_ = value;
+            // Apply to all nodes immediately
+            for (uint8_t i = 0; i < 5; i++) {
+                applyCustomCharacterToNode(i);
+            }
             break;
 
         case kParam_Mode2_Frequency:
             mode2_frequency_ = value;
+            // Apply to all nodes immediately
+            for (uint8_t i = 0; i < 5; i++) {
+                applyCustomCharacterToNode(i);
+            }
             break;
         case kParam_Mode2_Damping:
             mode2_damping_ = value;
+            // Apply to all nodes immediately
+            for (uint8_t i = 0; i < 5; i++) {
+                applyCustomCharacterToNode(i);
+            }
             break;
         case kParam_Mode2_Weight:
             mode2_weight_ = value;
+            // Apply to all nodes immediately
+            for (uint8_t i = 0; i < 5; i++) {
+                applyCustomCharacterToNode(i);
+            }
             break;
 
         case kParam_Mode3_Frequency:
             mode3_frequency_ = value;
+            // Apply to all nodes immediately
+            for (uint8_t i = 0; i < 5; i++) {
+                applyCustomCharacterToNode(i);
+            }
             break;
         case kParam_Mode3_Damping:
             mode3_damping_ = value;
+            // Apply to all nodes immediately
+            for (uint8_t i = 0; i < 5; i++) {
+                applyCustomCharacterToNode(i);
+            }
             break;
         case kParam_Mode3_Weight:
             mode3_weight_ = value;
+            // Apply to all nodes immediately
+            for (uint8_t i = 0; i < 5; i++) {
+                applyCustomCharacterToNode(i);
+            }
             break;
 
         // Excitation parameters (for Character Editor)
         case kParam_PokeStrength:
             pokeStrength_ = value;
+            // Apply to all nodes immediately
+            for (uint8_t i = 0; i < 5; i++) {
+                applyCustomCharacterToNode(i);
+            }
             break;
         case kParam_PokeDuration:
             pokeDuration_ = value;
+            // Apply to all nodes immediately
+            for (uint8_t i = 0; i < 5; i++) {
+                applyCustomCharacterToNode(i);
+            }
             break;
 
         // Wave Shape parameters (20 parameters: 5 nodes × 4 modes)
@@ -445,7 +501,10 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
         // Always 5 nodes
     } else if (paramId == kParam_Personality) {
         personality_ = value;
-        // Per-character now, not global
+        // Apply to all nodes immediately
+        for (uint8_t i = 0; i < 5; i++) {
+            applyCustomCharacterToNode(i);
+        }
     }
 }
 
