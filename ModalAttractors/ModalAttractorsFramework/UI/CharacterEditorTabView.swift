@@ -16,10 +16,11 @@ import SwiftUI
 /// - The editor controls always show the current global parameter values
 /// - To edit a different character: load a template/preset, adjust parameters, then apply to a node
 ///
-/// Future enhancement: Per-node parameter editing would require node-specific parameter storage
+/// Now using ParameterStore for clean separation of data and presentation
 struct CharacterEditorTabView: View {
     @EnvironmentObject var parameterTree: ParameterTree
     @StateObject private var presetManager = CharacterPresetManager.shared
+    @StateObject private var parameterStore = ParameterStore()
 
     @State private var selectedNodeIndex: Int = 0
     @State private var selectedTemplateIndex: Int = 0
@@ -27,25 +28,6 @@ struct CharacterEditorTabView: View {
     @State private var showingSaveDialog: Bool = false
     @State private var showingPresetList: Bool = false
     @State private var presetName: String = ""
-
-    // Character template names (matching NodeCharacter.cpp + additional variations)
-    private let characterTemplates = [
-        "Vibrant Bass",
-        "Dark Node",
-        "Bright Bell",
-        "Glassy Shimmer",
-        "Drone Hub",
-        "Metallic Strike",
-        "Warm Pad",
-        "Percussive Hit",
-        "Resonant Bell",
-        "Deep Rumble",
-        "Harmonic Stack",
-        "Detuned Chorus",
-        "Mallet Tone",
-        "Wind Chime",
-        "Gong Wash"
-    ]
 
     var body: some View {
         ScrollView {
@@ -144,8 +126,8 @@ struct CharacterEditorTabView: View {
                     .foregroundColor(.secondary)
 
                 Picker("Template", selection: $selectedTemplateIndex) {
-                    ForEach(0..<characterTemplates.count, id: \.self) { index in
-                        Text(characterTemplates[index]).tag(index)
+                    ForEach(0..<CharacterTemplates.names.count, id: \.self) { index in
+                        Text(CharacterTemplates.names[index]).tag(index)
                     }
                 }
                 .pickerStyle(.menu)
@@ -353,186 +335,14 @@ struct CharacterEditorTabView: View {
     // MARK: - Actions
 
     private func loadTemplate() {
-        // Load template character values into editor parameters
-        // Format: [(freq_multiplier, damping, weight)] for each of 4 modes
-        let templates: [[(Float, Float, Float)]] = [
-            // 0: Vibrant Bass (low, rich fundamentals)
-            [(1.0, 0.8, 1.0), (2.01, 1.0, 0.7), (3.02, 1.2, 0.5), (4.05, 1.5, 0.3)],
-
-            // 1: Dark Node (low damping, complex)
-            [(1.0, 0.5, 1.0), (1.9, 0.6, 0.8), (2.8, 0.7, 0.6), (3.5, 0.9, 0.4)],
-
-            // 2: Bright Bell (harmonic, ringing)
-            [(1.0, 1.2, 0.8), (2.0, 1.4, 1.0), (3.0, 1.6, 0.7), (4.0, 2.0, 0.5)],
-
-            // 3: Glassy Shimmer (high partials)
-            [(2.0, 0.8, 0.6), (3.5, 1.0, 0.8), (5.2, 1.2, 1.0), (7.1, 1.5, 0.7)],
-
-            // 4: Drone Hub (sustained, coupled)
-            [(1.0, 0.3, 1.0), (1.5, 0.4, 0.9), (2.2, 0.5, 0.8), (3.1, 0.6, 0.7)],
-
-            // 5: Metallic Strike (bright, sharp attack, fast decay)
-            [(1.0, 2.0, 0.6), (3.14, 2.5, 0.8), (5.87, 3.0, 1.0), (8.23, 3.5, 0.7)],
-
-            // 6: Warm Pad (smooth, sustained, low harmonics)
-            [(1.0, 0.2, 1.0), (2.0, 0.25, 0.85), (3.0, 0.3, 0.7), (4.0, 0.4, 0.5)],
-
-            // 7: Percussive Hit (fast decay, punchy)
-            [(1.0, 3.0, 1.0), (2.5, 3.5, 0.6), (4.2, 4.0, 0.4), (6.7, 4.5, 0.2)],
-
-            // 8: Resonant Bell (harmonic stack, long sustain)
-            [(1.0, 0.6, 1.0), (2.0, 0.7, 0.9), (3.0, 0.8, 0.8), (4.0, 1.0, 0.7)],
-
-            // 9: Deep Rumble (sub-bass focus, low partials)
-            [(0.5, 0.5, 1.0), (1.0, 0.6, 0.9), (1.5, 0.8, 0.6), (2.0, 1.0, 0.4)],
-
-            // 10: Harmonic Stack (perfect harmonic series)
-            [(1.0, 1.0, 1.0), (2.0, 1.0, 0.8), (3.0, 1.0, 0.6), (4.0, 1.0, 0.4)],
-
-            // 11: Detuned Chorus (slightly detuned, thick)
-            [(1.0, 0.7, 1.0), (1.99, 0.7, 0.85), (2.98, 0.8, 0.7), (4.03, 0.9, 0.5)],
-
-            // 12: Mallet Tone (wood/mallet character)
-            [(1.0, 1.5, 1.0), (2.76, 1.8, 0.7), (4.18, 2.2, 0.5), (5.94, 2.5, 0.3)],
-
-            // 13: Wind Chime (delicate, high partials)
-            [(3.0, 0.9, 0.7), (4.5, 1.0, 0.8), (6.2, 1.1, 1.0), (8.7, 1.3, 0.8)],
-
-            // 14: Gong Wash (complex inharmonic, evolving)
-            [(1.0, 0.4, 0.8), (2.37, 0.5, 1.0), (3.86, 0.6, 0.9), (5.19, 0.7, 0.7)]
-        ]
-
-        guard selectedTemplateIndex < templates.count else { return }
-        let template = templates[selectedTemplateIndex]
-
-        // Apply to mode parameters
-        parameterTree.mode0.frequency.value = template[0].0
-        parameterTree.mode0.damping.value = template[0].1
-        parameterTree.mode0.weight.value = template[0].2
-
-        parameterTree.mode1.frequency.value = template[1].0
-        parameterTree.mode1.damping.value = template[1].1
-        parameterTree.mode1.weight.value = template[1].2
-
-        parameterTree.mode2.frequency.value = template[2].0
-        parameterTree.mode2.damping.value = template[2].1
-        parameterTree.mode2.weight.value = template[2].2
-
-        parameterTree.mode3.frequency.value = template[3].0
-        parameterTree.mode3.damping.value = template[3].1
-        parameterTree.mode3.weight.value = template[3].2
-
-        // Set template-specific excitation, personality, and wave shapes
-        // Wave shape indices: 0=Sine, 1=Sawtooth, 2=Triangle, 3=Square, 4=Pulse25%, 5=Pulse10%
-        switch selectedTemplateIndex {
-        case 0: // Vibrant Bass - rich fundamental with harmonics
-            parameterTree.excitation.pokeStrength.value = 0.7
-            parameterTree.excitation.pokeDuration.value = 15.0
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 0).value = 0 // Sine
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 1).value = 1 // Sawtooth
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 2).value = 2 // Triangle
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 3).value = 0 // Sine
-        case 1: // Dark Node - complex with sawtooth
-            parameterTree.excitation.pokeStrength.value = 0.5
-            parameterTree.excitation.pokeDuration.value = 20.0
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 0).value = 1 // Sawtooth
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 1).value = 3 // Square
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 2).value = 1 // Sawtooth
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 3).value = 2 // Triangle
-        case 2: // Bright Bell - pure sine waves
-            parameterTree.excitation.pokeStrength.value = 0.8
-            parameterTree.excitation.pokeDuration.value = 10.0
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 0).value = 0 // Sine
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 1).value = 0 // Sine
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 2).value = 0 // Sine
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 3).value = 0 // Sine
-        case 3: // Glassy Shimmer - triangle for smoothness
-            parameterTree.excitation.pokeStrength.value = 0.6
-            parameterTree.excitation.pokeDuration.value = 12.0
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 0).value = 2 // Triangle
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 1).value = 0 // Sine
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 2).value = 2 // Triangle
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 3).value = 2 // Triangle
-        case 4: // Drone Hub - sustained with square
-            parameterTree.excitation.pokeStrength.value = 0.4
-            parameterTree.excitation.pokeDuration.value = 25.0
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 0).value = 3 // Square
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 1).value = 0 // Sine
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 2).value = 3 // Square
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 3).value = 1 // Sawtooth
-        case 5: // Metallic Strike - bright harmonics
-            parameterTree.excitation.pokeStrength.value = 0.9
-            parameterTree.excitation.pokeDuration.value = 5.0
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 0).value = 3 // Square
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 1).value = 1 // Sawtooth
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 2).value = 3 // Square
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 3).value = 4 // Pulse25%
-        case 6: // Warm Pad - smooth sine and triangle
-            parameterTree.excitation.pokeStrength.value = 0.3
-            parameterTree.excitation.pokeDuration.value = 30.0
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 0).value = 0 // Sine
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 1).value = 2 // Triangle
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 2).value = 0 // Sine
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 3).value = 2 // Triangle
-        case 7: // Percussive Hit - sharp attack with pulse
-            parameterTree.excitation.pokeStrength.value = 1.0
-            parameterTree.excitation.pokeDuration.value = 3.0
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 0).value = 5 // Pulse10%
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 1).value = 3 // Square
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 2).value = 4 // Pulse25%
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 3).value = 1 // Sawtooth
-        case 8: // Resonant Bell - pure harmonics
-            parameterTree.excitation.pokeStrength.value = 0.75
-            parameterTree.excitation.pokeDuration.value = 12.0
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 0).value = 0 // Sine
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 1).value = 0 // Sine
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 2).value = 2 // Triangle
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 3).value = 0 // Sine
-        case 9: // Deep Rumble - low with sawtooth
-            parameterTree.excitation.pokeStrength.value = 0.6
-            parameterTree.excitation.pokeDuration.value = 20.0
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 0).value = 0 // Sine
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 1).value = 1 // Sawtooth
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 2).value = 0 // Sine
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 3).value = 1 // Sawtooth
-        case 10: // Harmonic Stack - perfect harmonics with sine
-            parameterTree.excitation.pokeStrength.value = 0.65
-            parameterTree.excitation.pokeDuration.value = 15.0
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 0).value = 0 // Sine
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 1).value = 0 // Sine
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 2).value = 0 // Sine
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 3).value = 0 // Sine
-        case 11: // Detuned Chorus - thick with sawtooth
-            parameterTree.excitation.pokeStrength.value = 0.5
-            parameterTree.excitation.pokeDuration.value = 18.0
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 0).value = 1 // Sawtooth
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 1).value = 1 // Sawtooth
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 2).value = 2 // Triangle
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 3).value = 1 // Sawtooth
-        case 12: // Mallet Tone - wood character with mixed waves
-            parameterTree.excitation.pokeStrength.value = 0.85
-            parameterTree.excitation.pokeDuration.value = 8.0
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 0).value = 2 // Triangle
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 1).value = 3 // Square
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 2).value = 1 // Sawtooth
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 3).value = 2 // Triangle
-        case 13: // Wind Chime - delicate with triangle
-            parameterTree.excitation.pokeStrength.value = 0.4
-            parameterTree.excitation.pokeDuration.value = 14.0
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 0).value = 2 // Triangle
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 1).value = 2 // Triangle
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 2).value = 0 // Sine
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 3).value = 2 // Triangle
-        case 14: // Gong Wash - complex inharmonic with mixed waves
-            parameterTree.excitation.pokeStrength.value = 0.7
-            parameterTree.excitation.pokeDuration.value = 35.0
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 0).value = 1 // Sawtooth
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 1).value = 3 // Square
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 2).value = 1 // Sawtooth
-            parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 3).value = 4 // Pulse25%
-        default:
-            break
+        // Load template from CharacterTemplates (clean separation of data from UI)
+        guard let template = CharacterTemplates.template(at: selectedTemplateIndex) else {
+            return
         }
+
+        // Apply template to parameter store, then apply store to parameter tree
+        template.apply(to: parameterStore, nodeIndex: selectedNodeIndex)
+        parameterStore.applyTo(parameterTree, nodeIndex: selectedNodeIndex)
     }
 
     private func applyToNode() {
@@ -555,15 +365,18 @@ struct CharacterEditorTabView: View {
     }
 
     private func loadCustomPreset(_ preset: CharacterPreset) {
-        // Apply the custom preset to the editor parameters (including wave shapes for current node)
-        preset.apply(to: parameterTree, nodeIndex: selectedNodeIndex)
+        // Apply the custom preset to the parameter store, then to parameter tree
+        preset.apply(to: parameterStore, nodeIndex: selectedNodeIndex)
+        parameterStore.applyTo(parameterTree, nodeIndex: selectedNodeIndex)
     }
 
     private func savePreset() {
         // Save current editor parameters as custom preset (including wave shapes from current node)
         guard !presetName.isEmpty else { return }
 
-        let preset = CharacterPreset(name: presetName, from: parameterTree, nodeIndex: selectedNodeIndex)
+        // Load current values into parameter store, then create preset
+        parameterStore.loadFrom(parameterTree)
+        let preset = CharacterPreset(name: presetName, from: parameterStore)
         presetManager.savePreset(preset)
 
         // Clear the name
