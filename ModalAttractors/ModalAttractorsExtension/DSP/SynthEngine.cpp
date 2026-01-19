@@ -33,6 +33,15 @@ enum ParamID {
     kParam_Mode3_Frequency = 13,
     kParam_Mode3_Damping = 14,
     kParam_Mode3_Weight = 15,
+    
+    kParam_Mode4_Frequency = 48,
+    kParam_Mode4_Damping = 49,
+    kParam_Mode4_Weight = 50,
+
+    kParam_Mode5_Frequency = 51,
+    kParam_Mode5_Damping = 52,
+    kParam_Mode5_Weight = 53,
+
     kParam_PokeStrength = 16,
     kParam_PokeDuration = 17,
 
@@ -69,6 +78,18 @@ enum ParamID {
     kParam_Node4_Mode1_WaveShape = 44,
     kParam_Node4_Mode2_WaveShape = 45,
     kParam_Node4_Mode3_WaveShape = 46,
+
+    kParam_Node0_Mode4_WaveShape = 54,
+    kParam_Node1_Mode4_WaveShape = 55,
+    kParam_Node2_Mode4_WaveShape = 56,
+    kParam_Node3_Mode4_WaveShape = 57,
+    kParam_Node4_Mode4_WaveShape = 58,
+    
+    kParam_Node0_Mode5_WaveShape = 59,
+    kParam_Node1_Mode5_WaveShape = 60,
+    kParam_Node2_Mode5_WaveShape = 61,
+    kParam_Node3_Mode5_WaveShape = 57,
+    kParam_Node4_Mode5_WaveShape = 57,
 
     // Character Editor - currently editing node index (0-4)
     // This hidden parameter tracks which node is selected in the Character Editor
