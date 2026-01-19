@@ -53,7 +53,7 @@ struct ParameterKnob: View {
                     .trim(from: 0, to: normalizedValue * 0.75)  // 0.75 = 270°/360°
                     .stroke(UIConstants.Colors.primary, lineWidth: 4)
                     .frame(width: size, height: size)
-                    .rotationEffect(.degrees(-135))
+                    .rotationEffect(.degrees(-225))
 
                 // Pointer indicator
                 Rectangle()
