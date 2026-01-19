@@ -17,6 +17,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 0: Vibrant Bass
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {1.0f, 2.0f, 3.0f, 5.0f},
         .mode_damping = {0.3f, 0.5f, 0.8f, 1.2f},
         .mode_weight = {1.0f, 0.8f, 0.6f, 0.4f},
@@ -31,6 +32,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 1: Dark Node
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {1.0f, 1.5f, 2.2f, 3.1f},
         .mode_damping = {0.8f, 1.2f, 1.8f, 2.5f},
         .mode_weight = {0.8f, 0.4f, 0.2f, 0.1f},
@@ -45,6 +47,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 2: Bright Bell
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {1.0f, 2.76f, 5.40f, 8.93f},
         .mode_damping = {0.4f, 0.6f, 0.5f, 0.7f},
         .mode_weight = {0.7f, 0.9f, 1.0f, 0.8f},
@@ -59,6 +62,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 3: Glassy Shimmer
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {1.0f, 2.01f, 4.03f, 11.2f},
         .mode_damping = {0.5f, 0.6f, 0.7f, 0.4f},
         .mode_weight = {0.6f, 0.7f, 0.6f, 0.9f},
@@ -73,6 +77,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 4: Drone Hub
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {1.0f, 1.002f, 1.498f, 2.0f},
         .mode_damping = {0.1f, 0.15f, 0.2f, 0.3f},
         .mode_weight = {1.0f, 0.9f, 0.7f, 0.5f},
@@ -87,6 +92,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 5: Metallic Strike
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {1.0f, 3.14f, 5.87f, 8.23f},
         .mode_damping = {2.0f, 2.5f, 3.0f, 3.5f},
         .mode_weight = {0.6f, 0.8f, 1.0f, 0.7f},
@@ -101,6 +107,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 6: Warm Pad
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {1.0f, 2.0f, 3.0f, 4.0f},
         .mode_damping = {0.2f, 0.25f, 0.3f, 0.4f},
         .mode_weight = {1.0f, 0.85f, 0.7f, 0.5f},
@@ -115,6 +122,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 7: Percussive Hit
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {1.0f, 2.5f, 4.2f, 6.7f},
         .mode_damping = {3.0f, 3.5f, 4.0f, 4.5f},
         .mode_weight = {1.0f, 0.6f, 0.4f, 0.2f},
@@ -129,6 +137,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 8: Resonant Bell
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {1.0f, 2.0f, 3.0f, 4.0f},
         .mode_damping = {0.6f, 0.7f, 0.8f, 1.0f},
         .mode_weight = {1.0f, 0.9f, 0.8f, 0.7f},
@@ -143,6 +152,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 9: Deep Rumble
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {0.5f, 1.0f, 1.5f, 2.0f},
         .mode_damping = {0.5f, 0.6f, 0.8f, 1.0f},
         .mode_weight = {1.0f, 0.9f, 0.6f, 0.4f},
@@ -157,6 +167,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 10: Harmonic Stack
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {1.0f, 2.0f, 3.0f, 4.0f},
         .mode_damping = {1.0f, 1.0f, 1.0f, 1.0f},
         .mode_weight = {1.0f, 0.8f, 0.6f, 0.4f},
@@ -171,6 +182,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 11: Detuned Chorus
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {1.0f, 1.99f, 2.98f, 4.03f},
         .mode_damping = {0.7f, 0.7f, 0.8f, 0.9f},
         .mode_weight = {1.0f, 0.85f, 0.7f, 0.5f},
@@ -185,6 +197,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 12: Mallet Tone
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {1.0f, 2.76f, 4.18f, 5.94f},
         .mode_damping = {1.5f, 1.8f, 2.2f, 2.5f},
         .mode_weight = {1.0f, 0.7f, 0.5f, 0.3f},
@@ -199,6 +212,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 13: Wind Chime
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {3.0f, 4.5f, 6.2f, 8.7f},
         .mode_damping = {0.9f, 1.0f, 1.1f, 1.3f},
         .mode_weight = {0.7f, 0.8f, 1.0f, 0.8f},
@@ -213,6 +227,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 14: Gong Wash
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {1.0f, 2.37f, 3.86f, 5.19f},
         .mode_damping = {0.4f, 0.5f, 0.6f, 0.7f},
         .mode_weight = {0.8f, 1.0f, 0.9f, 0.7f},
@@ -231,6 +246,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 15: Church Bell
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {1.0f, 1.19f, 1.5f, 2.0f},
         .mode_damping = {1.0f, 1.2f, 1.4f, 1.8f},
         .mode_weight = {1.0f, 0.75f, 0.6f, 0.45f},
@@ -245,6 +261,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 16: Circular Plate
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {1.0f, 2.081f, 3.413f, 3.891f},
         .mode_damping = {1.0f, 1.1f, 1.3f, 1.4f},
         .mode_weight = {1.0f, 0.7f, 0.5f, 0.35f},
@@ -259,6 +276,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 17: Wine Glass
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {1.0f, 2.28f, 3.65f, 5.13f},
         .mode_damping = {1.0f, 1.3f, 1.6f, 2.0f},
         .mode_weight = {1.0f, 0.65f, 0.45f, 0.3f},
@@ -273,6 +291,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 18: Tuned Bar
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {1.0f, 4.0f, 10.0f, 18.0f},
         .mode_damping = {1.0f, 1.4f, 2.0f, 2.5f},
         .mode_weight = {1.0f, 0.5f, 0.25f, 0.15f},
@@ -287,6 +306,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 19: Drum Membrane
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {1.0f, 1.593f, 2.136f, 2.296f},
         .mode_damping = {0.8f, 1.0f, 1.2f, 1.3f},
         .mode_weight = {1.0f, 0.7f, 0.5f, 0.4f},
@@ -301,6 +321,7 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
 
     // 20: Small Bell
     {
+        .num_active_modes = 4,
         .mode_freq_mult = {1.0f, 1.35f, 1.7f, 2.2f},
         .mode_damping = {0.6f, 0.8f, 1.0f, 1.2f},
         .mode_weight = {1.0f, 0.8f, 0.6f, 0.4f},
@@ -336,8 +357,13 @@ const char* getCharacterName(uint8_t character_id) {
 bool validateCharacter(const NodeCharacter* character) {
     if (!character) return false;
 
-    // Validate mode parameters
-    for (int i = 0; i < 4; i++) {
+    // Validate num_active_modes is within range
+    if (character->num_active_modes < 1 || character->num_active_modes > MAX_MODES) {
+        return false;
+    }
+
+    // Validate mode parameters (only check active modes)
+    for (int i = 0; i < character->num_active_modes; i++) {
         // Frequency multipliers should be positive and reasonable
         if (character->mode_freq_mult[i] < 0.1f || character->mode_freq_mult[i] > 20.0f) {
             return false;

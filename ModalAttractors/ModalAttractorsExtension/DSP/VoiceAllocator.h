@@ -140,13 +140,13 @@ private:
     float pitch_bend_;                 ///< Current pitch bend amount
     node_personality_t personality_;   ///< Current personality mode
 
-    // Mode parameters (for each of 4 modes)
+    // Mode parameters (for each of up to MAX_MODES modes)
     struct ModeParams {
         float freq_multiplier;
         float damping;
         float weight;
     };
-    ModeParams mode_params_[4];        ///< Current mode parameters
+    ModeParams mode_params_[MAX_MODES];        ///< Current mode parameters
 
     // Excitation parameters
     float poke_strength_;              ///< Poke strength (0.0-1.0)

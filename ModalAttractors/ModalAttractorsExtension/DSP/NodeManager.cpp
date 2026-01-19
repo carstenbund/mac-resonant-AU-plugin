@@ -320,7 +320,7 @@ void NodeManager::exciteNode(uint8_t node_idx, uint8_t midi_note, float velocity
     // Get base frequency from the note
     float base_freq = node->getBaseFrequency();
 
-    for (uint8_t mode_idx = 0; mode_idx < 4; mode_idx++) {
+    for (uint8_t mode_idx = 0; mode_idx < character->num_active_modes; mode_idx++) {
         float mode_freq = base_freq * character->mode_freq_mult[mode_idx];
         node->setMode(mode_idx, mode_freq,
                      character->mode_damping[mode_idx],
