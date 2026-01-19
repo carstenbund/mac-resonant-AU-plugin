@@ -343,6 +343,72 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
 
 
 
+    // MARK: - Preset Support
+
+    /// Cached factory preset objects
+    private lazy var _factoryPresets: [AUAudioUnitPreset] = {
+        return ModalAttractorsFactoryPresets.enumerated().map { index, data in
+            AUAudioUnitPreset(number: index, name: data.name)
+        }
+    }()
+
+    /// Currently selected preset (nil = custom state)
+    private var _currentPreset: AUAudioUnitPreset?
+
+    /// Factory presets available to host applications
+    public override var factoryPresets: [AUAudioUnitPreset]? {
+        return _factoryPresets
+    }
+
+    /// Currently selected preset
+    public override var currentPreset: AUAudioUnitPreset? {
+        get { return _currentPreset }
+        set {
+            guard let preset = newValue else {
+                _currentPreset = nil
+                return
+            }
+
+            // Factory preset (number >= 0)
+            if preset.number >= 0 && preset.number < ModalAttractorsFactoryPresets.count {
+                applyFactoryPreset(at: preset.number)
+                _currentPreset = preset
+            }
+            // User preset (number < 0)
+            else if preset.number < 0 {
+                if let state = try? presetState(for: preset) {
+                    fullState = state
+                    _currentPreset = preset
+                }
+            }
+        }
+    }
+
+    /// Apply factory preset values to parameters
+    private func applyFactoryPreset(at index: Int) {
+        guard index >= 0 && index < ModalAttractorsFactoryPresets.count,
+              let paramTree = parameterTree,
+              let engine = engine else { return }
+
+        let presetData = ModalAttractorsFactoryPresets[index]
+        let state = presetData.toStateDictionary()
+
+        // Apply each parameter from the preset
+        for (identifier, value) in state {
+            if let param = paramTree.parameter(withIdentifier: identifier),
+               let floatValue = value as? Float {
+                param.value = floatValue
+                modal_attractors_engine_set_parameter(engine, UInt32(param.address), floatValue)
+            }
+        }
+    }
+
+    /// Enable user preset support (macOS 10.15+ / iOS 13+)
+    @available(macOS 10.15, iOS 13.0, *)
+    public override var supportsUserPresets: Bool {
+        return true
+    }
+
     // MARK: - State Management
 
     public override var fullState: [String : Any]? {
@@ -359,6 +425,12 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
             state["manufacturer"] = Self.fourCharCode("Test") // 1413829748
             state["version"] = 67072
 
+            // Include current preset info if set
+            if let preset = _currentPreset {
+                state["presetNumber"] = preset.number
+                state["presetName"] = preset.name
+            }
+
             // Save all parameter values
             if let paramTree = parameterTree {
                 for param in paramTree.allParameters {
@@ -374,6 +446,14 @@ public class ModalAttractorsExtensionAudioUnit: AUAudioUnit, @unchecked Sendable
         }
         set {
             guard let engine = engine, let newState = newValue else { return }
+
+            // Restore preset reference if present
+            if let presetNumber = newState["presetNumber"] as? Int,
+               let presetName = newState["presetName"] as? String {
+                _currentPreset = AUAudioUnitPreset(number: presetNumber, name: presetName)
+            } else {
+                _currentPreset = nil
+            }
 
             // Restore parameter values
             if let paramTree = parameterTree {
