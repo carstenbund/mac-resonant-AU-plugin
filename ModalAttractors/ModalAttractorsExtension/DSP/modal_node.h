@@ -237,6 +237,52 @@ void modal_node_stop(modal_node_t* node);
 void modal_node_reset(modal_node_t* node);
 
 // ============================================================================
+// Physical Preset API
+// ============================================================================
+
+/**
+ * @brief Get number of available physical presets
+ *
+ * @return Number of presets
+ */
+uint8_t modal_node_get_num_presets(void);
+
+/**
+ * @brief Get preset name by index
+ *
+ * @param preset_idx Preset index [0..num_presets-1]
+ * @return Preset name string, or NULL if invalid index
+ */
+const char* modal_node_get_preset_name(uint8_t preset_idx);
+
+/**
+ * @brief Get preset description by index
+ *
+ * @param preset_idx Preset index [0..num_presets-1]
+ * @return Preset description string, or NULL if invalid index
+ */
+const char* modal_node_get_preset_description(uint8_t preset_idx);
+
+/**
+ * @brief Apply physical preset to node
+ *
+ * Sets all 4 modes according to preset frequency ratios, damping ratios, and weights.
+ * Frequency ratios are relative to fundamental_freq_hz.
+ * Damping ratios are relative to base_damping.
+ *
+ * Example:
+ *   // Apply church bell preset at 440 Hz fundamental, 0.5 base damping
+ *   modal_node_apply_preset(&node, 0, 440.0f, 0.5f);
+ *
+ * @param node Pointer to node structure
+ * @param preset_idx Preset index [0..num_presets-1]
+ * @param fundamental_freq_hz Fundamental frequency in Hz
+ * @param base_damping Base damping coefficient (scaled by preset ratios)
+ */
+void modal_node_apply_preset(modal_node_t* node, uint8_t preset_idx,
+                             float fundamental_freq_hz, float base_damping);
+
+// ============================================================================
 // Utility Functions
 // ============================================================================
 
