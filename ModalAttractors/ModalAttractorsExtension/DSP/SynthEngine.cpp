@@ -112,6 +112,12 @@ SynthEngine::SynthEngine(uint32_t maxPolyphony)
     , mode3_frequency_(4.5f)
     , mode3_damping_(2.0f)
     , mode3_weight_(0.4f)
+    , mode4_frequency_(5.5f)
+    , mode4_damping_(2.5f)
+    , mode4_weight_(0.3f)
+    , mode5_frequency_(6.5f)
+    , mode5_damping_(3.0f)
+    , mode5_weight_(0.2f)
     // Excitation parameters (for Character Editor)
     , pokeStrength_(0.5f)
     , pokeDuration_(10.0f)
@@ -430,6 +436,32 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
             applyCustomCharacterToNode(editingNodeIndex_);
             break;
 
+        case kParam_Mode4_Frequency:
+            mode4_frequency_ = value;
+            applyCustomCharacterToNode(editingNodeIndex_);
+            break;
+        case kParam_Mode4_Damping:
+            mode4_damping_ = value;
+            applyCustomCharacterToNode(editingNodeIndex_);
+            break;
+        case kParam_Mode4_Weight:
+            mode4_weight_ = value;
+            applyCustomCharacterToNode(editingNodeIndex_);
+            break;
+
+        case kParam_Mode5_Frequency:
+            mode5_frequency_ = value;
+            applyCustomCharacterToNode(editingNodeIndex_);
+            break;
+        case kParam_Mode5_Damping:
+            mode5_damping_ = value;
+            applyCustomCharacterToNode(editingNodeIndex_);
+            break;
+        case kParam_Mode5_Weight:
+            mode5_weight_ = value;
+            applyCustomCharacterToNode(editingNodeIndex_);
+            break;
+
         // Excitation parameters (for Character Editor)
         // Apply immediately to the currently edited node
         case kParam_PokeStrength:
@@ -441,13 +473,13 @@ void SynthEngine::setParameter(uint32_t paramId, float value) {
             applyCustomCharacterToNode(editingNodeIndex_);
             break;
 
-        // Wave Shape parameters (20 parameters: 5 nodes × 4 modes)
+        // Wave Shape parameters (30 parameters: 5 nodes × 6 modes)
         // Handle all wave shape parameters in a range check
         default:
-            if (paramId >= kParam_Node0_Mode0_WaveShape && paramId <= kParam_Node4_Mode3_WaveShape) {
+            if (paramId >= kParam_Node0_Mode0_WaveShape && paramId <= kParam_Node4_Mode5_WaveShape) {
                 uint32_t paramOffset = paramId - kParam_Node0_Mode0_WaveShape;
-                uint32_t nodeIndex = paramOffset / 4;  // 0-4
-                uint32_t modeIndex = paramOffset % 4;  // 0-3
+                uint32_t nodeIndex = paramOffset / 6;  // 0-4
+                uint32_t modeIndex = paramOffset % 6;  // 0-5
                 wave_shape_t shape = static_cast<wave_shape_t>(static_cast<int>(value));
 
                 if (nodeManager_) {
@@ -535,6 +567,20 @@ float SynthEngine::getParameter(uint32_t paramId) const {
         case kParam_Mode3_Weight:
             return mode3_weight_;
 
+        case kParam_Mode4_Frequency:
+            return mode4_frequency_;
+        case kParam_Mode4_Damping:
+            return mode4_damping_;
+        case kParam_Mode4_Weight:
+            return mode4_weight_;
+
+        case kParam_Mode5_Frequency:
+            return mode5_frequency_;
+        case kParam_Mode5_Damping:
+            return mode5_damping_;
+        case kParam_Mode5_Weight:
+            return mode5_weight_;
+
         // Excitation parameters (for Character Editor)
         case kParam_PokeStrength:
             return pokeStrength_;
@@ -590,8 +636,16 @@ void SynthEngine::applyCustomCharacterToNode(uint8_t nodeIndex) {
     customChar.mode_damping[3] = mode3_damping_;
     customChar.mode_weight[3] = mode3_weight_;
 
+    customChar.mode_freq_mult[4] = mode4_frequency_;
+    customChar.mode_damping[4] = mode4_damping_;
+    customChar.mode_weight[4] = mode4_weight_;
+
+    customChar.mode_freq_mult[5] = mode5_frequency_;
+    customChar.mode_damping[5] = mode5_damping_;
+    customChar.mode_weight[5] = mode5_weight_;
+
     // Wave shapes - get current wave shapes for this node
-    for (uint32_t mode = 0; mode < 4; mode++) {
+    for (uint32_t mode = 0; mode < 6; mode++) {
         customChar.mode_shape[mode] = nodeManager_->getModeWaveShape(nodeIndex, mode);
     }
 
