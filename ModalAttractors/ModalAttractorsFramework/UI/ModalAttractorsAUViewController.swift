@@ -112,13 +112,13 @@ public class ModalAttractorsAUViewController: AUViewController {
 
     public override func viewDidAppear() {
         super.viewDidAppear()
-        log.info("viewDidAppear - current size: \(view.frame.size)")
+        log.info("viewDidAppear - current size: \(view.frame.size.width, privacy: .public)x\(view.frame.size.height, privacy: .public)")
 
         // Capture initial size only once when view first appears
         // Do NOT continuously observe frame changes as this causes cumulative zoom scaling
         if storedContentSize == nil && view.frame.size.width > 0 && view.frame.size.height > 0 {
             storedContentSize = view.frame.size
-            log.info("Captured initial content size: \(view.frame.size)")
+            log.info("Captured initial content size: \(view.frame.size.width, privacy: .public)x\(view.frame.size.height, privacy: .public)")
         }
     }
 
