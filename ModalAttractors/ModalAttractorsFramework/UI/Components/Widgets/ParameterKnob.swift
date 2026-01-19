@@ -48,12 +48,12 @@ struct ParameterKnob: View {
                     .fill(UIConstants.Colors.sectionBackground)
                     .frame(width: size, height: size)
 
-                // Value arc
+                // Value arc (starts at 7 o'clock, sweeps 270°)
                 Circle()
                     .trim(from: 0, to: normalizedValue)
                     .stroke(UIConstants.Colors.primary, lineWidth: 4)
                     .frame(width: size, height: size)
-                    .rotationEffect(.degrees(-90))
+                    .rotationEffect(.degrees(-135))
 
                 // Pointer indicator
                 Rectangle()
