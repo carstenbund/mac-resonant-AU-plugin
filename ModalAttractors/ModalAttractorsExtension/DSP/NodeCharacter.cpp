@@ -332,6 +332,21 @@ const NodeCharacter CHARACTER_LIBRARY[] = {
         .coupling_response_gain = 1.0f,
         .name = "Small Bell",
         .description = "Small handbell or bicycle bell (higher inharmonicity)"
+    },
+
+    // 21: Rich Harmonic (6-Mode Character)
+    {
+        .num_active_modes = 6,
+        .mode_freq_mult = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f},
+        .mode_damping = {0.3f, 0.4f, 0.5f, 0.7f, 1.0f, 1.3f},
+        .mode_weight = {1.0f, 0.85f, 0.7f, 0.55f, 0.4f, 0.25f},
+        .mode_shape = {WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE, WAVE_SHAPE_SINE},
+        .personality = PERSONALITY_RESONATOR,
+        .poke_strength = 0.6f,
+        .poke_duration_ms = 20.0f,
+        .coupling_response_gain = 0.8f,
+        .name = "Rich Harmonic",
+        .description = "Full 6-mode harmonic series for rich, complex tones"
     }
 };
 
