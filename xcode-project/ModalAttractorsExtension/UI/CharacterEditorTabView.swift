@@ -182,7 +182,7 @@ struct CharacterEditorTabView: View {
                 .font(UIConstants.Fonts.sectionTitle)
                 .foregroundColor(UIConstants.Colors.textSecondary)
 
-            Text("4 internal modal oscillators per node")
+            Text("Up to 6 internal modal oscillators per node")
                 .font(.caption)
                 .foregroundColor(.secondary)
 
@@ -191,7 +191,7 @@ struct CharacterEditorTabView: View {
                 .foregroundColor(.secondary)
                 .italic()
 
-            // Row 1: Mode 0 and Mode 1 (side-by-side)
+            // Row 1: Modes 0, 1, 2 (3-column grid)
             HStack(alignment: .top, spacing: UIConstants.Spacing.large) {
                 ModeControlsView(
                     mode: parameterTree.mode0,
@@ -206,23 +206,39 @@ struct CharacterEditorTabView: View {
                     modeLabel: "MODE 1"
                 )
                 .frame(maxWidth: .infinity)
-            }
 
-            // Row 2: Mode 2 and Mode 3 (side-by-side)
-            HStack(alignment: .top, spacing: UIConstants.Spacing.large) {
                 ModeControlsView(
                     mode: parameterTree.mode2,
                     waveShape: parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 2),
                     modeLabel: "MODE 2"
                 )
                 .frame(maxWidth: .infinity)
+            }
 
+            // Row 2: Modes 3, 4, 5 (3-column grid)
+            HStack(alignment: .top, spacing: UIConstants.Spacing.large) {
                 ModeControlsView(
                     mode: parameterTree.mode3,
                     waveShape: parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 3),
                     modeLabel: "MODE 3"
                 )
                 .frame(maxWidth: .infinity)
+
+                ModeControlsView(
+                    mode: parameterTree.mode4,
+                    waveShape: parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 4),
+                    modeLabel: "MODE 4"
+                )
+                .frame(maxWidth: .infinity)
+                .opacity(0.6)  // Initially dimmed - will be enabled for 6-mode characters
+
+                ModeControlsView(
+                    mode: parameterTree.mode5,
+                    waveShape: parameterTree.waveShapeParameter(nodeIndex: selectedNodeIndex, modeIndex: 5),
+                    modeLabel: "MODE 5"
+                )
+                .frame(maxWidth: .infinity)
+                .opacity(0.6)  // Initially dimmed - will be enabled for 6-mode characters
             }
         }
     }

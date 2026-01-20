@@ -196,9 +196,9 @@ public class ParameterStore: ObservableObject {
         // Personality
         values["personality"] = parameterTree.voice.personality.value
 
-        // Wave shapes for all nodes and modes
+        // Wave shapes for all nodes and modes (up to 6 modes)
         for nodeIndex in 0..<5 {
-            for modeIndex in 0..<4 {
+            for modeIndex in 0..<6 {
                 let waveShape = parameterTree.waveShapeParameter(
                     nodeIndex: nodeIndex,
                     modeIndex: modeIndex
@@ -230,6 +230,14 @@ public class ParameterStore: ObservableObject {
         if let damp = values["mode3Damping"] { parameterTree.mode3.damping.value = damp }
         if let wt = values["mode3Weight"] { parameterTree.mode3.weight.value = wt }
 
+        if let freq = values["mode4Frequency"] { parameterTree.mode4.frequency.value = freq }
+        if let damp = values["mode4Damping"] { parameterTree.mode4.damping.value = damp }
+        if let wt = values["mode4Weight"] { parameterTree.mode4.weight.value = wt }
+
+        if let freq = values["mode5Frequency"] { parameterTree.mode5.frequency.value = freq }
+        if let damp = values["mode5Damping"] { parameterTree.mode5.damping.value = damp }
+        if let wt = values["mode5Weight"] { parameterTree.mode5.weight.value = wt }
+
         // Excitation
         if let strength = values["pokeStrength"] {
             parameterTree.excitation.pokeStrength.value = strength
@@ -243,10 +251,10 @@ public class ParameterStore: ObservableObject {
             parameterTree.voice.personality.value = personality
         }
 
-        // Wave shapes - apply to specific node or all nodes
+        // Wave shapes - apply to specific node or all nodes (up to 6 modes)
         let nodeIndices = nodeIndex.map { [$0] } ?? Array(0..<5)
         for node in nodeIndices {
-            for mode in 0..<4 {
+            for mode in 0..<6 {
                 let id = "node\(node)Mode\(mode)WaveShape"
                 if let waveShape = values[id] {
                     parameterTree.waveShapeParameter(
