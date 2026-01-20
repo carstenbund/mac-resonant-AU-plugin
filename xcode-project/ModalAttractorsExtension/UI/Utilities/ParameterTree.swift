@@ -168,6 +168,14 @@ public class ModeParameters: ObservableObject {
             freqAddr = .param_Mode3_Frequency
             dampAddr = .param_Mode3_Damping
             wtAddr = .param_Mode3_Weight
+        case 4:
+            freqAddr = .param_Mode4_Frequency
+            dampAddr = .param_Mode4_Damping
+            wtAddr = .param_Mode4_Weight
+        case 5:
+            freqAddr = .param_Mode5_Frequency
+            dampAddr = .param_Mode5_Damping
+            wtAddr = .param_Mode5_Weight
         default:
             fatalError("Invalid mode index: \(modeIndex)")
         }
