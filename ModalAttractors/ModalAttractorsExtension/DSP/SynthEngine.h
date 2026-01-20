@@ -243,7 +243,7 @@ private:
     uint8_t noteRouting_;      // 0=RoundRobin, 1=PitchZones
     uint8_t multiExcite_;      // 0=ReTrigger, 1=Accumulate
 
-    // Parameter cache - Per-mode parameters (for Character Editor)
+    // Parameter cache - Per-mode parameters (for Character Editor - up to 6 modes)
     float mode0_frequency_;
     float mode0_damping_;
     float mode0_weight_;
@@ -256,6 +256,12 @@ private:
     float mode3_frequency_;
     float mode3_damping_;
     float mode3_weight_;
+    float mode4_frequency_;
+    float mode4_damping_;
+    float mode4_weight_;
+    float mode5_frequency_;
+    float mode5_damping_;
+    float mode5_weight_;
 
     // Parameter cache - Excitation (for Character Editor)
     float pokeStrength_;

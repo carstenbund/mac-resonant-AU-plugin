@@ -328,6 +328,107 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
             defaultValue: 0,
             valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
         )
+
+        // Extended wave shapes for modes 4-5
+        // Node 0 modes 4-5
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node0_Mode4_WaveShape,
+            identifier: "node0Mode4WaveShape",
+            name: "Node 0 Mode 4 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node0_Mode5_WaveShape,
+            identifier: "node0Mode5WaveShape",
+            name: "Node 0 Mode 5 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+
+        // Node 1 modes 4-5
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node1_Mode4_WaveShape,
+            identifier: "node1Mode4WaveShape",
+            name: "Node 1 Mode 4 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node1_Mode5_WaveShape,
+            identifier: "node1Mode5WaveShape",
+            name: "Node 1 Mode 5 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+
+        // Node 2 modes 4-5
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node2_Mode4_WaveShape,
+            identifier: "node2Mode4WaveShape",
+            name: "Node 2 Mode 4 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node2_Mode5_WaveShape,
+            identifier: "node2Mode5WaveShape",
+            name: "Node 2 Mode 5 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+
+        // Node 3 modes 4-5
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node3_Mode4_WaveShape,
+            identifier: "node3Mode4WaveShape",
+            name: "Node 3 Mode 4 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node3_Mode5_WaveShape,
+            identifier: "node3Mode5WaveShape",
+            name: "Node 3 Mode 5 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+
+        // Node 4 modes 4-5
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node4_Mode4_WaveShape,
+            identifier: "node4Mode4WaveShape",
+            name: "Node 4 Mode 4 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Node4_Mode5_WaveShape,
+            identifier: "node4Mode5WaveShape",
+            name: "Node 4 Mode 5 Wave",
+            units: .indexed,
+            valueRange: 0...5,
+            defaultValue: 0,
+            valueStrings: ["Sine", "Sawtooth", "Triangle", "Square", "Pulse 25%", "Pulse 10%"]
+        )
     }
 
     // MARK: - Character Editor State (Hidden Parameter)
@@ -460,6 +561,66 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
             units: .generic,
             valueRange: 0.0...1.0,
             defaultValue: 0.4
+        )
+    }
+
+    // MARK: - Mode 4 Parameters
+    ParameterGroupSpec(identifier: "mode4", name: "Mode 4") {
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Mode4_Frequency,
+            identifier: "mode4Frequency",
+            name: "Frequency Multiplier",
+            units: .generic,
+            valueRange: 0.5...8.0,
+            defaultValue: 5.0
+        )
+
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Mode4_Damping,
+            identifier: "mode4Damping",
+            name: "Damping",
+            units: .generic,
+            valueRange: 0.1...5.0,
+            defaultValue: 2.5
+        )
+
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Mode4_Weight,
+            identifier: "mode4Weight",
+            name: "Weight",
+            units: .generic,
+            valueRange: 0.0...1.0,
+            defaultValue: 0.0  // Inactive by default
+        )
+    }
+
+    // MARK: - Mode 5 Parameters
+    ParameterGroupSpec(identifier: "mode5", name: "Mode 5") {
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Mode5_Frequency,
+            identifier: "mode5Frequency",
+            name: "Frequency Multiplier",
+            units: .generic,
+            valueRange: 0.5...8.0,
+            defaultValue: 6.0
+        )
+
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Mode5_Damping,
+            identifier: "mode5Damping",
+            name: "Damping",
+            units: .generic,
+            valueRange: 0.1...5.0,
+            defaultValue: 3.0
+        )
+
+        ParameterSpec(
+            address: ModalAttractorsExtensionParameterAddress.param_Mode5_Weight,
+            identifier: "mode5Weight",
+            name: "Weight",
+            units: .generic,
+            valueRange: 0.0...1.0,
+            defaultValue: 0.0  // Inactive by default
         )
     }
 

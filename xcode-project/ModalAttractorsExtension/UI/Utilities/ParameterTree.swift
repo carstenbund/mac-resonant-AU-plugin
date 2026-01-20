@@ -20,8 +20,11 @@ public class ParameterTree: ObservableObject {
     public let mode1: ModeParameters
     public let mode2: ModeParameters
     public let mode3: ModeParameters
+    public let mode4: ModeParameters
+    public let mode5: ModeParameters
     public let excitation: ExcitationParameters
     public let voice: VoiceParameters
+    public let characterEditorState: CharacterEditorStateParameters
 
     private let auParameterTree: AUParameterTree
 
@@ -34,8 +37,35 @@ public class ParameterTree: ObservableObject {
         self.mode1 = ModeParameters(auParameterTree: auParameterTree, modeIndex: 1)
         self.mode2 = ModeParameters(auParameterTree: auParameterTree, modeIndex: 2)
         self.mode3 = ModeParameters(auParameterTree: auParameterTree, modeIndex: 3)
+        self.mode4 = ModeParameters(auParameterTree: auParameterTree, modeIndex: 4)
+        self.mode5 = ModeParameters(auParameterTree: auParameterTree, modeIndex: 5)
         self.excitation = ExcitationParameters(auParameterTree: auParameterTree)
         self.voice = VoiceParameters(auParameterTree: auParameterTree)
+        self.characterEditorState = CharacterEditorStateParameters(auParameterTree: auParameterTree)
+    }
+
+    /// Get wave shape parameter for a specific node and mode
+    /// - Parameters:
+    ///   - nodeIndex: Node index (0-4)
+    ///   - modeIndex: Mode index (0-5 for 6-mode support)
+    /// - Returns: ParameterWrapper for the wave shape parameter
+    public func waveShapeParameter(nodeIndex: Int, modeIndex: Int) -> ParameterWrapper {
+        // Modes 0-3: base address (27) + (nodeIndex * 4) + modeIndex
+        // Modes 4-5: base address (54) + (nodeIndex * 2) + (modeIndex - 4)
+        let address: UInt64
+        if modeIndex < 4 {
+            let baseAddress = ModalAttractorsExtensionParameterAddress.param_Node0_Mode0_WaveShape.rawValue
+            address = baseAddress + UInt64(nodeIndex * 4 + modeIndex)
+        } else {
+            let baseAddress = ModalAttractorsExtensionParameterAddress.param_Node0_Mode4_WaveShape.rawValue
+            address = baseAddress + UInt64(nodeIndex * 2 + (modeIndex - 4))
+        }
+
+        guard let param = auParameterTree.parameter(withAddress: address) else {
+            fatalError("Invalid wave shape parameter for node \(nodeIndex), mode \(modeIndex)")
+        }
+
+        return ParameterWrapper(parameter: param)
     }
 
     /// Create a mock parameter tree for SwiftUI previews
@@ -272,5 +302,15 @@ public class ParameterWrapper: ObservableObject {
         default:
             return String(format: "%.2f", value)
         }
+    }
+}
+
+/// Character Editor State parameter group (hidden parameter)
+public class CharacterEditorStateParameters: ObservableObject {
+    @Published public var editingNodeIndex: ParameterWrapper
+
+    init(auParameterTree: AUParameterTree) {
+        let param = auParameterTree.parameter(withAddress: ModalAttractorsExtensionParameterAddress.param_EditingNodeIndex.rawValue)!
+        self.editingNodeIndex = ParameterWrapper(parameter: param)
     }
 }
