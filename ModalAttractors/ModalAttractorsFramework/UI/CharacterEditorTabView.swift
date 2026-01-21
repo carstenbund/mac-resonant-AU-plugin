@@ -230,7 +230,6 @@ struct CharacterEditorTabView: View {
                     modeLabel: "MODE 4"
                 )
                 .frame(maxWidth: .infinity)
-                .opacity(0.6)  // Initially dimmed - will be enabled for 6-mode characters
 
                 ModeControlsView(
                     mode: parameterTree.mode5,
@@ -238,7 +237,6 @@ struct CharacterEditorTabView: View {
                     modeLabel: "MODE 5"
                 )
                 .frame(maxWidth: .infinity)
-                .opacity(0.6)  // Initially dimmed - will be enabled for 6-mode characters
             }
         }
     }

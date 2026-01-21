@@ -67,7 +67,7 @@ extern const NodeCharacter CHARACTER_LIBRARY[];
 /**
  * @brief Number of built-in characters
  */
-#define NUM_BUILTIN_CHARACTERS 21
+#define NUM_BUILTIN_CHARACTERS 22
 
 // ============================================================================
 // Character Utilities
