@@ -17,9 +17,14 @@ ModalVoice::ModalVoice(uint8_t voice_id)
     , samples_since_update_(0)
     , samples_per_update_(0)
     , sample_rate_(48000.0f)
+    , is_sustained_(false)
+    , key_held_(false)
     , fadeout_samples_remaining_(0)
     , fadeout_total_samples_(0)
     , fadeout_gain_(1.0f)
+    , fadein_samples_remaining_(0)
+    , fadein_total_samples_(0)
+    , fadein_gain_(0.0f)
 {
     // Initialize node with resonator personality by default
     modal_node_init(&node_, voice_id, PERSONALITY_RESONATOR);
@@ -38,6 +43,9 @@ void ModalVoice::initialize(float sample_rate) {
 
     // Calculate fade-out duration (5ms to prevent clicks)
     fadeout_total_samples_ = static_cast<uint32_t>(sample_rate * 0.005f);
+
+    // Calculate fade-in duration (2ms for crossfade on voice stealing)
+    fadein_total_samples_ = static_cast<uint32_t>(sample_rate * 0.002f);
 
     // Initialize audio synth
     audio_synth_init(&synth_, &node_, sample_rate);
@@ -58,6 +66,12 @@ void ModalVoice::noteOn(uint8_t midi_note, float velocity) {
     velocity_ = velocity;
     state_ = State::Attack;
     age_ = 0;
+    key_held_ = true;
+    is_sustained_ = false;
+
+    // Start fade-in envelope for crossfade (2ms)
+    fadein_samples_remaining_ = fadein_total_samples_;
+    fadein_gain_ = 0.0f;
 
     // Update frequencies based on new note
     updateFrequencies();
@@ -82,7 +96,21 @@ void ModalVoice::noteOn(uint8_t midi_note, float velocity) {
 void ModalVoice::noteOff() {
     if (state_ == State::Inactive) return;
 
-    state_ = State::Release;
+    key_held_ = false;
+
+    // Only transition to release if not sustained by pedal
+    if (!is_sustained_) {
+        state_ = State::Release;
+    }
+}
+
+void ModalVoice::setSustain(bool sustain) {
+    is_sustained_ = sustain;
+
+    // If sustain released and key not held, transition to release
+    if (!sustain && !key_held_ && state_ != State::Inactive && state_ != State::Release) {
+        state_ = State::Release;
+    }
 }
 
 void ModalVoice::setPitchBend(float bend_amount, float bend_range) {
@@ -120,6 +148,26 @@ void ModalVoice::renderAudio(float* outL, float* outR, uint32_t num_frames) {
 
     // Render audio from modal state
     audio_synth_render(&synth_, outL, outR, num_frames);
+
+    // Apply fade-in envelope for crossfade on new voices
+    if (fadein_samples_remaining_ > 0) {
+        for (uint32_t i = 0; i < num_frames; i++) {
+            if (fadein_samples_remaining_ > 0) {
+                // Linear fade from 0.0 to 1.0
+                fadein_gain_ = 1.0f - (static_cast<float>(fadein_samples_remaining_) /
+                                       static_cast<float>(fadein_total_samples_));
+
+                outL[i] *= fadein_gain_;
+                outR[i] *= fadein_gain_;
+
+                fadein_samples_remaining_--;
+            } else {
+                // Fade-in complete, no more scaling needed
+                fadein_gain_ = 1.0f;
+                break;
+            }
+        }
+    }
 
     // Apply fade-out envelope if in FadeOut state
     if (state_ == State::FadeOut) {
@@ -177,6 +225,20 @@ void ModalVoice::reset() {
     state_ = State::Inactive;
     age_ = 0;
     samples_since_update_ = 0;
+    key_held_ = false;
+    is_sustained_ = false;
+    fadein_samples_remaining_ = 0;
+    fadeout_samples_remaining_ = 0;
+}
+
+void ModalVoice::forceSteal() {
+    // Force immediate transition to fadeout state with short 2ms fade
+    // This prevents clicks when stealing voices
+    state_ = State::FadeOut;
+    fadeout_samples_remaining_ = static_cast<uint32_t>(sample_rate_ * 0.002f);  // 2ms
+    fadeout_gain_ = 1.0f;
+    key_held_ = false;
+    is_sustained_ = false;
 }
 
 void ModalVoice::updateFrequencies() {

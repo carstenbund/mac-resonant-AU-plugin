@@ -76,6 +76,13 @@ void modal_attractors_engine_note_off(ModalAttractorsEngine* engine,
     engine->voice_allocator->noteOff(note);
 }
 
+void modal_attractors_engine_set_sustain(ModalAttractorsEngine* engine,
+                                         bool sustain) {
+    if (!engine || !engine->initialized) return;
+
+    engine->voice_allocator->setSustain(sustain);
+}
+
 void modal_attractors_engine_render(ModalAttractorsEngine* engine,
                                     float* outL,
                                     float* outR,

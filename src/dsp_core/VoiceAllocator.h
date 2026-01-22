@@ -65,6 +65,12 @@ public:
     void setPitchBend(float bend_amount);
 
     /**
+     * @brief Set sustain pedal state (CC64)
+     * @param sustain True if sustain pedal is down (≥64), false if up (<64)
+     */
+    void setSustain(bool sustain);
+
+    /**
      * @brief Update all active voices (control rate)
      *
      * Should be called at control rate (500 Hz typically)
@@ -104,6 +110,7 @@ private:
 
     int8_t note_to_voice_[128];        ///< MIDI note → voice mapping (-1 = none)
     float pitch_bend_;                 ///< Current pitch bend amount
+    bool sustain_pedal_;               ///< Sustain pedal state (CC64)
 
     float sample_rate_;                ///< Current sample rate
     bool initialized_;                 ///< Initialization flag
@@ -115,10 +122,19 @@ private:
     ModalVoice* findFreeVoice();
 
     /**
-     * @brief Steal oldest voice
-     * @return Pointer to stolen voice
+     * @brief Steal best candidate voice using hybrid policy
+     *
+     * Priority (in order):
+     * 1. Voices in release state (not held, not sustained)
+     * 2. Voices sustained by pedal (less priority than held keys)
+     * 3. All other active voices
+     *
+     * Within each category, selects quietest voice (by amplitude),
+     * with oldest voice as tie-breaker.
+     *
+     * @return Pointer to stolen voice, or nullptr if no active voices
      */
-    ModalVoice* stealOldestVoice();
+    ModalVoice* stealBestCandidate();
 };
 
 #endif // VOICE_ALLOCATOR_H

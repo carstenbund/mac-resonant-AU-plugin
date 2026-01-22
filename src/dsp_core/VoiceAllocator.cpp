@@ -5,11 +5,13 @@
 
 #include "VoiceAllocator.h"
 #include <cstring>
+#include <cmath>
 #include <algorithm>
 
 VoiceAllocator::VoiceAllocator(uint32_t max_polyphony)
     : max_polyphony_(max_polyphony)
     , pitch_bend_(0.0f)
+    , sustain_pedal_(false)
     , sample_rate_(48000.0f)
     , initialized_(false)
 {
@@ -60,8 +62,8 @@ ModalVoice* VoiceAllocator::noteOn(uint8_t midi_note, float velocity) {
     // Find free voice
     ModalVoice* voice = findFreeVoice();
     if (!voice) {
-        // No free voices, steal oldest
-        voice = stealOldestVoice();
+        // No free voices, steal best candidate (release-first + quietest)
+        voice = stealBestCandidate();
     }
 
     if (voice) {
@@ -110,6 +112,17 @@ void VoiceAllocator::setPitchBend(float bend_amount) {
     for (uint32_t i = 0; i < max_polyphony_; i++) {
         if (voices_[i]->isActive()) {
             voices_[i]->setPitchBend(bend_amount);
+        }
+    }
+}
+
+void VoiceAllocator::setSustain(bool sustain) {
+    sustain_pedal_ = sustain;
+
+    // Apply to all active voices
+    for (uint32_t i = 0; i < max_polyphony_; i++) {
+        if (voices_[i]->isActive()) {
+            voices_[i]->setSustain(sustain);
         }
     }
 }
@@ -185,25 +198,57 @@ ModalVoice* VoiceAllocator::findFreeVoice() {
     return nullptr;
 }
 
-ModalVoice* VoiceAllocator::stealOldestVoice() {
-    // Find oldest active voice
-    ModalVoice* oldest = nullptr;
+ModalVoice* VoiceAllocator::stealBestCandidate() {
+    ModalVoice* candidate = nullptr;
+    float min_level = 1e10f;  // Very large initial value
     uint32_t max_age = 0;
+    int best_priority = 999;  // Lower is better
 
     for (uint32_t i = 0; i < max_polyphony_; i++) {
-        if (voices_[i]->isActive()) {
-            uint32_t age = voices_[i]->getAge();
-            if (age > max_age) {
-                max_age = age;
-                oldest = voices_[i];
+        if (!voices_[i]->isActive()) continue;
+
+        ModalVoice::State state = voices_[i]->getState();
+        bool is_sustained = voices_[i]->isSustained();
+        bool is_key_held = (state == ModalVoice::State::Attack ||
+                           state == ModalVoice::State::Sustain) && !is_sustained;
+        float level = voices_[i]->getAmplitude();
+        uint32_t age = voices_[i]->getAge();
+
+        // Determine priority category (lower number = higher priority to steal)
+        int priority;
+        if (state == ModalVoice::State::Release || state == ModalVoice::State::FadeOut) {
+            priority = 0;  // Highest priority: already releasing
+        } else if (is_sustained && !is_key_held) {
+            priority = 1;  // Medium priority: sustained by pedal only
+        } else {
+            priority = 2;  // Lowest priority: actively held key
+        }
+
+        // Select candidate based on: priority (lower better) → level (lower better) → age (higher better)
+        bool is_better = false;
+        if (priority < best_priority) {
+            is_better = true;
+        } else if (priority == best_priority) {
+            if (level < min_level - 0.0001f) {  // Use small epsilon for float comparison
+                is_better = true;
+            } else if (fabsf(level - min_level) < 0.0001f && age > max_age) {
+                is_better = true;  // Tie-breaker: older voice
             }
+        }
+
+        if (is_better) {
+            best_priority = priority;
+            min_level = level;
+            max_age = age;
+            candidate = voices_[i];
         }
     }
 
-    // Force release the oldest voice
-    if (oldest) {
-        oldest->reset();
+    // Trigger short fade-out instead of hard reset (THIS FIXES THE CLICKS!)
+    if (candidate) {
+        // Force immediate 2ms fadeout - this will crossfade with the new voice's 2ms fade-in
+        candidate->forceSteal();
     }
 
-    return oldest;
+    return candidate;
 }

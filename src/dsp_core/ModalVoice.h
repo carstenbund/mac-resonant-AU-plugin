@@ -59,6 +59,18 @@ public:
     void noteOff();
 
     /**
+     * @brief Set sustain pedal state (CC64)
+     * @param sustain True if sustain pedal is down
+     */
+    void setSustain(bool sustain);
+
+    /**
+     * @brief Check if voice is sustained by pedal
+     * @return True if sustain pedal is holding this voice
+     */
+    bool isSustained() const { return is_sustained_; }
+
+    /**
      * @brief Apply pitch bend
      * @param bend_amount Pitch bend amount (-1.0 to +1.0)
      * @param bend_range Pitch bend range in semitones (default 2.0)
@@ -150,6 +162,14 @@ public:
      */
     void reset();
 
+    /**
+     * @brief Force immediate steal with short fadeout
+     *
+     * Used by voice allocator when stealing a voice.
+     * Triggers a 2ms fadeout to prevent clicks during voice takeover.
+     */
+    void forceSteal();
+
 private:
     uint8_t voice_id_;              ///< Voice identifier
     modal_node_t node_;             ///< Core modal node (C struct)
@@ -166,10 +186,19 @@ private:
 
     float sample_rate_;             ///< Current sample rate
 
+    // Sustain pedal state (CC64)
+    bool is_sustained_;             ///< True if sustain pedal is holding this voice
+    bool key_held_;                 ///< True if key is physically held (not released)
+
     // Fade-out envelope state (to prevent clicks on voice deactivation)
     uint32_t fadeout_samples_remaining_; ///< Samples remaining in fade-out
     uint32_t fadeout_total_samples_;     ///< Total samples in fade-out (5ms)
     float fadeout_gain_;                 ///< Current fade-out gain multiplier
+
+    // Fade-in envelope state (for crossfade on voice stealing)
+    uint32_t fadein_samples_remaining_;  ///< Samples remaining in fade-in
+    uint32_t fadein_total_samples_;      ///< Total samples in fade-in (2ms)
+    float fadein_gain_;                  ///< Current fade-in gain multiplier
 
     /**
      * @brief Update mode frequencies based on MIDI note and pitch bend

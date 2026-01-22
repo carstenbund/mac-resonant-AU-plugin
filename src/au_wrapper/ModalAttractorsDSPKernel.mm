@@ -70,9 +70,16 @@ void ModalAttractorsDSPKernel::handleMIDI(uint8_t status, uint8_t data1, uint8_t
             modal_attractors_engine_note_off(&engine_, data1);
             break;
 
+        case 0xB0:  // Control Change
+            if (data1 == 64) {  // CC64 - Sustain Pedal
+                // data2 >= 64 means sustain on, < 64 means sustain off
+                modal_attractors_engine_set_sustain(&engine_, data2 >= 64);
+            }
+            // TODO: Add support for other CC messages
+            break;
+
         // TODO: Add support for other MIDI messages
         // 0xE0 - Pitch Bend
-        // 0xB0 - Control Change
         // 0xD0 - Channel Pressure
 
         default:

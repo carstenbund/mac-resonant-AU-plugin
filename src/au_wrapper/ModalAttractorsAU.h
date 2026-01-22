@@ -91,6 +91,14 @@ void modal_attractors_engine_note_off(ModalAttractorsEngine* engine,
                                       uint8_t note);
 
 /**
+ * @brief Set sustain pedal state (CC64)
+ * @param engine Engine state
+ * @param sustain True if sustain pedal is down (≥64), false if up (<64)
+ */
+void modal_attractors_engine_set_sustain(ModalAttractorsEngine* engine,
+                                         bool sustain);
+
+/**
  * @brief Render audio
  * @param engine Engine state
  * @param outL Left channel output
