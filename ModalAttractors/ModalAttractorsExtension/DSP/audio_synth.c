@@ -60,6 +60,12 @@ float envelope_hann(float t) {
 // Oscillator Functions
 // ============================================================================
 
+// NOTE: In the physical modal attractor model, resonator modes are ALWAYS
+// sinusoidal eigenmodes (a_k represents the coefficient of e^(iω_k*t)).
+// Waveform selection affects the DRIVE spectral distribution (see modal_node.c),
+// not the oscillator basis functions. We keep other waveform functions here
+// for reference, but only osc_sine() is used in the physically-correct implementation.
+
 /**
  * @brief Sine oscillator
  * @param phase Phase in radians [0, 2π)
@@ -208,32 +214,10 @@ void audio_synth_render(audio_synth_t* synth,
             // Note: Do NOT add modal phase cargf(a_k) here - it causes discontinuities
             // The amplitude already captures the modal dynamics
 
-            // Generate sample with selected wave shape
-            float oscillator_out;
-            wave_shape_t shape = node->modes[k].params.shape;
-
-            switch (shape) {
-                case WAVE_SHAPE_SINE:
-                    oscillator_out = osc_sine(phase);
-                    break;
-                case WAVE_SHAPE_SAWTOOTH:
-                    oscillator_out = osc_sawtooth(phase);
-                    break;
-                case WAVE_SHAPE_TRIANGLE:
-                    oscillator_out = osc_triangle(phase);
-                    break;
-                case WAVE_SHAPE_SQUARE:
-                    oscillator_out = osc_pulse(phase, 0.5f);
-                    break;
-                case WAVE_SHAPE_PULSE_25:
-                    oscillator_out = osc_pulse(phase, 0.25f);
-                    break;
-                case WAVE_SHAPE_PULSE_10:
-                    oscillator_out = osc_pulse(phase, 0.1f);
-                    break;
-                default:
-                    oscillator_out = osc_sine(phase);  // Fallback to sine
-            }
+            // Physical model: resonator modes are ALWAYS sinusoidal eigenmodes
+            // Waveform richness comes from spectral shaping of the DRIVE (see modal_node.c)
+            // This preserves the fundamental interpretation: a_k = coefficient of e^(iω_k*t)
+            float oscillator_out = osc_sine(phase);
 
             float sample_f = amplitude * oscillator_out;
 

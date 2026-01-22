@@ -42,6 +42,51 @@ float random_phase(void) {
     return ((float)rand() / RAND_MAX) * 2.0f * M_PI;
 }
 
+float waveform_harmonic_amplitude(wave_shape_t waveform, int harmonic_idx) {
+    // harmonic_idx: 0 = fundamental, 1 = 2nd harmonic, 2 = 3rd harmonic, etc.
+    int n = harmonic_idx + 1; // harmonic number (1, 2, 3, ...)
+
+    switch (waveform) {
+        case WAVE_SHAPE_SINE:
+            // Pure fundamental only
+            return (harmonic_idx == 0) ? 1.0f : 0.0f;
+
+        case WAVE_SHAPE_SAWTOOTH:
+            // All harmonics: amplitude = 1/n
+            return 1.0f / (float)n;
+
+        case WAVE_SHAPE_SQUARE:
+            // Odd harmonics only: amplitude = 1/n
+            return (n % 2 == 1) ? (1.0f / (float)n) : 0.0f;
+
+        case WAVE_SHAPE_TRIANGLE:
+            // Odd harmonics only: amplitude = 1/n²
+            if (n % 2 == 0) return 0.0f;
+            return 1.0f / (float)(n * n);
+
+        case WAVE_SHAPE_PULSE_25:
+            // Pulse wave (25% duty): complex harmonic pattern
+            // For simplicity: all harmonics with sin(πn/4)/(πn/4) envelope
+            {
+                float duty = 0.25f;
+                float sinc = sinf(M_PI * n * duty) / (M_PI * n * duty);
+                return fabsf(sinc) * (1.0f / (float)n);
+            }
+
+        case WAVE_SHAPE_PULSE_10:
+            // Pulse wave (10% duty): narrower pulse, more harmonics
+            {
+                float duty = 0.10f;
+                float sinc = sinf(M_PI * n * duty) / (M_PI * n * duty);
+                return fabsf(sinc) * (1.0f / (float)n);
+            }
+
+        default:
+            // Fallback to sine
+            return (harmonic_idx == 0) ? 1.0f : 0.0f;
+    }
+}
+
 // ============================================================================
 // Complex Math Helpers
 // ============================================================================
@@ -98,13 +143,14 @@ void modal_node_init(modal_node_t* node, uint8_t node_id, node_personality_t per
         node->modes[k].a = real + I * imag;
         node->modes[k].a_dot = 0.0f;
         node->modes[k].params.active = false;
-        node->modes[k].params.shape = WAVE_SHAPE_SINE;  // Default to sine wave
+        node->modes[k].params.shape = WAVE_SHAPE_SINE;  // Legacy parameter (now unused)
     }
 
     node->coupling_strength = 0.3f;
     node->global_damping = 0.0f;  // No extra damping by default
     node->carrier_freq_hz = 440.0f;
     node->audio_gain = 0.7f;
+    node->excitation_waveform = WAVE_SHAPE_SINE;  // Default: pure sine excitation (fundamental only)
     node->running = false;
     node->step_count = 0;
 }
@@ -179,7 +225,11 @@ void modal_node_step(modal_node_t* node) {
                 phase = random_phase();
             }
 
-            float strength = node->excitation.strength * mode->params.weight;
+            // Apply waveform-based spectral shaping
+            // This distributes excitation energy according to harmonic content
+            float harmonic_amplitude = waveform_harmonic_amplitude(node->excitation_waveform, k);
+
+            float strength = node->excitation.strength * mode->params.weight * harmonic_amplitude;
             excitation_term = strength * envelope * cexp_i(phase);
         }
 
@@ -209,14 +259,24 @@ void modal_node_apply_poke(modal_node_t* node, const poke_event_t* poke) {
     node->excitation.active = true;
 
     // For immediate effect, also add a small kick to active modes
+    // Apply waveform-based spectral shaping to preserve physical model
     for (int k = 0; k < MAX_MODES; k++) {
         if (!node->modes[k].params.active) continue;
 
-        float weight = poke->mode_weights[k];
+        // Get base weight from poke event
+        float base_weight = poke->mode_weights[k];
+
+        // Apply harmonic amplitude based on excitation waveform
+        // This is where "waveform selection" happens - via spectral shaping of drive
+        float harmonic_amplitude = waveform_harmonic_amplitude(node->excitation_waveform, k);
+
+        // Combined weight: poke weight × waveform spectral shape
+        float effective_weight = base_weight * harmonic_amplitude;
+
         float phase = (poke->phase_hint < 0.0f) ? random_phase() : poke->phase_hint;
 
-        // Small immediate kick
-        float kick_strength = poke->strength * weight * 0.1f;
+        // Small immediate kick with spectral shaping
+        float kick_strength = poke->strength * effective_weight * 0.1f;
         node->modes[k].a += kick_strength * cexp_i(phase);
     }
 }

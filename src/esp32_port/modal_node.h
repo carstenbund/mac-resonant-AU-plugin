@@ -111,11 +111,14 @@ typedef struct {
     excitation_envelope_t excitation;   ///< Current excitation envelope
 
     float coupling_strength;            ///< Global coupling coefficient
+    float global_damping;               ///< Global damping coefficient (added to all modes)
     uint8_t num_neighbors;              ///< Number of connected neighbors
     uint8_t neighbor_ids[MAX_NEIGHBORS];///< Neighbor node IDs
 
     float carrier_freq_hz;              ///< Base audio frequency (Hz)
     float audio_gain;                   ///< Master output gain [0,1]
+
+    wave_shape_t excitation_waveform;   ///< Waveform for spectral shaping of drive (affects excitation distribution)
 
     uint32_t step_count;                ///< Simulation step counter
     bool running;                       ///< Node running flag
@@ -261,6 +264,20 @@ float freq_to_omega(float freq_hz);
  * @return Random phase in radians
  */
 float random_phase(void);
+
+/**
+ * @brief Get harmonic amplitude for waveform spectral shaping
+ *
+ * Returns the relative amplitude for a given harmonic index based on
+ * the waveform type. This is used for physically-correct drive shaping:
+ * - Resonator modes stay sinusoidal (eigenmodes)
+ * - Waveform selection affects excitation spectral distribution
+ *
+ * @param waveform Waveform type
+ * @param harmonic_idx Harmonic index (0 = fundamental, 1 = 2nd harmonic, etc.)
+ * @return Relative amplitude [0, 1] for this harmonic
+ */
+float waveform_harmonic_amplitude(wave_shape_t waveform, int harmonic_idx);
 
 #ifdef __cplusplus
 }
