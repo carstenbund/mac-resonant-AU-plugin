@@ -164,9 +164,9 @@ public:
 
     /**
      * @brief Set node personality
-     * @param personality Resonator or self-oscillator
+     * @param personality Continuous value (0.0 to 1.0)
      */
-    void setPersonality(node_personality_t personality);
+    void setPersonality(float personality);
 
     /**
      * @brief Set global damping coefficient

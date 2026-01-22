@@ -500,10 +500,9 @@ let ModalAttractorsExtensionParameterSpecs = ParameterTreeSpec {
             address: ModalAttractorsExtensionParameterAddress.param_Personality,
             identifier: "personality",
             name: "Personality",
-            units: .indexed,
-            valueRange: 0...1,
-            defaultValue: 0,
-            valueStrings: ["Resonator", "Self-Oscillator"]
+            units: .generic,
+            valueRange: 0.0...1.0,
+            defaultValue: 0.0
         )
     }
 }

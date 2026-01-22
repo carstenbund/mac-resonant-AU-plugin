@@ -21,8 +21,8 @@ ModalVoice::ModalVoice(uint8_t voice_id)
     , fadeout_total_samples_(0)
     , fadeout_gain_(1.0f)
 {
-    // Initialize node with resonator personality by default
-    modal_node_init(&node_, voice_id, PERSONALITY_RESONATOR);
+    // Initialize node with resonator personality by default (0.0)
+    modal_node_init(&node_, voice_id, 0.0f);
 }
 
 ModalVoice::~ModalVoice() {
@@ -185,7 +185,7 @@ void ModalVoice::setMode(uint8_t mode_idx, float freq_hz, float damping, float w
     modal_node_set_mode(&node_, mode_idx, omega, damping, weight);
 }
 
-void ModalVoice::setPersonality(node_personality_t personality) {
+void ModalVoice::setPersonality(float personality) {
     node_.personality = personality;
 }
 
@@ -230,8 +230,8 @@ void ModalVoice::updateState() {
             break;
 
         case State::Attack:
-            // Transition to sustain if self-oscillator, else stay in attack
-            if (node_.personality == PERSONALITY_SELF_OSCILLATOR) {
+            // Transition to sustain if personality is high enough (> 0.5 = self-oscillator)
+            if (node_.personality > 0.5f) {
                 state_ = State::Sustain;
             }
             // Resonator stays in attack until release
