@@ -49,12 +49,20 @@ typedef struct {
 // ============================================================================
 
 /**
- * @brief Node personality types
+ * @brief Node personality types (legacy compatibility)
  */
 typedef enum {
     PERSONALITY_RESONATOR,      ///< Decays to silence (percussive)
     PERSONALITY_SELF_OSCILLATOR ///< Continuous sound (drone)
 } node_personality_t;
+
+/**
+ * @brief Personality is now a continuous parameter (0.0 to 1.0)
+ * 0.0 = Pure resonator (natural decay)
+ * 0.0-0.5 = Resonator with increasing self-drive (sustained resonance)
+ * 0.5-1.0 = Transition to Van der Pol self-oscillator
+ * 1.0 = Full self-oscillating mode
+ */
 
 /**
  * @brief Oscillator wave shapes
@@ -105,7 +113,7 @@ typedef struct {
  */
 typedef struct {
     uint8_t node_id;                    ///< Unique node identifier
-    node_personality_t personality;      ///< Resonator or self-oscillator
+    float personality;                   ///< Continuous personality (0.0 = resonator, 1.0 = self-oscillator)
 
     mode_state_t modes[MAX_MODES];      ///< 4 complex modes
     excitation_envelope_t excitation;   ///< Current excitation envelope
@@ -141,9 +149,9 @@ typedef struct {
  *
  * @param node Pointer to node structure
  * @param node_id Unique node identifier
- * @param personality Node personality type
+ * @param personality Node personality (0.0 to 1.0)
  */
-void modal_node_init(modal_node_t* node, uint8_t node_id, node_personality_t personality);
+void modal_node_init(modal_node_t* node, uint8_t node_id, float personality);
 
 /**
  * @brief Configure a single mode

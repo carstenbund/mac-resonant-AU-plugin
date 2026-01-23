@@ -85,7 +85,7 @@ static inline float carg_f(float complex z) {
 // Modal Node Core
 // ============================================================================
 
-void modal_node_init(modal_node_t* node, uint8_t node_id, node_personality_t personality) {
+void modal_node_init(modal_node_t* node, uint8_t node_id, float personality) {
     memset(node, 0, sizeof(modal_node_t));
 
     node->node_id = node_id;
@@ -148,15 +148,28 @@ void modal_node_step(modal_node_t* node) {
         float omega = mode->params.omega;
         float gamma = mode->params.gamma;
 
-        // Personality-specific dynamics
+        // Continuous personality-based dynamics (0.0 to 1.0)
         float effective_gamma = gamma;
-        if (node->personality == PERSONALITY_SELF_OSCILLATOR) {
-            // Self-oscillator: negative damping at low energy, positive at high
+        float personality = node->personality;
+
+        if (personality <= 0.5f) {
+            // Resonator with increasing self-drive (0.0 to 0.5)
+            // At 0.0: pure resonator (no offset)
+            // At 0.5: maximum negative offset (strong sustain)
+            float self_drive = personality * 2.0f; // Maps 0.0→0.5 to 0.0→1.0
+            effective_gamma = gamma - self_drive * 0.6f * gamma;
+        } else {
+            // Blend to Van der Pol self-oscillator (0.5 to 1.0)
+            float blend = (personality - 0.5f) * 2.0f; // Maps 0.5→1.0 to 0.0→1.0
+
+            // Van der Pol calculation
             float energy = cabsf(mode->a);
             float saturation_level = 1.0f;
+            float vdp_gamma = -gamma + 3.0f * gamma * (energy * energy) / (saturation_level * saturation_level);
 
-            // Van der Pol-like: γ_eff = -γ + β*|a|²
-            effective_gamma = -gamma + 3.0f * gamma * (energy * energy) / (saturation_level * saturation_level);
+            // Blended gamma: interpolate between sustained resonator and Van der Pol
+            float sustained_gamma = gamma - 0.6f * gamma;
+            effective_gamma = (1.0f - blend) * sustained_gamma + blend * vdp_gamma;
         }
 
         // Apply global damping (circuit energy control)

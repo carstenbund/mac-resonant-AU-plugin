@@ -283,17 +283,54 @@ struct CharacterEditorTabView: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
 
-            Picker("Personality", selection: Binding(
-                get: { Int(parameterTree.voice.personality.value) },
-                set: { parameterTree.voice.personality.value = Float($0) }
-            )) {
-                if let valueStrings = parameterTree.voice.personality.valueStrings {
-                    ForEach(0..<valueStrings.count, id: \.self) { index in
-                        Text(valueStrings[index]).tag(index)
+            VStack(alignment: .leading, spacing: UIConstants.Spacing.small) {
+                HStack {
+                    Text("Oscillation Mode")
+                        .font(UIConstants.Fonts.parameterLabel)
+                        .foregroundColor(UIConstants.Colors.textSecondary)
+
+                    Spacer()
+
+                    Text(personalityLabel(parameterTree.voice.personality.value))
+                        .font(UIConstants.Fonts.parameterValue)
+                        .foregroundColor(UIConstants.Colors.accent)
+                }
+
+                Slider(value: $parameterTree.voice.personality.value,
+                       in: 0.0...1.0)
+
+                // Detailed range descriptions
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack {
+                        Text("0.0 - 0.2")
+                            .font(.caption2)
+                            .foregroundColor(UIConstants.Colors.textSecondary)
+                            .frame(width: 60, alignment: .leading)
+                        Text("Pure resonator (natural decay)")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                    HStack {
+                        Text("0.2 - 0.5")
+                            .font(.caption2)
+                            .foregroundColor(UIConstants.Colors.textSecondary)
+                            .frame(width: 60, alignment: .leading)
+                        Text("Sustained resonance (self-drive)")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                    HStack {
+                        Text("0.5 - 1.0")
+                            .font(.caption2)
+                            .foregroundColor(UIConstants.Colors.textSecondary)
+                            .frame(width: 60, alignment: .leading)
+                        Text("Self-oscillator (Van der Pol)")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
                     }
                 }
+                .padding(.top, 4)
             }
-            .pickerStyle(.segmented)
         }
         .padding()
         .background(UIConstants.Colors.sectionBackground)
@@ -399,6 +436,20 @@ struct CharacterEditorTabView: View {
 
         // Clear the name
         presetName = ""
+    }
+
+    /// Generate descriptive label for personality value
+    private func personalityLabel(_ value: Float) -> String {
+        switch value {
+        case 0.0..<0.2:
+            return String(format: "%.2f (Decay)", value)
+        case 0.2..<0.5:
+            return String(format: "%.2f (Sustain)", value)
+        case 0.5..<0.8:
+            return String(format: "%.2f (Active)", value)
+        default:
+            return String(format: "%.2f (Self-Osc)", value)
+        }
     }
 }
 

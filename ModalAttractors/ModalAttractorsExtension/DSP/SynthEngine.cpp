@@ -260,8 +260,15 @@ void SynthEngine::processEvent(const SynthEvent& event) {
             break;
 
         case EventType::CC:
-            // Handle CC messages if needed
-            // Could map to parameters
+            // Handle CC messages
+            if (event.cc.cc == 1) {
+                // CC1 = Mod Wheel: controls global damping
+                // Map 0.0-1.0 to damping range 0.0-2.0
+                // When mod wheel is down (0.0), max damping kills oscillations
+                // When mod wheel is up (1.0), no extra damping allows full oscillation
+                float damping = (1.0f - event.cc.value) * 2.0f;
+                nodeManager_->setGlobalDamping(damping);
+            }
             break;
 
         case EventType::Parameter:
