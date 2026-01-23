@@ -31,8 +31,10 @@ struct VoiceControlsView: View {
                         .foregroundColor(UIConstants.Colors.accent)
                 }
 
-                Slider(value: $parameterTree.voice.personality.value,
-                       in: 0.0...1.0)
+                Slider(value: Binding(
+                    get: { parameterTree.voice.personality.value },
+                    set: { parameterTree.voice.personality.value = $0 }
+                ), in: 0.0...1.0)
 
                 // Range labels
                 HStack {
