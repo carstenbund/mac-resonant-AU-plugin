@@ -78,6 +78,12 @@ struct CharacterEditorTabView: View {
             }
             .padding()
         }
+        .background(
+            Image("editor-tab-background")
+                .resizable()
+                .scaledToFill()
+                .clipped()
+        )
     }
 
     // MARK: - Node Selector Section
