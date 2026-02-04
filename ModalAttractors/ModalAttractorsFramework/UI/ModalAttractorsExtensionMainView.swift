@@ -105,11 +105,15 @@ struct MainTabView: View {
             .padding()
         }
         .background(
-            Image("main-tab-background")
-                .resizable()
-                .scaledToFill()
-                .clipped()
+            GeometryReader { geo in
+                Image("main-tab-background")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .clipped()
+            }
         )
+        .clipped()
     }
 }
 
