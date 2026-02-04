@@ -13,18 +13,18 @@ import SwiftUI
 /// Main parameter tree wrapper for SwiftUI integration
 /// This bridges the AU parameter tree to SwiftUI's observable system
 public class ParameterTree: ObservableObject {
-    public let global: GlobalParameters
-    public let nodeCharacters: NodeCharacterParameters
-    public let routing: RoutingParameters
-    public let mode0: ModeParameters
-    public let mode1: ModeParameters
-    public let mode2: ModeParameters
-    public let mode3: ModeParameters
-    public let mode4: ModeParameters
-    public let mode5: ModeParameters
-    public let excitation: ExcitationParameters
-    public let voice: VoiceParameters
-    public let characterEditorState: CharacterEditorStateParameters
+    public var global: GlobalParameters
+    public var nodeCharacters: NodeCharacterParameters
+    public var routing: RoutingParameters
+    public var mode0: ModeParameters
+    public var mode1: ModeParameters
+    public var mode2: ModeParameters
+    public var mode3: ModeParameters
+    public var mode4: ModeParameters
+    public var mode5: ModeParameters
+    public var excitation: ExcitationParameters
+    public var voice: VoiceParameters
+    public var characterEditorState: CharacterEditorStateParameters
 
     private let auParameterTree: AUParameterTree
 
