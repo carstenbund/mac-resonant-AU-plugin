@@ -79,11 +79,15 @@ struct CharacterEditorTabView: View {
             .padding()
         }
         .background(
-            Image("editor-tab-background")
-                .resizable()
-                .scaledToFill()
-                .clipped()
+            GeometryReader { geo in
+                Image("editor-tab-background")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .clipped()
+            }
         )
+        .clipped()
     }
 
     // MARK: - Node Selector Section
