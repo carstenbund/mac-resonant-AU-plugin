@@ -57,6 +57,12 @@ public struct ModalAttractorsExtensionMainView: View {
         }
         .padding(12)
         .frame(minWidth: 520, minHeight: 400)
+        .background(
+            Image("panel-background")
+                .resizable()
+                .scaledToFill()
+                .clipped()
+        )
     }
 }
 
