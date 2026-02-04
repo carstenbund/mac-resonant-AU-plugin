@@ -102,18 +102,14 @@ struct MainTabView: View {
                 DriveControlsView()
             }
             .padding()
-        }
-        .background(
-            GeometryReader { geo in
+            .background(
                 Image("main-tab-background")
                     .resizable()
                     .scaledToFill()
-                    .frame(width: geo.size.width, height: geo.size.height)
-                    .clipped()
-            }
-            .allowsHitTesting(false)
-        )
-        .clipped()
+                    .allowsHitTesting(false)
+            )
+            .clipped()
+        }
     }
 }
 
