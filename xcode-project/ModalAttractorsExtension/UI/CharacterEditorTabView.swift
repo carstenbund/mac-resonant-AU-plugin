@@ -86,6 +86,7 @@ struct CharacterEditorTabView: View {
                     .frame(width: geo.size.width, height: geo.size.height)
                     .clipped()
             }
+            .allowsHitTesting(false)
         )
         .clipped()
     }
